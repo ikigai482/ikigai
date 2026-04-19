@@ -2545,6 +2545,14 @@
     <div style="display:flex;flex-direction:column;gap:8px" id="modules-list"></div>
   </div>
 
+  <!-- Sync Firebase -->
+  <div class="card" style="margin-bottom:20px;border:1px solid rgba(66,133,244,0.3);background:linear-gradient(135deg,rgba(66,133,244,0.06),rgba(52,168,83,0.04))">
+    <div class="card-title">☁️ Synchronisation cloud</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:12px">Connecte-toi pour accéder à tes données depuis n'importe quel appareil.</div>
+    <div id="firebase-status" style="font-size:12px;margin-bottom:12px;color:var(--muted)">Chargement...</div>
+    <button id="firebase-btn" onclick="window._fbSignIn && window._fbSignIn()" class="btn" style="width:100%">🔵 Connexion Google</button>
+  </div>
+
   <!-- Mode Mobile -->
   <div class="card" style="margin-bottom:20px">
     <div class="card-title">Mode Mobile 📱</div>
@@ -2912,6 +2920,70 @@ body:has(#s-focus.active) { overflow: hidden; }
 body:has(#s-focus.active) .main { overflow: hidden; padding: 0; }
 </style>
 
+<script type="module">
+// ==================== FIREBASE ====================
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import { getFirestore, doc, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBST5bTy6jx6eIRQgvgPWp6kuhxqwqoYHA",
+  authDomain: "ikigai-44a18.firebaseapp.com",
+  projectId: "ikigai-44a18",
+  storageBucket: "ikigai-44a18.firebasestorage.app",
+  messagingSenderId: "713106083032",
+  appId: "1:713106083032:web:2ac239ec71d119fb215bad"
+};
+
+const app  = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db   = getFirestore(app);
+
+window._fbAuth = auth;
+window._fbDb   = db;
+window._fbDoc  = doc;
+window._fbSetDoc = setDoc;
+window._fbGetDoc = getDoc;
+window._fbSignIn = () => signInWithPopup(auth, new GoogleAuthProvider());
+window._fbSignOut = () => signOut(auth);
+
+onAuthStateChanged(auth, async (user) => {
+  window._fbUser = user;
+  const btn = document.getElementById('firebase-btn');
+  const status = document.getElementById('firebase-status');
+
+  if (user) {
+    if (btn) { btn.textContent = '🔴 Se déconnecter'; btn.onclick = window._fbSignOut; }
+    if (status) status.innerHTML = `<span style="color:var(--success)">✅ Connecté : ${user.displayName}</span>`;
+    // Charger les données depuis Firebase
+    try {
+      const snap = await getDoc(doc(db, 'users', user.uid, 'data', 'main'));
+      if (snap.exists()) {
+        const firebaseData = snap.data();
+        // Fusionner avec localStorage (Firebase prioritaire)
+        Object.assign(window._appData, firebaseData);
+        if (typeof renderDashboard === 'function') renderDashboard();
+        if (typeof updateXPWidget === 'function') updateXPWidget();
+        if (typeof applyModules === 'function') applyModules();
+        if (typeof updateDashboardGreeting === 'function') updateDashboardGreeting();
+        console.log('✅ Données chargées depuis Firebase');
+      }
+    } catch(e) { console.log('Firebase load error:', e); }
+  } else {
+    if (btn) { btn.textContent = '🔵 Connexion Google'; btn.onclick = window._fbSignIn; }
+    if (status) status.innerHTML = `<span style="color:var(--muted)">Non connecté — données locales uniquement</span>`;
+  }
+});
+
+// Sauvegarde Firebase (appelée après chaque save())
+window._fbSave = async () => {
+  if (!window._fbUser || !window._appData) return;
+  try {
+    await setDoc(doc(db, 'users', window._fbUser.uid, 'data', 'main'), window._appData);
+  } catch(e) { console.log('Firebase save error:', e); }
+};
+</script>
+
 <script>
 // ==================== DATA LAYER ====================
 const STORE_KEY = 'mavie_v1';
@@ -2933,9 +3005,13 @@ let data = {
 
 function load() {
   try { const s = localStorage.getItem(STORE_KEY); if (s) data = JSON.parse(s); } catch(e) {}
+  window._appData = data;
 }
 function save() {
   try { localStorage.setItem(STORE_KEY, JSON.stringify(data)); } catch(e) {}
+  window._appData = data;
+  // Sync Firebase en arrière-plan
+  if (window._fbSave) window._fbSave();
 }
 load();
 
@@ -3835,117 +3911,178 @@ async function loadWeather() {
 
 // ==================== DASHBOARD IA ====================
 async function generateAIDashboard() {
-  const btn = document.getElementById('ai-dash-btn');
+  const btn     = document.getElementById('ai-dash-btn');
   const content = document.getElementById('ai-dashboard-content');
-  const ts = document.getElementById('ai-dash-timestamp');
+  const ts      = document.getElementById('ai-dash-timestamp');
   if (!btn || !content) return;
 
   btn.textContent = '⟳ Analyse...';
   btn.disabled = true;
 
-  // Skeleton
+  // Skeleton animé
   content.innerHTML = `<div style="display:flex;flex-direction:column;gap:10px">
-    ${[1,2,3].map(()=>`<div style="height:14px;background:var(--bg3);border-radius:6px;animation:pulse 1.5s ease-in-out infinite;width:${70+Math.random()*25}%"></div>`).join('')}
+    <div style="height:14px;background:var(--bg3);border-radius:6px;animation:pulse 1.5s ease-in-out infinite;width:85%"></div>
+    <div style="height:14px;background:var(--bg3);border-radius:6px;animation:pulse 1.5s ease-in-out infinite;width:70%"></div>
+    <div style="height:14px;background:var(--bg3);border-radius:6px;animation:pulse 1.5s ease-in-out infinite;width:90%"></div>
   </div>`;
 
-  // Collecter les données
-  const today_key = today();
-  const hab = data.habitudes || [];
-  const doneHab = hab.filter(h => data.habitDone?.[today_key + h.id]).length;
-  const objJour = (data.objectifs?.jour || []);
-  const doneObj = objJour.filter(o => o.done).length;
-  const eau = (data.trackers?.[today_key + '_eau'] || 0);
-  const sommeil = (data.trackers?.[today_key + '_sommeil'] || 0);
-  const pas = (data.trackers?.[today_key + '_pas'] || 0);
+  await new Promise(r => setTimeout(r, 600)); // Petite pause pour l'effet
+
+  // ===== COLLECTE DES DONNÉES =====
+  const today_key  = today();
+  const heure      = new Date().getHours();
+  const hab        = data.habitudes || [];
+  const doneHab    = hab.filter(h => data.habitDone?.[today_key + h.id]).length;
+  const totalHab   = hab.length;
+  const pctHab     = totalHab > 0 ? Math.round(doneHab / totalHab * 100) : 0;
+  const objJour    = (data.objectifs?.jour || []);
+  const doneObj    = objJour.filter(o => o.done).length;
+  const eau        = data.trackers?.[today_key + '_eau'] || 0;
+  const sommeil    = parseFloat(data.trackers?.[today_key + '_sommeil'] || 0);
+  const pas        = data.trackers?.[today_key + '_pas'] || 0;
   const { streak, best } = calcStreakData();
-  const recentMoods = (data.journal || []).slice(0, 5).map(j => `${j.mood} (${j.score}/10)`).join(', ');
-  const feeling = data.morning?.feeling || '';
-  const morningNote = data.morning?.note || '';
+  const feeling    = data.morning?.feeling || '';
+  const xpTotal    = data.xp?.total || 0;
+  const xpToday    = data.xp?.today || 0;
+  const lvl        = getLevelInfo(xpTotal);
+  const focusSess  = data.xp?.focusSessions || 0;
+  const lastJournal= (data.journal || [])[0];
+  const prenom     = data.profil?.prenom || '';
+  const objectifCorps = data.profil?.['objectif-corps'] || 'maintien';
 
-  const prompt = `Tu es un coach de vie bienveillant. Voici les données du jour de l'utilisateur :
+  // ===== CALCUL DU SCORE =====
+  let score = 50;
+  if (totalHab > 0) score += pctHab * 0.2;           // +20 max si toutes habitudes
+  if (doneObj > 0)  score += Math.min(doneObj * 5, 15); // +15 max objectifs
+  if (eau >= 1500)  score += 5;
+  if (eau >= 2000)  score += 5;
+  if (sommeil >= 7) score += 10;
+  if (streak >= 7)  score += 10;
+  if (streak >= 30) score += 5;
+  if (xpToday >= 50) score += 5;
+  score = Math.round(Math.min(100, Math.max(0, score)));
 
-- Habitudes complétées : ${doneHab}/${hab.length}
-- Objectifs du jour : ${doneObj}/${objJour.length} accomplis
-- Eau bue : ${eau}ml / 2000ml
-- Sommeil : ${sommeil}h / 8h
-- Pas : ${pas.toLocaleString()} / 10 000
-- Streak actuel : ${streak} jours (record : ${best})
-- Humeur récente : ${recentMoods || 'pas de données'}
-- Ressenti ce matin : ${feeling} ${morningNote}
-- Heure : ${new Date().getHours()}h
+  // ===== ÉNERGIE =====
+  let energie = 'moyenne';
+  if (score >= 70 || sommeil >= 7.5) energie = 'haute';
+  if (score < 40 || sommeil < 5)     energie = 'basse';
+  const energyColor = { haute:'var(--success)', moyenne:'var(--accent)', basse:'var(--danger)' }[energie];
+  const energyEmoji = { haute:'⚡', moyenne:'🔆', basse:'🌙' }[energie];
+  const scoreColor  = score >= 70 ? 'var(--success)' : score >= 40 ? 'var(--accent)' : 'var(--danger)';
 
-Génère une analyse courte et personnalisée en JSON (sans markdown) :
-{
-  "salutation": "phrase d'accroche chaleureuse et personnalisée (1 phrase)",
-  "analyse": "analyse honnête de ses données du jour (2-3 phrases, sois direct et précis)",
-  "point_fort": "ce qui va bien aujourd'hui (1 phrase courte)",
-  "conseil": "1 conseil concret et actionnable pour améliorer sa journée",
-  "energie": "haute|moyenne|basse",
-  "score_jour": nombre entre 0 et 100
-}`;
+  // ===== SALUTATION =====
+  const prenomStr = prenom ? ` ${prenom}` : '';
+  const salutations = {
+    matin: [`Bonne matinée${prenomStr} ! La journée commence, tout est possible.`,
+             `C'est parti${prenomStr} ! Une nouvelle journée pour avancer vers tes objectifs.`],
+    aprem:  [`Tu es en plein milieu de ta journée${prenomStr} — comment ça se passe ?`,
+             `Après-midi${prenomStr} ! C'est le bon moment pour un point sur ta journée.`],
+    soir:   [`Belle soirée${prenomStr} ! C'est le moment de faire le bilan de ta journée.`,
+             `La journée tire à sa fin${prenomStr}. Voyons ce que tu as accompli.`],
+  };
+  const period = heure < 13 ? 'matin' : heure < 19 ? 'aprem' : 'soir';
+  const salutation = salutations[period][Math.floor(Math.random() * 2)];
 
-  try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 600,
-        system: 'Tu es un coach de vie. Réponds UNIQUEMENT en JSON valide sans markdown.',
-        messages: [{ role: 'user', content: prompt }]
-      })
-    });
-    const d = await res.json();
-    const text = d.content?.[0]?.text?.replace(/```json|```/g,'').trim() || '{}';
-    const ai = JSON.parse(text);
+  // ===== ANALYSE =====
+  const analyseParties = [];
 
-    const energyColor = { haute: 'var(--success)', moyenne: 'var(--accent)', basse: 'var(--danger)' }[ai.energie] || 'var(--accent)';
-    const energyEmoji = { haute: '⚡', moyenne: '🔆', basse: '🌙' }[ai.energie] || '🔆';
-    const score = Math.max(0, Math.min(100, ai.score_jour || 50));
-    const scoreColor = score >= 70 ? 'var(--success)' : score >= 40 ? 'var(--accent)' : 'var(--danger)';
-
-    content.innerHTML = `
-      <div style="margin-bottom:14px;padding:12px 14px;background:rgba(160,96,255,0.06);border-radius:10px;border-left:3px solid #a060ff">
-        <div style="font-size:14px;color:var(--text);font-style:italic">"${ai.salutation}"</div>
-      </div>
-
-      <div style="display:grid;grid-template-columns:1fr auto;gap:12px;margin-bottom:14px;align-items:start">
-        <div style="font-size:13px;color:var(--muted);line-height:1.6">${ai.analyse}</div>
-        <div style="text-align:center;min-width:70px">
-          <div style="font-family:var(--font-mono);font-size:28px;font-weight:600;color:${scoreColor}">${score}</div>
-          <div style="font-size:10px;color:var(--muted)">score / 100</div>
-        </div>
-      </div>
-
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
-        <div style="padding:10px 12px;background:rgba(64,208,160,0.06);border-radius:10px;border:1px solid rgba(64,208,160,0.15)">
-          <div style="font-size:11px;color:var(--success);font-weight:500;margin-bottom:4px">✅ Point fort</div>
-          <div style="font-size:12px;color:var(--text)">${ai.point_fort}</div>
-        </div>
-        <div style="padding:10px 12px;background:rgba(200,169,110,0.06);border-radius:10px;border:1px solid rgba(200,169,110,0.15)">
-          <div style="font-size:11px;color:var(--accent);font-weight:500;margin-bottom:4px">💡 Conseil</div>
-          <div style="font-size:12px;color:var(--text)">${ai.conseil}</div>
-        </div>
-      </div>
-
-      <div style="display:flex;align-items:center;justify-content:space-between">
-        <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:${energyColor}">
-          ${energyEmoji} Énergie <strong>${ai.energie}</strong>
-        </div>
-        <div style="font-size:11px;color:var(--muted)">Généré à ${new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}</div>
-      </div>`;
-
-    if (ts) ts.textContent = `Dernière analyse : ${new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}`;
-
-  } catch(e) {
-    content.innerHTML = `<div style="color:var(--danger);font-size:13px;padding:12px">Erreur : ${e.message}<br><small style="color:var(--muted)">${e.stack?.split('\n')[0] || ''}</small></div>`;
-    console.error('AI Dashboard error:', e);
+  // Habitudes
+  if (totalHab === 0) {
+    analyseParties.push('Tu n\'as pas encore créé d\'habitudes — c\'est le meilleur moment pour commencer !');
+  } else if (pctHab === 100) {
+    analyseParties.push(`🔥 Toutes tes habitudes sont cochées (${doneHab}/${totalHab}) — journée parfaite !`);
+  } else if (pctHab >= 60) {
+    analyseParties.push(`Tu as complété ${doneHab}/${totalHab} habitudes (${pctHab}%) — bon début, ${totalHab - doneHab} restante${totalHab - doneHab > 1 ? 's' : ''}.`);
+  } else {
+    analyseParties.push(`Seulement ${doneHab}/${totalHab} habitudes cochées aujourd'hui — tu peux encore rattraper ça !`);
   }
 
-  btn.textContent = '✦ Actualiser';
+  // Streak
+  if (streak >= 30) analyseParties.push(`Ton streak de ${streak} jours est exceptionnel — tu es dans le top des utilisateurs les plus disciplinés.`);
+  else if (streak >= 7) analyseParties.push(`${streak} jours de suite sans faillir — tu construis quelque chose de solide.`);
+  else if (streak === 0) analyseParties.push(`Ton streak est à zéro — chaque légende a recommencé un jour. Aujourd'hui c'est le tien.`);
+
+  // Sommeil
+  if (sommeil > 0) {
+    if (sommeil >= 8) analyseParties.push(`${sommeil}h de sommeil — ton corps est bien récupéré.`);
+    else if (sommeil < 6) analyseParties.push(`Seulement ${sommeil}h de sommeil — ça peut impacter ton énergie et ta concentration aujourd'hui.`);
+  }
+
+  // Eau
+  if (eau >= 2000) analyseParties.push(`Hydratation parfaite (${eau}ml) ✅`);
+  else if (eau > 0 && eau < 1500) analyseParties.push(`Pense à boire plus — tu es à ${eau}ml sur 2000ml recommandés.`);
+
+  const analyse = analyseParties.slice(0, 2).join(' ');
+
+  // ===== POINT FORT =====
+  const pointsForts = [];
+  if (streak >= 7)     pointsForts.push(`Streak impressionnant de ${streak} jours 🔥`);
+  if (pctHab === 100)  pointsForts.push('100% des habitudes complétées ✅');
+  if (eau >= 2000)     pointsForts.push('Hydratation parfaite 💧');
+  if (sommeil >= 7.5)  pointsForts.push(`Excellent sommeil (${sommeil}h) 😴`);
+  if (xpToday >= 50)   pointsForts.push(`${xpToday} XP gagnés aujourd'hui ⭐`);
+  if (doneObj === objJour.length && objJour.length > 0) pointsForts.push('Tous les objectifs du jour accomplis 🎯');
+  const point_fort = pointsForts.length > 0 ? pointsForts[0] : streak > 0 ? `${streak} jour${streak>1?'s':''} de streak — continue !` : 'Tu es là, c\'est déjà un pas.';
+
+  // ===== CONSEIL =====
+  const conseils = [];
+  if (totalHab === 0)       conseils.push('Crée ta première habitude dans la section Habitudes — commence par quelque chose de très simple.');
+  else if (pctHab < 100)    conseils.push(`Il te reste ${totalHab - doneHab} habitude${totalHab-doneHab>1?'s':''} à cocher — prends 5 minutes pour les faire maintenant.`);
+  if (eau < 1500)           conseils.push('Bois un grand verre d\'eau maintenant — l\'hydratation impacte directement ton énergie et ta concentration.');
+  if (objJour.length === 0) conseils.push('Définis 1 à 3 objectifs pour aujourd\'hui dans la section Objectifs — ça donne une direction claire à ta journée.');
+  if (focusSess === 0)      conseils.push('Lance une session Focus de 25 minutes sur ta tâche la plus importante — tu seras surpris de ce que tu peux accomplir.');
+  if (sommeil > 0 && sommeil < 7) conseils.push('Essaie de te coucher 30 minutes plus tôt ce soir — le sommeil est la base de tout le reste.');
+  if (objectifCorps === 'perte') conseils.push('Pense à vérifier tes macros dans ton profil — la régularité nutritionnelle est clé pour la perte de poids.');
+
+  const conseil = conseils[0] || (heure < 12
+    ? 'Commence ta journée par ta tâche la plus importante — après c\'est toujours plus facile.'
+    : heure < 18
+    ? 'Fais une courte session de méditation de 5 minutes pour recharger les batteries.'
+    : 'Prépare ta journée de demain ce soir — 5 minutes de planification = 1h gagnée demain.');
+
+  // ===== AFFICHAGE =====
+  content.innerHTML = `
+    <div style="margin-bottom:14px;padding:12px 14px;background:rgba(160,96,255,0.06);border-radius:10px;border-left:3px solid #a060ff">
+      <div style="font-size:14px;color:var(--text);font-style:italic">"${salutation}"</div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr auto;gap:12px;margin-bottom:14px;align-items:start">
+      <div style="font-size:13px;color:var(--muted);line-height:1.6">${analyse}</div>
+      <div style="text-align:center;min-width:70px">
+        <div style="font-family:var(--font-mono);font-size:28px;font-weight:600;color:${scoreColor}">${score}</div>
+        <div style="font-size:10px;color:var(--muted)">score / 100</div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+      <div style="padding:10px 12px;background:rgba(64,208,160,0.06);border-radius:10px;border:1px solid rgba(64,208,160,0.15)">
+        <div style="font-size:11px;color:var(--success);font-weight:500;margin-bottom:4px">✅ Point fort</div>
+        <div style="font-size:12px;color:var(--text)">${point_fort}</div>
+      </div>
+      <div style="padding:10px 12px;background:rgba(200,169,110,0.06);border-radius:10px;border:1px solid rgba(200,169,110,0.15)">
+        <div style="font-size:11px;color:var(--accent);font-weight:500;margin-bottom:4px">💡 Conseil</div>
+        <div style="font-size:12px;color:var(--text)">${conseil}</div>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+      <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:${energyColor}">
+        ${energyEmoji} Énergie <strong>${energie}</strong>
+      </div>
+      <div style="display:flex;gap:12px;font-size:11px;color:var(--muted)">
+        <span>🔥 ${streak}j streak</span>
+        <span>⭐ Niv.${lvl.level} ${lvl.name}</span>
+        <span>+${xpToday} XP</span>
+      </div>
+    </div>`;
+
+  if (ts) ts.textContent = `Analyse du ${new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}`;
+  btn.textContent = '↻ Actualiser';
   btn.disabled = false;
 }
 
+  // Collecter les données
+  const today_key = today();
 // ==================== DASHBOARD ====================
 const quotes = [
   { t: '"La discipline est le pont entre les objectifs et les accomplissements."', a: 'Jim Rohn' },
