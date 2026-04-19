@@ -2,7 +2,17 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#c8a96e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Ikigai">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="description" content="Ton espace de développement personnel — habitudes, focus, sport, finance et plus.">
 <title>Ikigai — Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
@@ -10840,6 +10850,80 @@ function renderActu() {
 
 // ==================== INIT ====================
 renderDashboard();
+
+// ==================== PWA ====================
+let deferredPrompt = null;
+
+// Enregistrer le Service Worker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js')
+      .then(reg => {
+        console.log('[PWA] Service Worker enregistré ✦', reg.scope);
+        // Vérifier les mises à jour
+        reg.addEventListener('updatefound', () => {
+          const newWorker = reg.installing;
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              showUpdateBanner();
+            }
+          });
+        });
+      })
+      .catch(err => console.log('[PWA] SW erreur:', err));
+  });
+}
+
+// Capturer l'événement d'installation
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  showInstallBanner();
+});
+
+window.addEventListener('appinstalled', () => {
+  console.log('[PWA] App installée !');
+  hideInstallBanner();
+  deferredPrompt = null;
+});
+
+function showInstallBanner() {
+  if (document.getElementById('pwa-install-banner')) return;
+  const banner = document.createElement('div');
+  banner.id = 'pwa-install-banner';
+  banner.style.cssText = `position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--bg2);border:1px solid rgba(200,169,110,.3);border-radius:16px;padding:14px 20px;display:flex;align-items:center;gap:12px;z-index:9999;box-shadow:0 8px 32px rgba(0,0,0,.4);max-width:340px;width:90%`;
+  banner.innerHTML = `
+    <div style="font-size:28px">📱</div>
+    <div style="flex:1">
+      <div style="font-size:13px;font-weight:700;color:var(--text)">Installer Ikigai</div>
+      <div style="font-size:11px;color:var(--muted)">Accès rapide depuis ton écran d'accueil</div>
+    </div>
+    <button onclick="installPWA()" style="background:linear-gradient(135deg,#c8a96e,#a08040);border:none;border-radius:10px;padding:8px 14px;color:#0e0e10;font-weight:700;font-size:12px;cursor:pointer">Installer</button>
+    <button onclick="hideInstallBanner()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px;padding:0 4px">✕</button>`;
+  document.body.appendChild(banner);
+}
+
+function hideInstallBanner() {
+  document.getElementById('pwa-install-banner')?.remove();
+}
+
+async function installPWA() {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  console.log('[PWA] Choix utilisateur:', outcome);
+  deferredPrompt = null;
+  hideInstallBanner();
+}
+
+function showUpdateBanner() {
+  const banner = document.createElement('div');
+  banner.style.cssText = `position:fixed;top:20px;left:50%;transform:translateX(-50%);background:var(--bg2);border:1px solid rgba(200,169,110,.3);border-radius:12px;padding:12px 20px;display:flex;align-items:center;gap:10px;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,.3)`;
+  banner.innerHTML = `
+    <span style="font-size:14px">✦ Nouvelle version disponible</span>
+    <button onclick="window.location.reload()" style="background:var(--accent);border:none;border-radius:8px;padding:6px 12px;color:#0e0e10;font-weight:600;font-size:12px;cursor:pointer">Mettre à jour</button>`;
+  document.body.appendChild(banner);
+}
 </script>
 </body>
 </html>
