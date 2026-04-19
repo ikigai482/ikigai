@@ -396,6 +396,69 @@
 </style>
 </head>
 <body>
+
+<!-- ===== PAGE LOGIN ===== -->
+<div id="login-page" style="position:fixed;inset:0;background:#0a0a0f;display:flex;align-items:center;justify-content:center;z-index:9999;flex-direction:column">
+
+  <!-- Fond animé -->
+  <div style="position:absolute;inset:0;overflow:hidden;pointer-events:none">
+    <div style="position:absolute;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(160,96,255,0.15),transparent);top:-100px;left:-100px;animation:float1 8s ease-in-out infinite"></div>
+    <div style="position:absolute;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(200,169,110,0.1),transparent);bottom:-50px;right:-50px;animation:float2 10s ease-in-out infinite"></div>
+  </div>
+
+  <style>
+    @keyframes float1 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(40px,30px)} }
+    @keyframes float2 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-30px,-20px)} }
+    @keyframes loginShake { 0%,100%{transform:translateX(0)} 20%,60%{transform:translateX(-8px)} 40%,80%{transform:translateX(8px)} }
+    #login-box { animation: none; }
+    #login-box.shake { animation: loginShake 0.4s ease; }
+  </style>
+
+  <!-- Logo -->
+  <div style="text-align:center;margin-bottom:32px;position:relative;z-index:1">
+    <div style="font-size:56px;margin-bottom:8px">✦</div>
+    <div style="font-size:32px;font-weight:800;color:#fff;letter-spacing:.05em">IKIGAI</div>
+    <div style="font-size:13px;color:rgba(255,255,255,0.4);margin-top:4px">Ton espace de développement personnel</div>
+  </div>
+
+  <!-- Carte login -->
+  <div id="login-box" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:36px 40px;width:100%;max-width:380px;backdrop-filter:blur(20px);position:relative;z-index:1">
+    <div style="font-size:18px;font-weight:700;color:#fff;margin-bottom:6px;text-align:center">Connexion</div>
+    <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:24px;text-align:center">Entre tes identifiants pour accéder à Ikigai</div>
+
+    <div style="margin-bottom:14px">
+      <label style="font-size:12px;color:rgba(255,255,255,0.5);display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em">Identifiant</label>
+      <input id="login-user" type="text" placeholder="Ton identifiant" autocomplete="username"
+        style="width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:12px 14px;color:#fff;font-size:14px;outline:none;box-sizing:border-box;transition:border .2s"
+        onfocus="this.style.borderColor='rgba(160,96,255,0.6)'" onblur="this.style.borderColor='rgba(255,255,255,0.12)'"
+        onkeydown="if(event.key==='Enter')document.getElementById('login-pass').focus()">
+    </div>
+
+    <div style="margin-bottom:20px">
+      <label style="font-size:12px;color:rgba(255,255,255,0.5);display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em">Mot de passe</label>
+      <div style="position:relative">
+        <input id="login-pass" type="password" placeholder="Ton mot de passe" autocomplete="current-password"
+          style="width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:12px 14px;padding-right:44px;color:#fff;font-size:14px;outline:none;box-sizing:border-box;transition:border .2s"
+          onfocus="this.style.borderColor='rgba(160,96,255,0.6)'" onblur="this.style.borderColor='rgba(255,255,255,0.12)'"
+          onkeydown="if(event.key==='Enter')tryLogin()">
+        <button onclick="togglePassVis()" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:rgba(255,255,255,0.4);cursor:pointer;font-size:16px" id="pass-vis-btn">👁</button>
+      </div>
+    </div>
+
+    <div id="login-error" style="display:none;background:rgba(255,60,60,0.15);border:1px solid rgba(255,60,60,0.3);border-radius:8px;padding:10px 12px;font-size:12px;color:#ff6060;margin-bottom:14px;text-align:center">
+      ❌ Identifiant ou mot de passe incorrect
+    </div>
+
+    <button onclick="tryLogin()" style="width:100%;padding:14px;background:linear-gradient(135deg,#a060ff,#c8a96e);border:none;border-radius:12px;color:#fff;font-size:15px;font-weight:700;cursor:pointer;transition:opacity .2s;letter-spacing:.03em"
+      onmouseenter="this.style.opacity='.9'" onmouseleave="this.style.opacity='1'">
+      Entrer ✦
+    </button>
+
+    <div style="text-align:center;margin-top:16px;font-size:11px;color:rgba(255,255,255,0.25)">
+      Ikigai · Développement personnel
+    </div>
+  </div>
+</div>
 <div class="app">
 
 <!-- SIDEBAR -->
@@ -471,6 +534,31 @@
       </div>
       <div id="xp-new-badge" style="display:none;font-size:11px;background:var(--accent);color:#0e0e10;padding:4px 10px;border-radius:20px;font-weight:600;animation:pulse 1.5s infinite">🏆 Nouveau badge !</div>
     </div>
+  </div>
+
+  <!-- Mode Flux -->
+  <div id="flux-widget" class="card mt16" style="border:1px solid rgba(64,208,160,0.2);background:linear-gradient(135deg,rgba(64,208,160,0.05),rgba(160,96,255,0.03));transition:all .5s ease">
+    <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+      <div id="flux-orb" style="width:48px;height:48px;border-radius:50%;background:radial-gradient(circle,#40d0a0,#208060);flex-shrink:0;box-shadow:0 0 20px rgba(64,208,160,0.4);transition:all .8s ease;display:flex;align-items:center;justify-content:center;font-size:22px">🧠</div>
+      <div style="flex:1;min-width:180px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px">
+          <div id="flux-state-label" style="font-size:15px;font-weight:700;color:var(--text)">Initialisation...</div>
+          <div id="flux-badge" style="font-size:10px;padding:2px 8px;border-radius:20px;background:rgba(64,208,160,0.15);color:#40d0a0;font-weight:600">FLUX</div>
+        </div>
+        <div id="flux-desc" style="font-size:12px;color:var(--muted);line-height:1.5">Analyse ton comportement en temps réel...</div>
+        <div style="margin-top:8px;display:flex;gap:6px" id="flux-indicators">
+          <div style="flex:1;height:4px;background:var(--bg3);border-radius:2px;overflow:hidden"><div id="flux-bar-focus" style="height:100%;width:0%;background:#40d0a0;border-radius:2px;transition:width .8s ease"></div></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:3px">
+          <span style="font-size:10px;color:var(--muted)">Distrait</span>
+          <span id="flux-score-label" style="font-size:10px;color:var(--muted)">--</span>
+          <span style="font-size:10px;color:var(--muted)">Dans le flux</span>
+        </div>
+      </div>
+      <div id="flux-action-btn" style="display:none">
+      </div>
+    </div>
+    <div id="flux-suggestion" style="display:none;margin-top:12px;padding:10px 14px;border-radius:10px;font-size:12px;line-height:1.6"></div>
   </div>
 
   <!-- Météo -->
@@ -2676,9 +2764,26 @@
 
       <div style="border-left:3px solid var(--accent);padding:10px 14px;background:var(--bg3);border-radius:0 10px 10px 0">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
-          <span style="font-size:11px;font-weight:700;color:var(--accent);font-family:var(--font-mono)">v1.7</span>
+          <span style="font-size:11px;font-weight:700;color:var(--accent);font-family:var(--font-mono)">v1.8</span>
           <span style="font-size:11px;color:var(--muted)">Dernière version</span>
           <span style="background:var(--accent);color:#0e0e10;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;margin-left:auto">ACTUEL</span>
+        </div>
+        <div style="font-size:12px;color:var(--text);line-height:1.8">
+          ☁️ Synchronisation Firebase — accès depuis n'importe quel appareil<br>
+          🔐 Page de login avec compte utilisateur<br>
+          💸 Tracker de dépenses mensuel (12 catégories, budget, graphes)<br>
+          📚 Bibliothèque (42 livres, 11 catégories avec fiches détaillées)<br>
+          💪 Section Sport complète (30 exercices, 8 sports, séances perso)<br>
+          👤 Profil personnalisé (TDEE, macros, recettes IA, finances)<br>
+          ⭐ Système XP & Badges (10 niveaux, 21 badges, 11 sources XP)<br>
+          🤖 Analyse du jour locale (score, conseil, énergie, sans API)<br>
+          🌸 2 nouveaux thèmes : Midnight Rose & Hacker
+        </div>
+      </div>
+
+      <div style="border-left:3px solid var(--border);padding:10px 14px;background:var(--bg3);border-radius:0 10px 10px 0">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+          <span style="font-size:11px;font-weight:700;color:var(--muted);font-family:var(--font-mono)">v1.7</span>
         </div>
         <div style="font-size:12px;color:var(--text);line-height:1.8">
           🧩 Modules activables/désactivables (personnalise ta sidebar)<br>
@@ -2985,6 +3090,331 @@ window._fbSave = async () => {
 </script>
 
 <script>
+// ==================== MODE FLUX — Détection état mental ====================
+const FluxEngine = {
+  // Données collectées
+  keystrokes: [],         // timestamps des frappes
+  mouseMovements: [],     // distances de souris
+  clicks: [],             // timestamps des clics
+  pauses: [],             // durées des pauses
+  scrollEvents: [],       // timestamps des scrolls
+  lastActivity: Date.now(),
+  lastKeystroke: 0,
+  lastMousePos: { x:0, y:0 },
+  sessionStart: Date.now(),
+
+  // État actuel
+  state: 'initializing',  // initializing | flux | focused | distracted | tired | break
+  fluxScore: 50,          // 0-100
+  analysisInterval: null,
+  initialized: false,
+
+  STATES: {
+    flux:        { label:'Dans le Flux 🌊',    color:'#40d0a0', bg:'rgba(64,208,160,0.08)',  border:'rgba(64,208,160,0.25)',  orb:'radial-gradient(circle,#40d0a0,#208060)', shadow:'rgba(64,208,160,0.4)', emoji:'🌊' },
+    focused:     { label:'Concentré 🎯',        color:'#a060ff', bg:'rgba(160,96,255,0.08)', border:'rgba(160,96,255,0.25)',  orb:'radial-gradient(circle,#a060ff,#6030a0)', shadow:'rgba(160,96,255,0.4)', emoji:'🎯' },
+    distracted:  { label:'Distrait 💭',         color:'#c8a96e', bg:'rgba(200,169,110,0.08)',border:'rgba(200,169,110,0.25)', orb:'radial-gradient(circle,#c8a96e,#907040)', shadow:'rgba(200,169,110,0.3)', emoji:'💭' },
+    tired:       { label:'Fatigué 😴',          color:'#6080a0', bg:'rgba(96,128,160,0.08)', border:'rgba(96,128,160,0.2)',   orb:'radial-gradient(circle,#6080a0,#405060)', shadow:'rgba(96,128,160,0.3)', emoji:'😴' },
+    break:       { label:'Pause active ☕',     color:'#ff8040', bg:'rgba(255,128,64,0.08)', border:'rgba(255,128,64,0.2)',   orb:'radial-gradient(circle,#ff8040,#c05020)', shadow:'rgba(255,128,64,0.3)', emoji:'☕' },
+    initializing:{ label:'Observation...',      color:'var(--muted)', bg:'transparent',       border:'rgba(64,208,160,0.2)',   orb:'radial-gradient(circle,#404040,#202020)', shadow:'rgba(0,0,0,0)', emoji:'🧠' },
+  },
+
+  SUGGESTIONS: {
+    flux:       ['Tu es dans le flux — ne t\'arrête pas, continue sur ta lancée ! 🚀', 'État optimal détecté — profites-en pour attaquer ta tâche la plus complexe.', 'Ton cerveau est en pleine forme. Pomodoro lancé ?'],
+    focused:    ['Belle concentration ! Tu travailles méthodiquement.', 'Bonne régularité de frappe — tu es bien ancré dans ta tâche.', 'Concentration solide détectée. Continue comme ça.'],
+    distracted: ['Beaucoup de pauses détectées — tu es peut-être distrait. Un verre d\'eau ?', 'Ton rythme est irrégulier. Essaie 5 min de respiration 4-7-8.', 'Distraction détectée — ferme les onglets inutiles et relance un Focus.'],
+    tired:      ['Ton activité ralentit — ton corps a peut-être besoin d\'une pause.', 'Signes de fatigue détectés. 10 min de marche peuvent relancer l\'énergie.', 'Fatigue probable — une courte sieste de 20 min peut tout changer.'],
+    break:      ['Tu prends une pause — c\'est bien ! Profites-en pour t\'étirer.', 'Pause active — hydrate-toi et regarde au loin 20 secondes.', 'Moment de repos — fais quelques respirations profondes.'],
+  },
+
+  init() {
+    if (this.initialized) return;
+    this.initialized = true;
+
+    // Écouter les frappes
+    document.addEventListener('keydown', (e) => {
+      const now = Date.now();
+      if (this.lastKeystroke > 0) {
+        const interval = now - this.lastKeystroke;
+        if (interval < 5000) this.keystrokes.push(interval); // gap entre frappes
+        if (interval > 2000) this.pauses.push(interval);     // pauses
+      }
+      this.lastKeystroke = now;
+      this.lastActivity = now;
+      if (this.keystrokes.length > 100) this.keystrokes.shift();
+      if (this.pauses.length > 50) this.pauses.shift();
+    });
+
+    // Écouter la souris
+    document.addEventListener('mousemove', (e) => {
+      const dx = e.clientX - this.lastMousePos.x;
+      const dy = e.clientY - this.lastMousePos.y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist > 5) {
+        this.mouseMovements.push({ dist, time: Date.now() });
+        if (this.mouseMovements.length > 200) this.mouseMovements.shift();
+      }
+      this.lastMousePos = { x: e.clientX, y: e.clientY };
+      this.lastActivity = Date.now();
+    });
+
+    // Écouter les clics
+    document.addEventListener('click', () => {
+      this.clicks.push(Date.now());
+      this.lastActivity = Date.now();
+      if (this.clicks.length > 50) this.clicks.shift();
+    });
+
+    // Écouter le scroll
+    document.addEventListener('scroll', () => {
+      this.scrollEvents.push(Date.now());
+      this.lastActivity = Date.now();
+      if (this.scrollEvents.length > 50) this.scrollEvents.shift();
+    });
+
+    // Analyser toutes les 8 secondes
+    this.analysisInterval = setInterval(() => this.analyze(), 8000);
+    // Première analyse après 15s
+    setTimeout(() => this.analyze(), 15000);
+
+    // Mise à jour visuelle légère toutes les 2s
+    setInterval(() => this.updateVisuals(), 2000);
+  },
+
+  analyze() {
+    const now = Date.now();
+    const window5s  = 5000;
+    const window30s = 30000;
+    const inactivity = now - this.lastActivity;
+
+    // === CALCUL DES MÉTRIQUES ===
+
+    // 1. Fréquence de frappe (dernières 30s)
+    const recentKeys = this.keystrokes.filter((_, i) => {
+      return this.keystrokes.length - i < 30;
+    });
+    const avgKeyInterval = recentKeys.length > 3
+      ? recentKeys.reduce((a,b) => a+b, 0) / recentKeys.length
+      : 999;
+    const keystrokeRhythm = recentKeys.length > 3
+      ? this.calculateRhythmConsistency(recentKeys)
+      : 0;
+
+    // 2. Mouvement souris (dernières 30s)
+    const recentMouse = this.mouseMovements.filter(m => now - m.time < 30000);
+    const totalMouseDist = recentMouse.reduce((s, m) => s + m.dist, 0);
+    const mouseSpeed = recentMouse.length > 0 ? totalMouseDist / 30 : 0; // pixels/seconde
+
+    // 3. Pauses récentes
+    const recentPauses = this.pauses.filter((_, i) => this.pauses.length - i < 10);
+    const avgPause = recentPauses.length > 0
+      ? recentPauses.reduce((a,b) => a+b, 0) / recentPauses.length
+      : 0;
+
+    // 4. Clics récents
+    const recentClicks = this.clicks.filter(c => now - c < 30000).length;
+
+    // === DÉTERMINATION DE L'ÉTAT ===
+    let score = 50;
+    let newState = 'focused';
+
+    // Inactivité totale
+    if (inactivity > 120000) { // 2 min sans rien
+      newState = 'break';
+      score = 20;
+    }
+    else if (inactivity > 45000) { // 45s sans rien
+      newState = 'tired';
+      score = 30;
+    }
+    else {
+      // Analyse du comportement actif
+      // Score de frappe rapide et régulière = flux
+      if (avgKeyInterval < 300 && keystrokeRhythm > 0.6) {
+        score += 30; // frappe rapide et régulière
+      } else if (avgKeyInterval < 600) {
+        score += 15;
+      }
+
+      // Mouvement souris fluide = concentré
+      if (mouseSpeed > 20 && mouseSpeed < 200) {
+        score += 15; // mouvement naturel
+      } else if (mouseSpeed > 200) {
+        score -= 10; // agitation
+      }
+
+      // Pauses courtes et régulières = concentré
+      if (avgPause > 0 && avgPause < 1500) {
+        score += 10; // petites pauses naturelles
+      } else if (avgPause > 3000) {
+        score -= 15; // longues pauses = distraction
+      }
+
+      // Beaucoup de clics = peut-être distrait
+      if (recentClicks > 10) score -= 10;
+
+      score = Math.max(0, Math.min(100, score));
+
+      if (score >= 75) newState = 'flux';
+      else if (score >= 55) newState = 'focused';
+      else if (score >= 35) newState = 'distracted';
+      else newState = 'tired';
+    }
+
+    // Transition douce du score
+    this.fluxScore = Math.round(this.fluxScore * 0.7 + score * 0.3);
+
+    // Ne changer d'état que si vraiment différent (évite le clignotement)
+    if (newState !== this.state) {
+      this.state = newState;
+      this.applyStateEffects(newState);
+    }
+
+    this.updateWidget();
+  },
+
+  calculateRhythmConsistency(intervals) {
+    if (intervals.length < 3) return 0;
+    const mean = intervals.reduce((a,b) => a+b, 0) / intervals.length;
+    const variance = intervals.reduce((s, v) => s + Math.pow(v - mean, 2), 0) / intervals.length;
+    const stdDev = Math.sqrt(variance);
+    return Math.max(0, 1 - (stdDev / mean));
+  },
+
+  applyStateEffects(state) {
+    // Adapter l'interface selon l'état
+    if (state === 'flux') {
+      // Mode Flux : interface épurée, suggestions de focus
+      document.querySelectorAll('.nav-section').forEach(el => {
+        el.style.transition = 'opacity .5s';
+      });
+    }
+    if (state === 'distracted') {
+      // Légère pulsation sur le widget
+      const orb = document.getElementById('flux-orb');
+      if (orb) {
+        orb.style.animation = 'pulse 1s ease-in-out 3';
+      }
+    }
+  },
+
+  updateWidget() {
+    const stateInfo = this.STATES[this.state] || this.STATES.focused;
+    const widget = document.getElementById('flux-widget');
+    const orb = document.getElementById('flux-orb');
+    const label = document.getElementById('flux-state-label');
+    const desc = document.getElementById('flux-desc');
+    const badge = document.getElementById('flux-badge');
+    const bar = document.getElementById('flux-bar-focus');
+    const scoreLabel = document.getElementById('flux-score-label');
+    const suggestion = document.getElementById('flux-suggestion');
+
+    if (!widget) return;
+
+    widget.style.borderColor = stateInfo.border;
+    widget.style.background  = `linear-gradient(135deg,${stateInfo.bg},transparent)`;
+    if (orb) {
+      orb.style.background  = stateInfo.orb;
+      orb.style.boxShadow   = `0 0 20px ${stateInfo.shadow}`;
+      orb.textContent       = stateInfo.emoji;
+    }
+    if (label) { label.textContent = stateInfo.label; label.style.color = stateInfo.color; }
+    if (badge) { badge.style.color = stateInfo.color; badge.style.background = `${stateInfo.color}20`; }
+    if (bar)   { bar.style.width = this.fluxScore + '%'; bar.style.background = stateInfo.color; }
+    if (scoreLabel) scoreLabel.textContent = `${this.fluxScore}% flux`;
+
+    // Suggestion contextuelle
+    const suggestions = this.SUGGESTIONS[this.state] || [];
+    if (suggestions.length > 0 && suggestion) {
+      const msg = suggestions[Math.floor(Math.random() * suggestions.length)];
+      suggestion.style.display = 'block';
+      suggestion.style.background = `${stateInfo.color}12`;
+      suggestion.style.border = `1px solid ${stateInfo.color}25`;
+      suggestion.style.color = 'var(--text)';
+      suggestion.textContent = msg;
+
+      // Décrire l'état dans la desc
+      const descs = {
+        flux: 'Rythme de frappe régulier · Souris fluide · Concentration maximale',
+        focused: 'Activité soutenue détectée · Bon niveau de concentration',
+        distracted: 'Irrégularité dans ton activité · Pauses fréquentes détectées',
+        tired: 'Activité ralentie · Ton corps signale peut-être de la fatigue',
+        break: 'Aucune activité depuis un moment · Tu prends une pause',
+        initializing: 'Collecte de données en cours...',
+      };
+      if (desc) desc.textContent = descs[this.state] || '';
+    }
+  },
+
+  updateVisuals() {
+    // Mise à jour légère de la barre sans recalcul complet
+    const bar = document.getElementById('flux-bar-focus');
+    const inactivity = Date.now() - this.lastActivity;
+    if (bar && inactivity > 5000 && this.fluxScore > 20) {
+      this.fluxScore = Math.max(20, this.fluxScore - 1);
+      bar.style.width = this.fluxScore + '%';
+    }
+  }
+};
+
+// Démarrer le moteur Flux quand le dashboard est affiché
+function initFluxEngine() {
+  if (!FluxEngine.initialized) {
+    FluxEngine.init();
+    // Premier affichage
+    setTimeout(() => FluxEngine.updateWidget(), 500);
+  }
+}
+
+// ==================== LOGIN ====================
+const USERS = [
+  { username: 'admin', password: 'admin2025', name: 'Florian', role: 'admin' },
+];
+
+function tryLogin() {
+  const u = document.getElementById('login-user')?.value.trim();
+  const p = document.getElementById('login-pass')?.value;
+  const err = document.getElementById('login-error');
+  const box = document.getElementById('login-box');
+
+  const user = USERS.find(x => x.username === u && x.password === p);
+  if (user) {
+    // Succès
+    sessionStorage.setItem('ikigai_logged', JSON.stringify({ username: user.username, name: user.name, role: user.role }));
+    const loginPage = document.getElementById('login-page');
+    loginPage.style.transition = 'opacity .4s ease';
+    loginPage.style.opacity = '0';
+    setTimeout(() => { loginPage.style.display = 'none'; }, 400);
+    // Mettre à jour le greeting avec le nom
+    if (data.profil && !data.profil.prenom) { data.profil.prenom = user.name; }
+    updateDashboardGreeting();
+  } else {
+    // Erreur
+    if (err) err.style.display = 'block';
+    if (box) {
+      box.classList.remove('shake');
+      void box.offsetWidth;
+      box.classList.add('shake');
+    }
+    setTimeout(() => { if (err) err.style.display = 'none'; }, 3000);
+  }
+}
+
+function togglePassVis() {
+  const inp = document.getElementById('login-pass');
+  const btn = document.getElementById('pass-vis-btn');
+  if (!inp) return;
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+  if (btn) btn.textContent = inp.type === 'password' ? '👁' : '🙈';
+}
+
+function checkLogin() {
+  const session = sessionStorage.getItem('ikigai_logged');
+  if (session) {
+    const loginPage = document.getElementById('login-page');
+    if (loginPage) loginPage.style.display = 'none';
+  }
+}
+
 // ==================== DATA LAYER ====================
 const STORE_KEY = 'mavie_v1';
 let data = {
@@ -4138,6 +4568,8 @@ function renderDashboard() {
 
   // Météo — charge une seule fois par session
   if (!window._weatherLoaded) { window._weatherLoaded = true; loadWeather(); }
+  // Mode Flux
+  initFluxEngine();
 
   if (data.quote) {
     document.getElementById('quote-text').textContent = '"' + data.quote + '"';
@@ -9279,6 +9711,7 @@ applyModules();
 updateDashboardGreeting();
 updateXPWidget();
 checkBadges();
+checkLogin();
 if (data.notifsOn && Notification.permission === 'granted') startNotifScheduler();
 
 // ==================== CALENDRIER HABITUDES ====================
