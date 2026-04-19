@@ -2,15 +2,17 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <!-- PWA -->
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#c8a96e">
+<meta name="theme-color" content="#0e0e10">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="Ikigai">
 <link rel="apple-touch-icon" href="icon-192.png">
+<link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" sizes="512x512" href="icon-512.png">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="description" content="Ton espace de développement personnel — habitudes, focus, sport, finance et plus.">
 <title>Ikigai — Dashboard</title>
@@ -406,6 +408,133 @@
 </style>
 </head>
 <body>
+
+<!-- ===== ONBOARDING ===== -->
+<div id="onboarding" style="position:fixed;inset:0;z-index:10000;background:#0a0a0f;display:none;align-items:center;justify-content:center;flex-direction:column;overflow:hidden">
+
+  <!-- Particules fond -->
+  <div style="position:absolute;inset:0;pointer-events:none;overflow:hidden">
+    <div style="position:absolute;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(200,169,110,0.08),transparent);top:-200px;right:-200px"></div>
+    <div style="position:absolute;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(160,96,255,0.06),transparent);bottom:-100px;left:-100px"></div>
+  </div>
+
+  <!-- Étapes -->
+  <div id="ob-step-1" class="ob-step" style="text-align:center;padding:32px 24px;max-width:440px;width:90%;position:relative;z-index:1">
+    <div style="font-size:64px;margin-bottom:16px">✦</div>
+    <div style="font-size:32px;font-weight:800;color:#fff;margin-bottom:8px;letter-spacing:-.5px">Bienvenue sur Ikigai</div>
+    <div style="font-size:15px;color:rgba(255,255,255,.5);margin-bottom:40px;line-height:1.6">Ton espace de développement personnel.<br>On te configure ça en 1 minute.</div>
+    <button onclick="obNext(2)" style="width:100%;padding:16px;background:linear-gradient(135deg,#c8a96e,#a08040);border:none;border-radius:14px;color:#0e0e10;font-size:16px;font-weight:800;cursor:pointer;letter-spacing:.02em">Commencer ✦</button>
+    <div style="margin-top:16px;font-size:12px;color:rgba(255,255,255,.25)">Aucune inscription requise · 100% local</div>
+  </div>
+
+  <div id="ob-step-2" class="ob-step" style="display:none;text-align:center;padding:32px 24px;max-width:440px;width:90%;position:relative;z-index:1">
+    <div style="font-size:48px;margin-bottom:12px">👋</div>
+    <div style="font-size:26px;font-weight:700;color:#fff;margin-bottom:6px">Comment tu t'appelles ?</div>
+    <div style="font-size:13px;color:rgba(255,255,255,.4);margin-bottom:28px">On va personnaliser Ikigai pour toi</div>
+    <input id="ob-prenom" type="text" placeholder="Ton prénom..." maxlength="30" autofocus
+      style="width:100%;padding:16px 20px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);border-radius:14px;color:#fff;font-size:18px;font-weight:500;outline:none;box-sizing:border-box;text-align:center;transition:border .2s;font-family:inherit"
+      onfocus="this.style.borderColor='rgba(200,169,110,.6)'"
+      onblur="this.style.borderColor='rgba(255,255,255,.15)'"
+      onkeydown="if(event.key==='Enter')obNext(3)">
+    <button onclick="obNext(3)" style="width:100%;padding:14px;background:linear-gradient(135deg,#c8a96e,#a08040);border:none;border-radius:14px;color:#0e0e10;font-size:15px;font-weight:700;cursor:pointer;margin-top:14px">Continuer →</button>
+    <button onclick="obNext(1)" style="background:none;border:none;color:rgba(255,255,255,.3);cursor:pointer;font-size:13px;margin-top:12px">← Retour</button>
+  </div>
+
+  <div id="ob-step-3" class="ob-step" style="display:none;text-align:center;padding:32px 24px;max-width:480px;width:90%;position:relative;z-index:1">
+    <div style="font-size:48px;margin-bottom:12px">🎯</div>
+    <div style="font-size:26px;font-weight:700;color:#fff;margin-bottom:6px">Ton objectif principal ?</div>
+    <div style="font-size:13px;color:rgba(255,255,255,.4);margin-bottom:24px">On adapte Ikigai à ce qui compte pour toi</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;text-align:left" id="ob-objectifs-grid">
+      <button onclick="obSelectObjectif('sante',this)" id="ob-obj-sante" style="padding:14px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:14px;cursor:pointer;color:#fff;text-align:left;transition:all .2s;font-family:inherit">
+        <div style="font-size:24px;margin-bottom:6px">💪</div>
+        <div style="font-size:13px;font-weight:600">Santé &amp; Sport</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:2px">Musculation, running, bien-être</div>
+      </button>
+      <button onclick="obSelectObjectif('prod',this)" id="ob-obj-prod" style="padding:14px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:14px;cursor:pointer;color:#fff;text-align:left;transition:all .2s;font-family:inherit">
+        <div style="font-size:24px;margin-bottom:6px">⚡</div>
+        <div style="font-size:13px;font-weight:600">Productivité</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:2px">Focus, habitudes, objectifs</div>
+      </button>
+      <button onclick="obSelectObjectif('finance',this)" id="ob-obj-finance" style="padding:14px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:14px;cursor:pointer;color:#fff;text-align:left;transition:all .2s;font-family:inherit">
+        <div style="font-size:24px;margin-bottom:6px">💰</div>
+        <div style="font-size:13px;font-weight:600">Finance</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:2px">Budget, épargne, investissement</div>
+      </button>
+      <button onclick="obSelectObjectif('culture',this)" id="ob-obj-culture" style="padding:14px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:14px;cursor:pointer;color:#fff;text-align:left;transition:all .2s;font-family:inherit">
+        <div style="font-size:24px;margin-bottom:6px">🧠</div>
+        <div style="font-size:13px;font-weight:600">Apprendre</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:2px">Livres, culture, cours</div>
+      </button>
+      <button onclick="obSelectObjectif('zen',this)" id="ob-obj-zen" style="padding:14px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:14px;cursor:pointer;color:#fff;text-align:left;transition:all .2s;font-family:inherit">
+        <div style="font-size:24px;margin-bottom:6px">🧘</div>
+        <div style="font-size:13px;font-weight:600">Bien-être mental</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:2px">Méditation, yoga, journal</div>
+      </button>
+      <button onclick="obSelectObjectif('tout',this)" id="ob-obj-tout" style="padding:14px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:14px;cursor:pointer;color:#fff;text-align:left;transition:all .2s;font-family:inherit">
+        <div style="font-size:24px;margin-bottom:6px">✦</div>
+        <div style="font-size:13px;font-weight:600">Tout à la fois</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:2px">Je veux tout explorer</div>
+      </button>
+    </div>
+    <button onclick="obNext(4)" id="ob-step3-btn" style="width:100%;padding:14px;background:linear-gradient(135deg,#c8a96e,#a08040);border:none;border-radius:14px;color:#0e0e10;font-size:15px;font-weight:700;cursor:pointer;margin-top:16px;opacity:.5" disabled>Continuer →</button>
+    <button onclick="obNext(2)" style="background:none;border:none;color:rgba(255,255,255,.3);cursor:pointer;font-size:13px;margin-top:10px">← Retour</button>
+  </div>
+
+  <div id="ob-step-4" class="ob-step" style="display:none;text-align:center;padding:32px 24px;max-width:440px;width:90%;position:relative;z-index:1">
+    <div style="font-size:48px;margin-bottom:12px">🎨</div>
+    <div style="font-size:26px;font-weight:700;color:#fff;margin-bottom:6px">Choisis ton ambiance</div>
+    <div style="font-size:13px;color:rgba(255,255,255,.4);margin-bottom:24px">Tu pourras changer dans les paramètres</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+      <button onclick="obSelectTheme('dark',this)" id="ob-theme-dark" style="padding:14px 10px;background:linear-gradient(135deg,#0e0e10,#1a1a25);border:2px solid transparent;border-radius:14px;cursor:pointer;color:#fff;font-size:12px;font-weight:600;transition:all .2s;font-family:inherit">
+        <div style="width:20px;height:20px;border-radius:50%;background:#c8a96e;margin:0 auto 8px;box-shadow:0 0 10px #c8a96e66"></div>Sombre
+      </button>
+      <button onclick="obSelectTheme('ocean',this)" id="ob-theme-ocean" style="padding:14px 10px;background:linear-gradient(135deg,#020b18,#0a2035);border:2px solid transparent;border-radius:14px;cursor:pointer;color:#fff;font-size:12px;font-weight:600;transition:all .2s;font-family:inherit">
+        <div style="width:20px;height:20px;border-radius:50%;background:#00b4d8;margin:0 auto 8px;box-shadow:0 0 10px #00b4d866"></div>Océan
+      </button>
+      <button onclick="obSelectTheme('forest',this)" id="ob-theme-forest" style="padding:14px 10px;background:linear-gradient(135deg,#080f08,#182518);border:2px solid transparent;border-radius:14px;cursor:pointer;color:#fff;font-size:12px;font-weight:600;transition:all .2s;font-family:inherit">
+        <div style="width:20px;height:20px;border-radius:50%;background:#4caf50;margin:0 auto 8px;box-shadow:0 0 10px #4caf5066"></div>Forêt
+      </button>
+      <button onclick="obSelectTheme('purple',this)" id="ob-theme-purple" style="padding:14px 10px;background:linear-gradient(135deg,#0d0520,#1a0a3a);border:2px solid transparent;border-radius:14px;cursor:pointer;color:#fff;font-size:12px;font-weight:600;transition:all .2s;font-family:inherit">
+        <div style="width:20px;height:20px;border-radius:50%;background:#a060ff;margin:0 auto 8px;box-shadow:0 0 10px #a060ff66"></div>Galactique
+      </button>
+      <button onclick="obSelectTheme('cafe',this)" id="ob-theme-cafe" style="padding:14px 10px;background:linear-gradient(135deg,#1a1008,#302018);border:2px solid transparent;border-radius:14px;cursor:pointer;color:#fff;font-size:12px;font-weight:600;transition:all .2s;font-family:inherit">
+        <div style="width:20px;height:20px;border-radius:50%;background:#c8903c;margin:0 auto 8px;box-shadow:0 0 10px #c8903c66"></div>Café
+      </button>
+      <button onclick="obSelectTheme('nord',this)" id="ob-theme-nord" style="padding:14px 10px;background:linear-gradient(135deg,#2e3440,#434c5e);border:2px solid transparent;border-radius:14px;cursor:pointer;color:#fff;font-size:12px;font-weight:600;transition:all .2s;font-family:inherit">
+        <div style="width:20px;height:20px;border-radius:50%;background:#88c0d0;margin:0 auto 8px;box-shadow:0 0 10px #88c0d066"></div>Nord
+      </button>
+    </div>
+    <button onclick="obNext(5)" id="ob-step4-btn" style="width:100%;padding:14px;background:linear-gradient(135deg,#c8a96e,#a08040);border:none;border-radius:14px;color:#0e0e10;font-size:15px;font-weight:700;cursor:pointer;margin-top:16px;opacity:.5" disabled>Continuer →</button>
+    <button onclick="obNext(3)" style="background:none;border:none;color:rgba(255,255,255,.3);cursor:pointer;font-size:13px;margin-top:10px">← Retour</button>
+  </div>
+
+  <div id="ob-step-5" class="ob-step" style="display:none;text-align:center;padding:32px 24px;max-width:440px;width:90%;position:relative;z-index:1">
+    <div id="ob-final-emoji" style="font-size:64px;margin-bottom:16px">🚀</div>
+    <div id="ob-final-title" style="font-size:28px;font-weight:800;color:#fff;margin-bottom:8px"></div>
+    <div id="ob-final-sub" style="font-size:14px;color:rgba(255,255,255,.5);margin-bottom:32px;line-height:1.6"></div>
+    <!-- Récap -->
+    <div id="ob-recap" style="background:rgba(255,255,255,.05);border-radius:14px;padding:16px;margin-bottom:24px;text-align:left"></div>
+    <button onclick="obFinish()" style="width:100%;padding:16px;background:linear-gradient(135deg,#c8a96e,#a08040);border:none;border-radius:14px;color:#0e0e10;font-size:16px;font-weight:800;cursor:pointer">
+      Lancer Ikigai ✦
+    </button>
+  </div>
+
+  <!-- Indicateur de progression -->
+  <div style="display:flex;gap:6px;margin-top:24px;position:relative;z-index:1" id="ob-dots">
+    <div class="ob-dot active" id="dot-1"></div>
+    <div class="ob-dot" id="dot-2"></div>
+    <div class="ob-dot" id="dot-3"></div>
+    <div class="ob-dot" id="dot-4"></div>
+    <div class="ob-dot" id="dot-5"></div>
+  </div>
+
+  <style>
+    .ob-step { animation: obFadeIn .4s ease both; }
+    @keyframes obFadeIn { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+    .ob-dot { width:8px; height:8px; border-radius:50%; background:rgba(255,255,255,.2); transition:all .3s; }
+    .ob-dot.active { background:#c8a96e; width:24px; border-radius:4px; }
+  </style>
+</div>
 
 <!-- ===== PAGE LOGIN ===== -->
 <div id="login-page" style="position:fixed;inset:0;background:#0a0a0f;display:flex;align-items:center;justify-content:center;z-index:9999;flex-direction:column">
@@ -3375,6 +3504,164 @@ function initFluxEngine() {
   }
 }
 
+// ==================== ONBOARDING ====================
+let obSelectedObjectif = null;
+let obSelectedTheme = 'dark';
+
+function checkOnboarding() {
+  // Seulement si connecté et première visite
+  const session = sessionStorage.getItem('ikigai_logged');
+  if (!session) return; // Pas connecté → pas d'onboarding
+  if (!data.onboardingDone) {
+    document.getElementById('onboarding').style.display = 'flex';
+  } else {
+    document.getElementById('onboarding').style.display = 'none';
+  }
+}
+
+function obNext(step) {
+  // Validation étape 2 — prénom
+  if (step === 3) {
+    const prenom = document.getElementById('ob-prenom')?.value.trim();
+    if (!prenom) {
+      const inp = document.getElementById('ob-prenom');
+      inp.style.borderColor = 'rgba(255,80,80,.6)';
+      inp.placeholder = 'Entre ton prénom d\'abord !';
+      inp.focus();
+      setTimeout(() => { inp.style.borderColor = 'rgba(255,255,255,.15)'; inp.placeholder = 'Ton prénom...'; }, 2000);
+      return;
+    }
+  }
+
+  // Cacher toutes les étapes
+  document.querySelectorAll('.ob-step').forEach(el => el.style.display = 'none');
+
+  // Afficher la nouvelle étape
+  const el = document.getElementById('ob-step-' + step);
+  if (el) { el.style.display = 'block'; el.style.animation = 'none'; void el.offsetWidth; el.style.animation = 'obFadeIn .4s ease both'; }
+
+  // Mettre à jour les dots
+  document.querySelectorAll('.ob-dot').forEach((d, i) => {
+    d.classList.toggle('active', i + 1 === step);
+  });
+
+  // Préparer l'étape finale
+  if (step === 5) obPrepareFinale();
+}
+
+function obSelectObjectif(id, btn) {
+  obSelectedObjectif = id;
+  // Reset tous les boutons
+  document.querySelectorAll('[id^="ob-obj-"]').forEach(b => {
+    b.style.background = 'rgba(255,255,255,.05)';
+    b.style.borderColor = 'rgba(255,255,255,.1)';
+  });
+  // Activer le sélectionné
+  btn.style.background = 'rgba(200,169,110,.15)';
+  btn.style.borderColor = 'rgba(200,169,110,.5)';
+  // Activer bouton continuer
+  const nextBtn = document.getElementById('ob-step3-btn');
+  if (nextBtn) { nextBtn.style.opacity = '1'; nextBtn.disabled = false; }
+}
+
+function obSelectTheme(id, btn) {
+  obSelectedTheme = id;
+  document.querySelectorAll('[id^="ob-theme-"]').forEach(b => {
+    b.style.borderColor = 'transparent';
+    b.style.transform = 'scale(1)';
+  });
+  btn.style.borderColor = '#c8a96e';
+  btn.style.transform = 'scale(1.05)';
+  // Activer bouton continuer
+  const nextBtn = document.getElementById('ob-step4-btn');
+  if (nextBtn) { nextBtn.style.opacity = '1'; nextBtn.disabled = false; }
+  // Preview du thème
+  applyTheme(id);
+}
+
+function obPrepareFinale() {
+  const prenom = document.getElementById('ob-prenom')?.value.trim() || 'toi';
+  const objectifLabels = {
+    sante: { label:'Santé & Sport 💪', desc:'Tes séances sport et yoga sont prêtes.', emoji:'💪' },
+    prod:  { label:'Productivité ⚡', desc:'Focus Pomodoro et habitudes configurés.', emoji:'⚡' },
+    finance: { label:'Finance 💰', desc:'Tracker de dépenses et investissements prêts.', emoji:'💰' },
+    culture: { label:'Apprendre 🧠', desc:'Bibliothèque et culture générale accessibles.', emoji:'🧠' },
+    zen:   { label:'Bien-être mental 🧘', desc:'Méditation guidée et journal disponibles.', emoji:'🧘' },
+    tout:  { label:'Tout explorer ✦', desc:'Toutes les sections sont activées.', emoji:'🚀' },
+  };
+  const obj = objectifLabels[obSelectedObjectif] || objectifLabels.tout;
+
+  document.getElementById('ob-final-emoji').textContent = obj.emoji;
+  document.getElementById('ob-final-title').textContent = `C'est parti, ${prenom} !`;
+  document.getElementById('ob-final-sub').textContent = obj.desc;
+
+  const themeNames = { dark:'Sombre Doré', ocean:'Océan', forest:'Forêt', purple:'Galactique', cafe:'Café', nord:'Nord' };
+  document.getElementById('ob-recap').innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:20px">👤</span>
+        <div><div style="font-size:11px;color:rgba(255,255,255,.4)">Prénom</div><div style="font-size:14px;font-weight:600;color:#fff">${prenom}</div></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:20px">🎯</span>
+        <div><div style="font-size:11px;color:rgba(255,255,255,.4)">Objectif</div><div style="font-size:14px;font-weight:600;color:#fff">${obj.label}</div></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:20px">🎨</span>
+        <div><div style="font-size:11px;color:rgba(255,255,255,.4)">Thème</div><div style="font-size:14px;font-weight:600;color:#fff">${themeNames[obSelectedTheme] || obSelectedTheme}</div></div>
+      </div>
+    </div>`;
+}
+
+function obFinish() {
+  const prenom = document.getElementById('ob-prenom')?.value.trim() || '';
+
+  // Sauvegarder les infos
+  if (!data.profil) data.profil = {};
+  data.profil.prenom = prenom;
+  data.theme = obSelectedTheme;
+
+  // Configurer selon l'objectif
+  const objectifConfig = {
+    sante:   { objectifs: ['Aller à la salle 3x/semaine', 'Marcher 10 000 pas/jour'], habitudes: ['Sport 💪', 'Étirements 🌿', 'Eau 💧'] },
+    prod:    { objectifs: ['Finir ma to-do list', 'Lire 20 min/jour'], habitudes: ['Pomodoro 🍅', 'Planification 📝', 'Pas de téléphone le matin 📵'] },
+    finance: { objectifs: ['Épargner 10% de mon salaire', 'Suivre mes dépenses'], habitudes: ['Saisir mes dépenses 💸', 'Lire sur la finance 📚'] },
+    culture: { objectifs: ['Lire 1 livre/mois', 'Apprendre quelque chose de nouveau'], habitudes: ['Lecture 📚', 'Culture générale ✦', 'Cours 🎓'] },
+    zen:     { objectifs: ['Méditer 10 min/jour', 'Dormir 8h'], habitudes: ['Méditation 🧘', 'Journal 📔', 'Écrans avant lit 📵'] },
+    tout:    { objectifs: ['Construire mes habitudes', 'Progresser chaque jour'], habitudes: ['Sport 💪', 'Méditation 🧘', 'Lecture 📚'] },
+  };
+
+  const config = objectifConfig[obSelectedObjectif] || objectifConfig.tout;
+
+  // Ajouter objectifs
+  if (!data.objectifs) data.objectifs = { jour:[], mois:[], annee:[] };
+  config.objectifs.forEach(t => {
+    data.objectifs.mois.push({ id: Date.now() + Math.random(), text: t, done: false, prio: 'normale' });
+  });
+
+  // Ajouter habitudes
+  if (!data.habitudes) data.habitudes = [];
+  const cats = { 'Sport 💪':'Corps', 'Étirements 🌿':'Corps', 'Eau 💧':'Corps', 'Pomodoro 🍅':'Esprit', 'Planification 📝':'Esprit', 'Lecture 📚':'Esprit', 'Méditation 🧘':'Esprit', 'Journal 📔':'Esprit', 'Cours 🎓':'Esprit', 'Culture générale ✦':'Esprit', 'Saisir mes dépenses 💸':'Finance', 'Lire sur la finance 📚':'Finance', 'Pas de téléphone le matin 📵':'Esprit', 'Écrans avant lit 📵':'Esprit' };
+  config.habitudes.forEach(h => {
+    data.habitudes.push({ id: Date.now() + Math.random(), name: h, cat: cats[h] || 'Autre', time: '' });
+  });
+
+  data.onboardingDone = true;
+  save();
+  applyTheme(obSelectedTheme);
+
+  // Fermer l'onboarding avec animation
+  const ob = document.getElementById('onboarding');
+  ob.style.transition = 'opacity .5s ease, transform .5s ease';
+  ob.style.opacity = '0';
+  ob.style.transform = 'scale(1.05)';
+  setTimeout(() => {
+    ob.style.display = 'none';
+    updateDashboardGreeting();
+    renderDashboard();
+  }, 500);
+}
+
 // ==================== LOGIN ====================
 const USERS = [
   { username: 'admin', password: 'admin2025', name: 'Florian', role: 'admin' },
@@ -3393,7 +3680,10 @@ function tryLogin() {
     const loginPage = document.getElementById('login-page');
     loginPage.style.transition = 'opacity .4s ease';
     loginPage.style.opacity = '0';
-    setTimeout(() => { loginPage.style.display = 'none'; }, 400);
+    setTimeout(() => {
+      loginPage.style.display = 'none';
+      checkOnboarding(); // Lancer onboarding si première fois
+    }, 400);
     // Mettre à jour le greeting avec le nom
     if (data.profil && !data.profil.prenom) { data.profil.prenom = user.name; }
     updateDashboardGreeting();
@@ -9722,9 +10012,56 @@ updateDashboardGreeting();
 updateXPWidget();
 checkBadges();
 checkLogin();
+checkOnboarding();
 if (data.notifsOn && Notification.permission === 'granted') startNotifScheduler();
 
-// ==================== CALENDRIER HABITUDES ====================
+// ==================== PWA ====================
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').then(reg => {
+      console.log('[PWA] Service Worker actif ✦');
+    }).catch(e => console.log('[PWA] SW erreur:', e));
+  });
+}
+
+// Bandeau installation
+let _pwaPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  _pwaPrompt = e;
+  // Afficher le bandeau après 3s
+  setTimeout(() => {
+    if (!sessionStorage.getItem('pwa_dismissed')) showPWABanner();
+  }, 3000);
+});
+window.addEventListener('appinstalled', () => {
+  document.getElementById('pwa-banner')?.remove();
+  _pwaPrompt = null;
+});
+
+function showPWABanner() {
+  if (document.getElementById('pwa-banner')) return;
+  const b = document.createElement('div');
+  b.id = 'pwa-banner';
+  b.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--bg2);border:1px solid rgba(200,169,110,.35);border-radius:16px;padding:14px 18px;display:flex;align-items:center;gap:12px;z-index:9999;box-shadow:0 8px 32px rgba(0,0,0,.5);max-width:320px;width:calc(100% - 40px)';
+  b.innerHTML = `
+    <img src="icon-192.png" style="width:40px;height:40px;border-radius:10px;flex-shrink:0">
+    <div style="flex:1;min-width:0">
+      <div style="font-size:13px;font-weight:700">Installer Ikigai</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:1px">Accès rapide depuis l'écran d'accueil</div>
+    </div>
+    <button onclick="installPWA()" style="background:var(--accent);border:none;border-radius:10px;padding:8px 14px;color:#0e0e10;font-weight:700;font-size:12px;cursor:pointer;flex-shrink:0">Installer</button>
+    <button onclick="this.parentElement.remove();sessionStorage.setItem('pwa_dismissed','1')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px;padding:0 2px;flex-shrink:0">✕</button>`;
+  document.body.appendChild(b);
+}
+
+async function installPWA() {
+  if (!_pwaPrompt) return;
+  _pwaPrompt.prompt();
+  const {outcome} = await _pwaPrompt.userChoice;
+  document.getElementById('pwa-banner')?.remove();
+  _pwaPrompt = null;
+}
 let calYear = new Date().getFullYear();
 let calMonth = new Date().getMonth(); // 0-indexed
 
@@ -10850,80 +11187,6 @@ function renderActu() {
 
 // ==================== INIT ====================
 renderDashboard();
-
-// ==================== PWA ====================
-let deferredPrompt = null;
-
-// Enregistrer le Service Worker
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js')
-      .then(reg => {
-        console.log('[PWA] Service Worker enregistré ✦', reg.scope);
-        // Vérifier les mises à jour
-        reg.addEventListener('updatefound', () => {
-          const newWorker = reg.installing;
-          newWorker.addEventListener('statechange', () => {
-            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-              showUpdateBanner();
-            }
-          });
-        });
-      })
-      .catch(err => console.log('[PWA] SW erreur:', err));
-  });
-}
-
-// Capturer l'événement d'installation
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-  showInstallBanner();
-});
-
-window.addEventListener('appinstalled', () => {
-  console.log('[PWA] App installée !');
-  hideInstallBanner();
-  deferredPrompt = null;
-});
-
-function showInstallBanner() {
-  if (document.getElementById('pwa-install-banner')) return;
-  const banner = document.createElement('div');
-  banner.id = 'pwa-install-banner';
-  banner.style.cssText = `position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--bg2);border:1px solid rgba(200,169,110,.3);border-radius:16px;padding:14px 20px;display:flex;align-items:center;gap:12px;z-index:9999;box-shadow:0 8px 32px rgba(0,0,0,.4);max-width:340px;width:90%`;
-  banner.innerHTML = `
-    <div style="font-size:28px">📱</div>
-    <div style="flex:1">
-      <div style="font-size:13px;font-weight:700;color:var(--text)">Installer Ikigai</div>
-      <div style="font-size:11px;color:var(--muted)">Accès rapide depuis ton écran d'accueil</div>
-    </div>
-    <button onclick="installPWA()" style="background:linear-gradient(135deg,#c8a96e,#a08040);border:none;border-radius:10px;padding:8px 14px;color:#0e0e10;font-weight:700;font-size:12px;cursor:pointer">Installer</button>
-    <button onclick="hideInstallBanner()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px;padding:0 4px">✕</button>`;
-  document.body.appendChild(banner);
-}
-
-function hideInstallBanner() {
-  document.getElementById('pwa-install-banner')?.remove();
-}
-
-async function installPWA() {
-  if (!deferredPrompt) return;
-  deferredPrompt.prompt();
-  const { outcome } = await deferredPrompt.userChoice;
-  console.log('[PWA] Choix utilisateur:', outcome);
-  deferredPrompt = null;
-  hideInstallBanner();
-}
-
-function showUpdateBanner() {
-  const banner = document.createElement('div');
-  banner.style.cssText = `position:fixed;top:20px;left:50%;transform:translateX(-50%);background:var(--bg2);border:1px solid rgba(200,169,110,.3);border-radius:12px;padding:12px 20px;display:flex;align-items:center;gap:10px;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,.3)`;
-  banner.innerHTML = `
-    <span style="font-size:14px">✦ Nouvelle version disponible</span>
-    <button onclick="window.location.reload()" style="background:var(--accent);border:none;border-radius:8px;padding:6px 12px;color:#0e0e10;font-weight:600;font-size:12px;cursor:pointer">Mettre à jour</button>`;
-  document.body.appendChild(banner);
-}
 </script>
 </body>
 </html>
