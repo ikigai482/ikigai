@@ -365,30 +365,80 @@
   @keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
   /* ===== MODE MOBILE ===== */
+  /* ===== MODE MOBILE — Hamburger + Drawer ===== */
   body.mobile-mode .app { flex-direction: column; }
-  body.mobile-mode .sidebar {
-    position: fixed; bottom: 0; left: 0; right: 0; top: auto;
-    width: 100%; height: 64px; flex-direction: row;
-    align-items: center; justify-content: space-around;
-    padding: 0; border-right: none; border-top: 1px solid var(--border);
-    z-index: 200; overflow: hidden;
+
+  /* Cacher la sidebar desktop */
+  body.mobile-mode .sidebar { display: none !important; }
+
+  /* Header mobile fixe en haut */
+  #mobile-header {
+    display: none;
+    position: fixed; top: 0; left: 0; right: 0; height: 56px;
+    background: var(--bg2); border-bottom: 1px solid var(--border);
+    z-index: 500; align-items: center; padding: 0 16px; gap: 12px;
   }
-  body.mobile-mode .sidebar .logo { display: none; }
-  body.mobile-mode .sidebar .nav-section { display: none; }
-  body.mobile-mode .sidebar .nav-item {
-    flex-direction: column; align-items: center; justify-content: center;
-    padding: 6px 4px; font-size: 10px; gap: 2px; flex: 1;
-    border-radius: 0; min-width: 0;
+  body.mobile-mode #mobile-header { display: flex; }
+  #mobile-header-title { flex:1; font-size:16px; font-weight:700; color:var(--text); }
+  #mob-hamburger {
+    width:40px; height:40px; border-radius:10px; background:var(--bg3);
+    border:none; cursor:pointer; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; gap:5px; flex-shrink:0;
   }
-  body.mobile-mode .sidebar .nav-item .nav-icon { font-size: 18px; margin: 0; }
-  body.mobile-mode .sidebar > div:last-child {
-    display: flex; flex: 1; border-top: none; padding: 0; margin: 0;
+  #mob-hamburger span { display:block; width:20px; height:2px; background:var(--text); border-radius:2px; transition:all .25s; }
+
+  /* Drawer latéral */
+  #mobile-drawer {
+    position: fixed; top: 0; left: -280px; bottom: 0; width: 280px;
+    background: var(--bg2); border-right: 1px solid var(--border);
+    z-index: 600; transition: left .3s cubic-bezier(.4,0,.2,1);
+    overflow-y: auto; padding: 0 0 32px;
   }
-  body.mobile-mode .sidebar > div:last-child .nav-item { flex: 1; }
-  body.mobile-mode .main {
-    margin-left: 0; padding: 16px 12px 80px;
+  #mobile-drawer.open { left: 0; }
+  #mobile-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,.6); z-index: 599;
+    backdrop-filter: blur(2px);
   }
+  #mobile-overlay.show { display: block; }
+
+  /* Drawer header */
+  #mobile-drawer-header {
+    padding: 20px 20px 12px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  #mob-close {
+    width:36px; height:36px; border-radius:8px; background:var(--bg3);
+    border:none; cursor:pointer; color:var(--muted); font-size:18px;
+    display:flex; align-items:center; justify-content:center;
+  }
+
+  /* Drawer nav items */
+  .mob-drawer-section {
+    font-size:10px; font-weight:700; color:var(--muted);
+    text-transform:uppercase; letter-spacing:.1em;
+    padding: 14px 20px 6px;
+  }
+  .mob-drawer-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 20px; cursor: pointer;
+    color: var(--text); font-size: 14px; font-weight: 500;
+    border: none; background: none; width: 100%; text-align: left;
+    font-family: inherit; transition: background .15s;
+    border-radius: 0;
+  }
+  .mob-drawer-item:hover, .mob-drawer-item.active {
+    background: var(--bg3);
+    color: var(--accent);
+  }
+  .mob-drawer-item .mob-icon { font-size: 18px; width: 24px; text-align: center; flex-shrink: 0; }
+  .mob-drawer-item.active { border-left: 3px solid var(--accent); padding-left: 17px; }
+
+  /* Main content décalé sous le header */
+  body.mobile-mode .main { margin-left: 0; padding: 72px 12px 24px; }
   body.mobile-mode .section { padding: 0; }
+  body.mobile-mode .page-header { padding: 8px 0 12px; }
   body.mobile-mode .page-header h1 { font-size: 22px; }
   body.mobile-mode .grid2, body.mobile-mode .grid3 { grid-template-columns: 1fr; }
   body.mobile-mode .card { padding: 14px; }
@@ -408,6 +458,28 @@
 </style>
 </head>
 <body>
+
+<!-- ===== MOBILE HEADER ===== -->
+<header id="mobile-header">
+  <button id="mob-hamburger" onclick="toggleMobileDrawer()">
+    <span></span><span></span><span></span>
+  </button>
+  <div id="mobile-header-title">Ikigai ✦</div>
+  <div id="mob-xp-mini" style="font-size:12px;color:var(--accent);font-weight:600;flex-shrink:0"></div>
+</header>
+
+<!-- ===== DRAWER + OVERLAY ===== -->
+<div id="mobile-overlay" onclick="closeMobileDrawer()"></div>
+<nav id="mobile-drawer">
+  <div id="mobile-drawer-header">
+    <div>
+      <div style="font-size:18px;font-weight:800;color:var(--text)">✦ Ikigai</div>
+      <div id="mob-drawer-level" style="font-size:11px;color:var(--muted);margin-top:1px"></div>
+    </div>
+    <button id="mob-close" onclick="closeMobileDrawer()">✕</button>
+  </div>
+  <div id="mobile-drawer-nav"></div>
+</nav>
 
 <!-- ===== ONBOARDING ===== -->
 <div id="onboarding" style="position:fixed;inset:0;z-index:10000;background:#0a0a0f;display:none;align-items:center;justify-content:center;flex-direction:column;overflow:hidden">
@@ -9940,10 +10012,111 @@ function applyMobileMode() {
   const toggle = document.getElementById('mobile-mode-toggle');
   const knob   = document.getElementById('mobile-mode-knob');
   if (toggle) toggle.style.background = on ? 'var(--accent)' : 'var(--bg2)';
-  if (knob) {
-    knob.style.left  = on ? '23px' : '3px';
-    knob.style.opacity = on ? '1' : '0.4';
+  if (knob) { knob.style.left = on ? '23px' : '3px'; knob.style.opacity = on ? '1' : '0.4'; }
+  if (on) { buildMobileDrawer(); updateMobXP(); }
+}
+
+// ===== DRAWER =====
+const MOB_SECTIONS = [
+  { section:'Vue d\'ensemble', items:[
+    { id:'dashboard',    icon:'◈', label:'Dashboard' },
+    { id:'routine',      icon:'☀', label:'Morning Routine' },
+  ]},
+  { section:'Organisation', items:[
+    { id:'objectifs',    icon:'◎', label:'Objectifs' },
+    { id:'habitudes',    icon:'⟳', label:'Habitudes' },
+  ]},
+  { section:'Savoir', items:[
+    { id:'notes',        icon:'◻', label:'Notes & Idées' },
+    { id:'cours',        icon:'◑', label:'Cours' },
+    { id:'culture',      icon:'✦', label:'Culture Générale' },
+    { id:'actu',         icon:'◉', label:'Actualités' },
+    { id:'bibliotheque', icon:'📚', label:'Bibliothèque' },
+  ]},
+  { section:'Jeux', items:[
+    { id:'jeux',         icon:'🌍', label:'Pays du Monde' },
+  ]},
+  { section:'Finance', items:[
+    { id:'depenses',     icon:'💸', label:'Dépenses' },
+    { id:'investissements',icon:'◬',label:'Investissements' },
+    { id:'dca',          icon:'↻', label:'Plan DCA' },
+    { id:'marche',       icon:'◐', label:'Marché & Analyse' },
+  ]},
+  { section:'Bien-être', items:[
+    { id:'humeur',       icon:'◉', label:'Humeur & Journal' },
+    { id:'focus',        icon:'◎', label:'Mode Focus' },
+    { id:'meditation',   icon:'🧘', label:'Méditation' },
+    { id:'yoga',         icon:'🌿', label:'Yoga' },
+    { id:'sport',        icon:'💪', label:'Sport' },
+  ]},
+  { section:'Profil', items:[
+    { id:'profil',       icon:'👤', label:'Mon Profil' },
+    { id:'xp',           icon:'⭐', label:'XP & Badges' },
+    { id:'parametres',   icon:'⚙', label:'Paramètres' },
+  ]},
+];
+
+function buildMobileDrawer() {
+  const nav = document.getElementById('mobile-drawer-nav');
+  if (!nav) return;
+  nav.innerHTML = MOB_SECTIONS.map(group => {
+    // Filtrer modules désactivés
+    const items = group.items.filter(i => !data.modules || data.modules[i.id] !== false);
+    if (!items.length) return '';
+    return `<div class="mob-drawer-section">${group.section}</div>` +
+      items.map(i => `<button class="mob-drawer-item${activeSection===i.id?' active':''}" onclick="mobileNavTo('${i.id}')">
+        <span class="mob-icon">${i.icon}</span>${i.label}
+      </button>`).join('');
+  }).join('');
+}
+
+function mobileNavTo(id) {
+  nav(id);
+  closeMobileDrawer();
+  // Mettre à jour titre header
+  const titleEl = document.getElementById('mobile-header-title');
+  const found = MOB_SECTIONS.flatMap(g=>g.items).find(i=>i.id===id);
+  if (titleEl && found) titleEl.textContent = found.label;
+  // Rebuild pour mettre à jour active
+  setTimeout(() => buildMobileDrawer(), 50);
+}
+
+function toggleMobileDrawer() {
+  const drawer  = document.getElementById('mobile-drawer');
+  const overlay = document.getElementById('mobile-overlay');
+  if (!drawer) return;
+  const isOpen = drawer.classList.contains('open');
+  if (isOpen) { closeMobileDrawer(); }
+  else {
+    buildMobileDrawer();
+    updateMobXP();
+    drawer.classList.add('open');
+    overlay.classList.add('show');
+    // Animer le hamburger → X
+    const spans = document.querySelectorAll('#mob-hamburger span');
+    if (spans.length === 3) {
+      spans[0].style.transform = 'translateY(7px) rotate(45deg)';
+      spans[1].style.opacity = '0';
+      spans[2].style.transform = 'translateY(-7px) rotate(-45deg)';
+    }
   }
+}
+
+function closeMobileDrawer() {
+  document.getElementById('mobile-drawer')?.classList.remove('open');
+  document.getElementById('mobile-overlay')?.classList.remove('show');
+  // Reset hamburger
+  const spans = document.querySelectorAll('#mob-hamburger span');
+  spans.forEach(s => { s.style.transform = ''; s.style.opacity = ''; });
+}
+
+function updateMobXP() {
+  const xpEl = document.getElementById('mob-xp-mini');
+  const levelEl = document.getElementById('mob-drawer-level');
+  if (!data.xp) return;
+  const lvl = getLevelInfo(data.xp.total || 0);
+  if (xpEl) xpEl.textContent = `${lvl.emoji} Niv.${lvl.level}`;
+  if (levelEl) levelEl.textContent = `${lvl.name} · ${(data.xp.total||0).toLocaleString('fr-FR')} XP`;
 }
 
 // ==================== THÈMES ====================
