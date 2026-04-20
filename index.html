@@ -39,61 +39,6 @@
     --radius-lg: 18px;
   }
 
-// ===== DASH WIDGETS (moved from module) =====
-
-const DASH_WIDGETS = [
-  { id:'quote-card',        label:'Citation du jour',  icon:'💬' },
-  { id:'xp-widget',         label:'Niveau & XP',       icon:'⭐' },
-  { id:'flux-widget',       label:'Mode Flux',         icon:'🧠' },
-  { id:'weather-card',      label:'Météo',             icon:'🌤' },
-  { id:'ai-dashboard-card', label:'Analyse IA',        icon:'✦'  },
-];
-function toggleDashWidget(id) {
-  if (!data.dashWidgets) data.dashWidgets = {};
-  data.dashWidgets[id] = data.dashWidgets[id] === false ? true : false;
-  save();
-  applyDashWidgets();
-  renderDashWidgets();
-}
-
-function renderDashWidgets() {
-  const el = document.getElementById('dash-widgets-list');
-  if (!el) return;
-  if (!data.dashWidgets) data.dashWidgets = {};
-  el.innerHTML = '';
-  DASH_WIDGETS.forEach(function(w) {
-    var on = data.dashWidgets[w.id] !== false;
-    var row = document.createElement('div');
-    row.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--bg3);border-radius:10px;border:1px solid var(--border);margin-bottom:8px';
-    var lbl = document.createElement('div');
-    lbl.style.cssText = 'display:flex;align-items:center;gap:12px';
-    lbl.innerHTML = '<span style="font-size:22px">' + w.icon + '</span><div><div style="font-size:13px;font-weight:600">' + w.label + '</div><div style="font-size:11px;color:' + (on ? '#40d0a0' : '#888') + '">' + (on ? '✓ Visible' : '✗ Masqué') + '</div></div>';
-    var btn = document.createElement('button');
-    btn.type = 'button';
-    btn.textContent = on ? 'ON' : 'OFF';
-    btn.style.cssText = 'padding:8px 22px;border-radius:8px;border:2px solid ' + (on ? 'var(--accent)' : 'var(--border)') + ';cursor:pointer;font-size:13px;font-weight:700;font-family:inherit;background:' + (on ? 'var(--accent)' : 'transparent') + ';color:' + (on ? '#0e0e10' : 'var(--text)');
-    btn.setAttribute('data-id', w.id);
-    btn.onclick = function() {
-      var id = this.getAttribute('data-id');
-      if (!data.dashWidgets) data.dashWidgets = {};
-      data.dashWidgets[id] = data.dashWidgets[id] === false ? true : false;
-      save();
-      applyDashWidgets();
-      renderDashWidgets();
-    };
-    row.appendChild(lbl);
-    row.appendChild(btn);
-    el.appendChild(row);
-  });
-}
-
-function applyDashWidgets() {
-  if (!data.dashWidgets) return;
-  DASH_WIDGETS.forEach(w => {
-    const el = document.getElementById(w.id);
-    if (el) el.style.display = data.dashWidgets[w.id] === false ? 'none' : '';
-  });
-}
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
@@ -784,66 +729,165 @@ function applyDashWidgets() {
 </div>
 
 <!-- ===== PAGE LOGIN ===== -->
-<div id="login-page" style="position:fixed;inset:0;background:#0a0a0f;display:flex;align-items:center;justify-content:center;z-index:9999;flex-direction:column">
-
-  <!-- Fond animé -->
-  <div style="position:absolute;inset:0;overflow:hidden;pointer-events:none">
-    <div style="position:absolute;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(160,96,255,0.15),transparent);top:-100px;left:-100px;animation:float1 8s ease-in-out infinite"></div>
-    <div style="position:absolute;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(200,169,110,0.1),transparent);bottom:-50px;right:-50px;animation:float2 10s ease-in-out infinite"></div>
-  </div>
+<div id="login-page" style="position:fixed;inset:0;background:#0a0a0f;z-index:9999;overflow-y:auto;display:flex;flex-direction:column">
 
   <style>
     @keyframes float1 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(40px,30px)} }
     @keyframes float2 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-30px,-20px)} }
     @keyframes loginShake { 0%,100%{transform:translateX(0)} 20%,60%{transform:translateX(-8px)} 40%,80%{transform:translateX(8px)} }
-    #login-box { animation: none; }
+    @keyframes fadeInUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
     #login-box.shake { animation: loginShake 0.4s ease; }
+    .lp-feature { animation: fadeInUp .5s ease both; }
+    .lp-feature:nth-child(1){animation-delay:.1s}
+    .lp-feature:nth-child(2){animation-delay:.2s}
+    .lp-feature:nth-child(3){animation-delay:.3s}
+    .lp-feature:nth-child(4){animation-delay:.4s}
+    .lp-feature:nth-child(5){animation-delay:.5s}
+    .lp-feature:nth-child(6){animation-delay:.6s}
+    .lp-btn-cta:hover { transform:translateY(-2px); box-shadow:0 8px 32px rgba(160,96,255,0.4); }
   </style>
 
-  <!-- Logo -->
-  <div style="text-align:center;margin-bottom:32px;position:relative;z-index:1">
-    <div style="font-size:56px;margin-bottom:8px">✦</div>
-    <div style="font-size:32px;font-weight:800;color:#fff;letter-spacing:.05em">IKIGAI</div>
-    <div style="font-size:13px;color:rgba(255,255,255,0.4);margin-top:4px">Ton espace de développement personnel</div>
+  <!-- Fond animé -->
+  <div style="position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:0">
+    <div style="position:absolute;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(160,96,255,0.12),transparent);top:-200px;left:-100px;animation:float1 8s ease-in-out infinite"></div>
+    <div style="position:absolute;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(200,169,110,0.08),transparent);bottom:-100px;right:-50px;animation:float2 10s ease-in-out infinite"></div>
+    <div style="position:absolute;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(64,208,160,0.06),transparent);top:50%;left:60%;animation:float1 12s ease-in-out infinite reverse"></div>
   </div>
 
-  <!-- Carte login -->
-  <div id="login-box" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:36px 40px;width:100%;max-width:380px;backdrop-filter:blur(20px);position:relative;z-index:1">
-    <div style="font-size:18px;font-weight:700;color:#fff;margin-bottom:6px;text-align:center">Connexion</div>
-    <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:24px;text-align:center">Entre tes identifiants pour accéder à Ikigai</div>
+  <!-- ===== LANDING PAGE (visible si pas connecté) ===== -->
+  <div id="landing-section" style="position:relative;z-index:1;max-width:900px;margin:0 auto;padding:60px 24px 80px;width:100%">
 
-    <div style="margin-bottom:14px">
-      <label style="font-size:12px;color:rgba(255,255,255,0.5);display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em">Identifiant</label>
-      <input id="login-user" type="text" placeholder="Ton identifiant" autocomplete="username"
-        style="width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:12px 14px;color:#fff;font-size:14px;outline:none;box-sizing:border-box;transition:border .2s"
-        onfocus="this.style.borderColor='rgba(160,96,255,0.6)'" onblur="this.style.borderColor='rgba(255,255,255,0.12)'"
-        onkeydown="if(event.key==='Enter')document.getElementById('login-pass').focus()">
-    </div>
-
-    <div style="margin-bottom:20px">
-      <label style="font-size:12px;color:rgba(255,255,255,0.5);display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em">Mot de passe</label>
-      <div style="position:relative">
-        <input id="login-pass" type="password" placeholder="Ton mot de passe" autocomplete="current-password"
-          style="width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:12px 14px;padding-right:44px;color:#fff;font-size:14px;outline:none;box-sizing:border-box;transition:border .2s"
-          onfocus="this.style.borderColor='rgba(160,96,255,0.6)'" onblur="this.style.borderColor='rgba(255,255,255,0.12)'"
-          onkeydown="if(event.key==='Enter')tryLogin()">
-        <button onclick="togglePassVis()" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:rgba(255,255,255,0.4);cursor:pointer;font-size:16px" id="pass-vis-btn">👁</button>
+    <!-- Hero -->
+    <div style="text-align:center;margin-bottom:72px;animation:fadeInUp .6s ease both">
+      <div style="font-size:72px;margin-bottom:16px;filter:drop-shadow(0 0 30px rgba(200,169,110,0.4))">✦</div>
+      <div style="font-size:52px;font-weight:900;color:#fff;letter-spacing:-.02em;margin-bottom:12px;line-height:1.1">IKIGAI</div>
+      <div style="font-size:20px;color:rgba(255,255,255,0.55);margin-bottom:32px;font-weight:300;line-height:1.5">
+        Ton espace de développement personnel<br>tout-en-un. Gratuit. 100% privé.
+      </div>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+        <button onclick="showLoginBox()" class="lp-btn-cta" style="padding:16px 36px;background:linear-gradient(135deg,#a060ff,#c8a96e);border:none;border-radius:14px;color:#fff;font-size:16px;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:.03em">
+          Accéder à mon espace ✦
+        </button>
+        <button onclick="document.getElementById('lp-features').scrollIntoView({behavior:'smooth'})" style="padding:16px 28px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);border-radius:14px;color:#fff;font-size:15px;cursor:pointer;transition:all .2s" onmouseenter="this.style.background='rgba(255,255,255,0.1)'" onmouseleave="this.style.background='rgba(255,255,255,0.06)'">
+          Voir les features ↓
+        </button>
       </div>
     </div>
 
-    <div id="login-error" style="display:none;background:rgba(255,60,60,0.15);border:1px solid rgba(255,60,60,0.3);border-radius:8px;padding:10px 12px;font-size:12px;color:#ff6060;margin-bottom:14px;text-align:center">
-      ❌ Identifiant ou mot de passe incorrect
+    <!-- Stats -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:72px;animation:fadeInUp .6s ease .2s both">
+      <div style="text-align:center;padding:24px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:16px">
+        <div style="font-size:36px;font-weight:800;color:#c8a96e">20+</div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.45);margin-top:4px">Sections</div>
+      </div>
+      <div style="text-align:center;padding:24px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:16px">
+        <div style="font-size:36px;font-weight:800;color:#a060ff">130+</div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.45);margin-top:4px">Livres en bibliothèque</div>
+      </div>
+      <div style="text-align:center;padding:24px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:16px">
+        <div style="font-size:36px;font-weight:800;color:#40d0a0">100%</div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.45);margin-top:4px">Local & Privé</div>
+      </div>
     </div>
 
-    <button onclick="tryLogin()" style="width:100%;padding:14px;background:linear-gradient(135deg,#a060ff,#c8a96e);border:none;border-radius:12px;color:#fff;font-size:15px;font-weight:700;cursor:pointer;transition:opacity .2s;letter-spacing:.03em"
-      onmouseenter="this.style.opacity='.9'" onmouseleave="this.style.opacity='1'">
-      Entrer ✦
-    </button>
+    <!-- Features -->
+    <div id="lp-features" style="margin-bottom:72px">
+      <div style="text-align:center;margin-bottom:36px;animation:fadeInUp .5s ease both">
+        <div style="font-size:28px;font-weight:800;color:#fff;margin-bottom:8px">Tout ce dont tu as besoin</div>
+        <div style="font-size:14px;color:rgba(255,255,255,0.4)">Une seule app. Zéro abonnement. Tes données restent chez toi.</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px">
+        <div class="lp-feature" style="padding:24px;background:rgba(160,96,255,0.06);border:1px solid rgba(160,96,255,0.2);border-radius:16px">
+          <div style="font-size:32px;margin-bottom:12px">⟳</div>
+          <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:6px">Habitudes & Streak</div>
+          <div style="font-size:12px;color:rgba(255,255,255,0.45);line-height:1.6">Tracker tes habitudes quotidiennes avec heatmap, streak de feu et statistiques avancées.</div>
+        </div>
+        <div class="lp-feature" style="padding:24px;background:rgba(200,169,110,0.06);border:1px solid rgba(200,169,110,0.2);border-radius:16px">
+          <div style="font-size:32px;margin-bottom:12px">⭐</div>
+          <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:6px">XP & Niveaux</div>
+          <div style="font-size:12px;color:rgba(255,255,255,0.45);line-height:1.6">Gagne des points d'expérience, monte de niveau et débloque des badges en progressant.</div>
+        </div>
+        <div class="lp-feature" style="padding:24px;background:rgba(64,208,160,0.06);border:1px solid rgba(64,208,160,0.2);border-radius:16px">
+          <div style="font-size:32px;margin-bottom:12px">📅</div>
+          <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:6px">Calendrier & Cours</div>
+          <div style="font-size:12px;color:rgba(255,255,255,0.45);line-height:1.6">Importe ton planning depuis Netypareo ou Pronote (.ics) en un clic.</div>
+        </div>
+        <div class="lp-feature" style="padding:24px;background:rgba(96,160,255,0.06);border:1px solid rgba(96,160,255,0.2);border-radius:16px">
+          <div style="font-size:32px;margin-bottom:12px">🃏</div>
+          <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:6px">Flashcards Ebbinghaus</div>
+          <div style="font-size:12px;color:rgba(255,255,255,0.45);line-height:1.6">Révision espacée intelligente basée sur la courbe d'oubli. Retiens tout ce que tu apprends.</div>
+        </div>
+        <div class="lp-feature" style="padding:24px;background:rgba(255,96,64,0.06);border:1px solid rgba(255,96,64,0.2);border-radius:16px">
+          <div style="font-size:32px;margin-bottom:12px">◎</div>
+          <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:6px">Mode Focus</div>
+          <div style="font-size:12px;color:rgba(255,255,255,0.45);line-height:1.6">Pomodoro immersif avec 5 ambiances : Lofi NYC, Bar Jazz, Bibliothèque, Forêt...</div>
+        </div>
+        <div class="lp-feature" style="padding:24px;background:rgba(255,64,160,0.06);border:1px solid rgba(255,64,160,0.2);border-radius:16px">
+          <div style="font-size:32px;margin-bottom:12px">💸</div>
+          <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:6px">Finance & Budget</div>
+          <div style="font-size:12px;color:rgba(255,255,255,0.45);line-height:1.6">Tracker de dépenses, investissements, plan DCA, objectifs d'épargne.</div>
+        </div>
+      </div>
+    </div>
 
-    <div style="text-align:center;margin-top:16px;font-size:11px;color:rgba(255,255,255,0.25)">
-      Ikigai · Développement personnel
+    <!-- CTA final -->
+    <div style="text-align:center;padding:48px 32px;background:linear-gradient(135deg,rgba(160,96,255,0.1),rgba(200,169,110,0.06));border:1px solid rgba(160,96,255,0.2);border-radius:24px;animation:fadeInUp .5s ease .3s both">
+      <div style="font-size:32px;font-weight:800;color:#fff;margin-bottom:12px">Prêt à commencer ?</div>
+      <div style="font-size:14px;color:rgba(255,255,255,0.45);margin-bottom:28px">Tes données restent sur ton appareil. Aucune inscription requise.</div>
+      <button onclick="showLoginBox()" class="lp-btn-cta" style="padding:16px 48px;background:linear-gradient(135deg,#a060ff,#c8a96e);border:none;border-radius:14px;color:#fff;font-size:17px;font-weight:700;cursor:pointer;transition:all .2s">
+        Accéder à Ikigai ✦
+      </button>
+    </div>
+
+  </div>
+
+  <!-- ===== LOGIN BOX (caché par défaut) ===== -->
+  <div id="login-box-wrap" style="display:none;position:fixed;inset:0;z-index:10;background:rgba(0,0,0,0.7);backdrop-filter:blur(8px);align-items:center;justify-content:center;flex-direction:column">
+
+    <div style="text-align:center;margin-bottom:24px">
+      <div style="font-size:40px;margin-bottom:6px">✦</div>
+      <div style="font-size:24px;font-weight:800;color:#fff">IKIGAI</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.35);margin-top:2px">Connexion à ton espace</div>
+    </div>
+
+    <div id="login-box" style="background:rgba(20,20,28,0.95);border:1px solid rgba(255,255,255,0.12);border-radius:20px;padding:36px 40px;width:100%;max-width:380px;position:relative;box-shadow:0 24px 80px rgba(0,0,0,0.6)">
+
+      <button onclick="hideLoginBox()" style="position:absolute;top:16px;right:16px;background:none;border:none;color:rgba(255,255,255,0.4);cursor:pointer;font-size:20px;line-height:1">✕</button>
+
+      <div style="font-size:17px;font-weight:700;color:#fff;margin-bottom:4px;text-align:center">Connexion</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.35);margin-bottom:24px;text-align:center">Entre tes identifiants</div>
+
+      <div style="margin-bottom:14px">
+        <label style="font-size:11px;color:rgba(255,255,255,0.5);display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em">Identifiant</label>
+        <input id="login-user" type="text" placeholder="Ton identifiant" autocomplete="username"
+          style="width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:12px 14px;color:#fff;font-size:14px;outline:none;box-sizing:border-box;transition:border .2s"
+          onfocus="this.style.borderColor='rgba(160,96,255,0.6)'" onblur="this.style.borderColor='rgba(255,255,255,0.12)'"
+          onkeydown="if(event.key==='Enter')document.getElementById('login-pass').focus()">
+      </div>
+
+      <div style="margin-bottom:20px">
+        <label style="font-size:11px;color:rgba(255,255,255,0.5);display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em">Mot de passe</label>
+        <div style="position:relative">
+          <input id="login-pass" type="password" placeholder="Ton mot de passe" autocomplete="current-password"
+            style="width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:12px 14px;padding-right:44px;color:#fff;font-size:14px;outline:none;box-sizing:border-box;transition:border .2s"
+            onfocus="this.style.borderColor='rgba(160,96,255,0.6)'" onblur="this.style.borderColor='rgba(255,255,255,0.12)'"
+            onkeydown="if(event.key==='Enter')tryLogin()">
+          <button onclick="togglePassVis()" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:rgba(255,255,255,0.4);cursor:pointer;font-size:16px" id="pass-vis-btn">👁</button>
+        </div>
+      </div>
+
+      <div id="login-error" style="display:none;background:rgba(255,60,60,0.15);border:1px solid rgba(255,60,60,0.3);border-radius:8px;padding:10px 12px;font-size:12px;color:#ff6060;margin-bottom:14px;text-align:center">
+        ❌ Identifiant ou mot de passe incorrect
+      </div>
+
+      <button onclick="tryLogin()" style="width:100%;padding:14px;background:linear-gradient(135deg,#a060ff,#c8a96e);border:none;border-radius:12px;color:#fff;font-size:15px;font-weight:700;cursor:pointer;letter-spacing:.03em"
+        onmouseenter="this.style.opacity='.9'" onmouseleave="this.style.opacity='1'">
+        Entrer ✦
+      </button>
+
     </div>
   </div>
+
 </div>
 <div class="app">
 
@@ -3643,87 +3687,6 @@ body:has(#s-focus.active) .main { overflow: hidden; padding: 0; }
 
 <script type="module">
 // ==================== COACH VOCAL IA ====================
-let _voiceSpeaking = false;
-
-function voiceCoach() {
-  if (!('speechSynthesis' in window)) {
-    alert('Ton navigateur ne supporte pas la synthèse vocale. Essaie Chrome ou Edge.');
-    return;
-  }
-  if (_voiceSpeaking) {
-    window.speechSynthesis.cancel();
-    _voiceSpeaking = false;
-    document.getElementById('voice-coach-btn').innerHTML = '🎙 Coach vocal';
-    return;
-  }
-
-  // Construire le message à lire
-  const heure = new Date().getHours();
-  const greeting = heure < 12 ? 'Bonjour' : heure < 18 ? 'Bon après-midi' : 'Bonsoir';
-  const prenom = data.profil?.prenom || '';
-
-  const doneHab = data.habitudes.filter(h => data.habitDone[today() + h.id]).length;
-  const totalHab = data.habitudes.length;
-  const doneObj  = (data.objectifs.jour||[]).filter(o => o.done).length;
-  const totalObj = (data.objectifs.jour||[]).length;
-  const streak   = calcStreakData().streak;
-
-  let msg = `${greeting} ${prenom}. `;
-  if (totalHab > 0) {
-    if (doneHab === totalHab) msg += `Excellent ! Tu as coché toutes tes ${totalHab} habitudes aujourd'hui. `;
-    else if (doneHab > 0)     msg += `Tu as complété ${doneHab} habitude${doneHab>1?'s':''} sur ${totalHab} aujourd'hui. `;
-    else                      msg += `Tu n'as pas encore coché d'habitudes aujourd'hui. `;
-  }
-  if (totalObj > 0) msg += `Pour tes objectifs, ${doneObj} sur ${totalObj} sont accomplis. `;
-  if (streak > 0)   msg += `Tu es sur une série de ${streak} jour${streak>1?'s':''}. Garde ce rythme ! `;
-  if (heure < 9)         msg += `C'est le matin, le meilleur moment pour attaquer tes tâches les plus importantes.`;
-  else if (heure < 12)   msg += `Tu es dans ta fenêtre de concentration optimale. Profite-en !`;
-  else if (heure < 14)   msg += `Après le déjeuner, prends 5 minutes pour faire le point avant de reprendre.`;
-  else if (heure < 17)   msg += `L'après-midi avance. Si tu as des habitudes non cochées, c'est le moment.`;
-  else if (heure < 20)   msg += `La journée touche à sa fin. Note 3 choses positives dans ton journal.`;
-  else                   msg += `Il est tard. Prépare ta liste de demain et repose-toi bien.`;
-  if (data.xp?.today > 0) msg += ` Tu as gagné ${data.xp.today} points d'expérience aujourd'hui. Bravo !`;
-
-  function speak(voice) {
-    window.speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(msg);
-    u.lang  = 'fr-FR';
-    u.rate  = 0.92;
-    u.pitch = 1.0;
-    u.volume = 1.0;
-    if (voice) u.voice = voice;
-    u.onstart = () => {
-      _voiceSpeaking = true;
-      const btn = document.getElementById('voice-coach-btn');
-      if (btn) btn.innerHTML = '⏹ Arrêter';
-    };
-    u.onend = u.onerror = () => {
-      _voiceSpeaking = false;
-      const btn = document.getElementById('voice-coach-btn');
-      if (btn) btn.innerHTML = '🎙 Coach vocal';
-    };
-    window.speechSynthesis.speak(u);
-  }
-
-  // Les voix sont chargées de manière asynchrone dans certains navigateurs
-  const voices = window.speechSynthesis.getVoices();
-  if (voices.length > 0) {
-    const fr = voices.find(v => v.lang.startsWith('fr')) || null;
-    speak(fr);
-  } else {
-    // Attendre que les voix soient prêtes
-    window.speechSynthesis.onvoiceschanged = () => {
-      const v2 = window.speechSynthesis.getVoices();
-      const fr = v2.find(v => v.lang.startsWith('fr')) || null;
-      speak(fr);
-      window.speechSynthesis.onvoiceschanged = null;
-    };
-    // Fallback si onvoiceschanged ne se déclenche pas
-    setTimeout(() => {
-      if (!_voiceSpeaking) speak(null);
-    }, 500);
-  }
-}
 
 // ==================== DASHBOARD WIDGETS ====================,
   { id:'xp-widget',        label:'Niveau & XP',             icon:'⭐' },
@@ -3799,6 +3762,169 @@ window._fbSave = async () => {
 </script>
 
 <script>
+
+// ===== DASH WIDGETS (moved from module) =====
+
+const DASH_WIDGETS = [
+  { id:'quote-card',        label:'Citation du jour',  icon:'💬' },
+  { id:'xp-widget',         label:'Niveau & XP',       icon:'⭐' },
+  { id:'flux-widget',       label:'Mode Flux',         icon:'🧠' },
+  { id:'weather-card',      label:'Météo',             icon:'🌤' },
+  { id:'ai-dashboard-card', label:'Analyse IA',        icon:'✦'  },
+];
+function toggleDashWidget(id) {
+  if (!data.dashWidgets) data.dashWidgets = {};
+  data.dashWidgets[id] = data.dashWidgets[id] === false ? true : false;
+  save();
+  applyDashWidgets();
+  renderDashWidgets();
+}
+
+function renderDashWidgets() {
+  const el = document.getElementById('dash-widgets-list');
+  if (!el) return;
+  if (!data.dashWidgets) data.dashWidgets = {};
+  el.innerHTML = '';
+  DASH_WIDGETS.forEach(function(w) {
+    var on = data.dashWidgets[w.id] !== false;
+    var row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--bg3);border-radius:10px;border:1px solid var(--border);margin-bottom:8px';
+    var lbl = document.createElement('div');
+    lbl.style.cssText = 'display:flex;align-items:center;gap:12px';
+    lbl.innerHTML = '<span style="font-size:22px">' + w.icon + '</span><div><div style="font-size:13px;font-weight:600">' + w.label + '</div><div style="font-size:11px;color:' + (on ? '#40d0a0' : '#888') + '">' + (on ? '✓ Visible' : '✗ Masqué') + '</div></div>';
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.textContent = on ? 'ON' : 'OFF';
+    btn.style.cssText = 'padding:8px 22px;border-radius:8px;border:2px solid ' + (on ? 'var(--accent)' : 'var(--border)') + ';cursor:pointer;font-size:13px;font-weight:700;font-family:inherit;background:' + (on ? 'var(--accent)' : 'transparent') + ';color:' + (on ? '#0e0e10' : 'var(--text)');
+    btn.setAttribute('data-id', w.id);
+    btn.onclick = function() {
+      var id = this.getAttribute('data-id');
+      if (!data.dashWidgets) data.dashWidgets = {};
+      data.dashWidgets[id] = data.dashWidgets[id] === false ? true : false;
+      save();
+      applyDashWidgets();
+      renderDashWidgets();
+    };
+    row.appendChild(lbl);
+    row.appendChild(btn);
+    el.appendChild(row);
+  });
+}
+
+function applyDashWidgets() {
+  if (!data.dashWidgets) return;
+  DASH_WIDGETS.forEach(w => {
+    const el = document.getElementById(w.id);
+    if (el) el.style.display = data.dashWidgets[w.id] === false ? 'none' : '';
+  });
+}
+
+
+let _voiceSpeaking = false;
+
+function voiceCoach() {
+  if (!('speechSynthesis' in window)) {
+    alert('Synthèse vocale non supportée. Utilise Chrome ou Edge.');
+    return;
+  }
+
+  if (_voiceSpeaking) {
+    window.speechSynthesis.cancel();
+    _voiceSpeaking = false;
+    const btn = document.getElementById('voice-coach-btn');
+    if (btn) btn.innerHTML = '🎙 Coach vocal';
+    return;
+  }
+
+  // Construire le message
+  let msg = '';
+  try {
+    const heure = new Date().getHours();
+    const greeting = heure < 12 ? 'Bonjour' : heure < 18 ? 'Bon après-midi' : 'Bonsoir';
+    const prenom = (data && data.profil && data.profil.prenom) ? data.profil.prenom : '';
+    msg += greeting + (prenom ? ' ' + prenom : '') + '. ';
+
+    if (data && data.habitudes && data.habitudes.length > 0) {
+      const doneHab = data.habitudes.filter(h => data.habitDone && data.habitDone[today() + h.id]).length;
+      const totalHab = data.habitudes.length;
+      if (doneHab === totalHab) msg += 'Excellent, toutes tes habitudes sont cochées. ';
+      else if (doneHab > 0) msg += 'Tu as coché ' + doneHab + ' habitude sur ' + totalHab + ' aujourd\'hui. ';
+      else msg += 'Tu n\'as pas encore coché d\'habitudes aujourd\'hui. ';
+    }
+
+    if (heure < 9)       msg += 'C\'est le matin, parfait pour attaquer les tâches importantes.';
+    else if (heure < 12) msg += 'Tu es dans ta fenêtre de concentration optimale, profites-en.';
+    else if (heure < 14) msg += 'Après le déjeuner, prends 5 minutes pour faire le point.';
+    else if (heure < 17) msg += 'L\'après-midi avance, finis tes habitudes avant ce soir.';
+    else if (heure < 20) msg += 'La journée touche à sa fin, note 3 choses positives dans ton journal.';
+    else                 msg += 'Il est tard, prépare ta liste de demain et repose-toi bien.';
+  } catch(e) {
+    msg = 'Bonjour ! Continue sur ta lancée, chaque jour compte.';
+  }
+
+  // Lancer la synthèse
+  try {
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(msg);
+    u.lang = 'fr-FR';
+    u.rate = 0.9;
+    u.pitch = 1;
+    u.volume = 1;
+
+    u.onstart = () => {
+      _voiceSpeaking = true;
+      const btn = document.getElementById('voice-coach-btn');
+      if (btn) btn.innerHTML = '⏹ Arrêter';
+    };
+    u.onend = () => {
+      _voiceSpeaking = false;
+      const btn = document.getElementById('voice-coach-btn');
+      if (btn) btn.innerHTML = '🎙 Coach vocal';
+    };
+    u.onerror = (e) => {
+      _voiceSpeaking = false;
+      const btn = document.getElementById('voice-coach-btn');
+      if (btn) btn.innerHTML = '🎙 Coach vocal';
+      console.log('Speech error:', e);
+    };
+
+    // Afficher le texte dans le dashboard pendant la lecture
+    const info = document.createElement('div');
+    info.id = 'voice-msg-display';
+    info.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--bg2);border:1px solid rgba(160,96,255,.4);border-radius:16px;padding:16px 24px;max-width:500px;width:90%;z-index:9999;font-size:13px;line-height:1.6;color:var(--text);box-shadow:0 8px 32px rgba(0,0,0,.4)';
+    info.innerHTML = '<div style="font-size:11px;color:#a060ff;font-weight:700;margin-bottom:6px">🎙 COACH VOCAL</div>' + msg + '<div style="margin-top:10px;text-align:right"><button onclick="window.speechSynthesis.cancel();document.getElementById(\'voice-msg-display\')?.remove()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:12px">✕ Fermer</button></div>';
+    document.getElementById('voice-msg-display')?.remove();
+    document.body.appendChild(info);
+    u.onend = () => {
+      _voiceSpeaking = false;
+      const btn = document.getElementById('voice-coach-btn');
+      if (btn) btn.innerHTML = '🎙 Coach vocal';
+      setTimeout(() => document.getElementById('voice-msg-display')?.remove(), 3000);
+    };
+
+    // Essayer avec voix française d'abord
+    const trySpeak = () => {
+      const voices = window.speechSynthesis.getVoices();
+      const fr = voices.find(v => v.lang && v.lang.startsWith('fr'));
+      if (fr) u.voice = fr;
+      window.speechSynthesis.speak(u);
+    };
+
+    const voices = window.speechSynthesis.getVoices();
+    if (voices.length > 0) {
+      trySpeak();
+    } else {
+      window.speechSynthesis.onvoiceschanged = () => {
+        window.speechSynthesis.onvoiceschanged = null;
+        trySpeak();
+      };
+      setTimeout(trySpeak, 300);
+    }
+  } catch(e) {
+    alert('Erreur coach vocal : ' + e.message);
+  }
+}
+
 // ==================== MODE FLUX — Détection état mental ====================
 const FluxEngine = {
   // Données collectées
@@ -4253,9 +4379,9 @@ function tryLogin() {
     loginPage.style.opacity = '0';
     setTimeout(() => {
       loginPage.style.display = 'none';
-      checkOnboarding(); // Lancer onboarding si première fois
+      hideLoginBox();
+      checkOnboarding();
     }, 400);
-    // Mettre à jour le greeting avec le nom
     if (data.profil && !data.profil.prenom) { data.profil.prenom = user.name; }
     updateDashboardGreeting();
   } else {
@@ -4278,11 +4404,24 @@ function togglePassVis() {
   if (btn) btn.textContent = inp.type === 'password' ? '👁' : '🙈';
 }
 
+function showLoginBox() {
+  const wrap = document.getElementById('login-box-wrap');
+  if (wrap) { wrap.style.display = 'flex'; setTimeout(() => document.getElementById('login-user')?.focus(), 100); }
+}
+function hideLoginBox() {
+  const wrap = document.getElementById('login-box-wrap');
+  if (wrap) wrap.style.display = 'none';
+}
+
 function checkLogin() {
   const session = sessionStorage.getItem('ikigai_logged');
   if (session) {
-    const loginPage = document.getElementById('login-page');
-    if (loginPage) loginPage.style.display = 'none';
+    // Déjà connecté — cacher toute la login page
+    const lp = document.getElementById('login-page');
+    if (lp) lp.style.display = 'none';
+  } else {
+    // Pas connecté — montrer landing page (login-page visible par défaut)
+    // La landing est déjà visible, login-box-wrap est caché
   }
 }
 
