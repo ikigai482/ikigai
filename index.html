@@ -38,6 +38,63 @@
     --radius: 12px;
     --radius-lg: 18px;
   }
+
+// ===== DASH WIDGETS (moved from module) =====
+
+const DASH_WIDGETS = [
+  { id:'quote-card',        label:'Citation du jour',  icon:'💬' },
+  { id:'xp-widget',         label:'Niveau & XP',       icon:'⭐' },
+  { id:'flux-widget',       label:'Mode Flux',         icon:'🧠' },
+  { id:'weather-card',      label:'Météo',             icon:'🌤' },
+  { id:'ai-dashboard-card', label:'Analyse IA',        icon:'✦'  },
+];
+function toggleDashWidget(id) {
+  if (!data.dashWidgets) data.dashWidgets = {};
+  data.dashWidgets[id] = data.dashWidgets[id] === false ? true : false;
+  save();
+  applyDashWidgets();
+  renderDashWidgets();
+}
+
+function renderDashWidgets() {
+  const el = document.getElementById('dash-widgets-list');
+  if (!el) return;
+  if (!data.dashWidgets) data.dashWidgets = {};
+  el.innerHTML = '';
+  DASH_WIDGETS.forEach(function(w) {
+    var on = data.dashWidgets[w.id] !== false;
+    var row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--bg3);border-radius:10px;border:1px solid var(--border);margin-bottom:8px';
+    var lbl = document.createElement('div');
+    lbl.style.cssText = 'display:flex;align-items:center;gap:12px';
+    lbl.innerHTML = '<span style="font-size:22px">' + w.icon + '</span><div><div style="font-size:13px;font-weight:600">' + w.label + '</div><div style="font-size:11px;color:' + (on ? '#40d0a0' : '#888') + '">' + (on ? '✓ Visible' : '✗ Masqué') + '</div></div>';
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.textContent = on ? 'ON' : 'OFF';
+    btn.style.cssText = 'padding:8px 22px;border-radius:8px;border:2px solid ' + (on ? 'var(--accent)' : 'var(--border)') + ';cursor:pointer;font-size:13px;font-weight:700;font-family:inherit;background:' + (on ? 'var(--accent)' : 'transparent') + ';color:' + (on ? '#0e0e10' : 'var(--text)');
+    btn.setAttribute('data-id', w.id);
+    btn.onclick = function() {
+      var id = this.getAttribute('data-id');
+      if (!data.dashWidgets) data.dashWidgets = {};
+      data.dashWidgets[id] = data.dashWidgets[id] === false ? true : false;
+      save();
+      applyDashWidgets();
+      renderDashWidgets();
+    };
+    row.appendChild(lbl);
+    row.appendChild(btn);
+    el.appendChild(row);
+  });
+}
+
+function applyDashWidgets() {
+  if (!data.dashWidgets) return;
+  DASH_WIDGETS.forEach(w => {
+    const el = document.getElementById(w.id);
+    if (el) el.style.display = data.dashWidgets[w.id] === false ? 'none' : '';
+  });
+}
+
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
     background: var(--bg);
@@ -455,6 +512,124 @@
   ::-webkit-scrollbar { width: 5px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: var(--bg3); border-radius: 3px; }
+
+  /* ===== ANIMATIONS ===== */
+
+  /* Entrée des sections — pas pour le focus */
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(14px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+  .section.active:not(#s-focus) {
+    animation: fadeUp .3s ease both;
+  }
+
+  /* Entrée des cards avec décalage — pas pour le focus */
+  @keyframes cardIn {
+    from { opacity:0; transform:translateY(10px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+  .section.active:not(#s-focus) .card { animation: cardIn .3s ease both; }
+  .section.active:not(#s-focus) .card:nth-child(1)  { animation-delay: .04s; }
+  .section.active:not(#s-focus) .card:nth-child(2)  { animation-delay: .08s; }
+  .section.active:not(#s-focus) .card:nth-child(3)  { animation-delay: .12s; }
+  .section.active:not(#s-focus) .card:nth-child(4)  { animation-delay: .16s; }
+  .section.active:not(#s-focus) .card:nth-child(5)  { animation-delay: .20s; }
+  .section.active:not(#s-focus) .card:nth-child(6)  { animation-delay: .24s; }
+
+  /* Boutons */
+  .btn { transition: transform .12s, box-shadow .12s; }
+  .btn:hover  { transform: translateY(-2px); box-shadow: 0 4px 14px rgba(0,0,0,.3); }
+  .btn:active { transform: scale(.97); }
+
+  /* Nav items */
+  .nav-item { transition: background .15s, color .15s, transform .1s; }
+  .nav-item:hover { transform: translateX(2px); }
+
+  /* Stat mini hover */
+  .stat-mini { transition: transform .15s, box-shadow .15s; }
+  .stat-mini:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,.2); }
+
+  /* Inputs focus */
+  input, textarea, select {
+    transition: border-color .2s, box-shadow .2s;
+  }
+  input:focus, textarea:focus, select:focus {
+    box-shadow: 0 0 0 2px rgba(200,169,110,.2);
+  }
+
+  /* Habit check bounce */
+  @keyframes checkBounce {
+    0%   { transform: scale(1); }
+    40%  { transform: scale(1.25); }
+    70%  { transform: scale(.9); }
+    100% { transform: scale(1); }
+  }
+  .habit-check { transition: background .2s, border-color .2s; }
+  .habit-check.done { animation: checkBounce .3s ease; }
+
+  /* XP popup */
+  @keyframes xpPop {
+    0%   { opacity:0; transform:translateY(0) scale(.8); }
+    20%  { opacity:1; transform:translateY(-20px) scale(1.1); }
+    80%  { opacity:1; transform:translateY(-45px) scale(1); }
+    100% { opacity:0; transform:translateY(-65px) scale(.9); }
+  }
+  .xp-float {
+    position:fixed; pointer-events:none; z-index:9999;
+    font-size:15px; font-weight:800; color:var(--accent);
+    text-shadow:0 2px 8px rgba(0,0,0,.5);
+    animation: xpPop .9s ease forwards;
+  }
+
+  /* Confetti */
+  @keyframes confettiFall {
+    0%   { transform: translateY(-10px) rotate(0deg); opacity:1; }
+    100% { transform: translateY(100vh) rotate(600deg); opacity:0; }
+  }
+  .confetti-bit {
+    position:fixed; pointer-events:none; z-index:9998;
+    width:8px; height:8px; border-radius:2px;
+    animation: confettiFall linear forwards;
+  }
+
+  /* Badge toast */
+  @keyframes slideInRight {
+    from { transform: translateX(120%); opacity:0; }
+    to   { transform: translateX(0); opacity:1; }
+  }
+  .badge-toast {
+    position:fixed; bottom:24px; right:24px;
+    background:var(--bg2); border:1px solid rgba(160,96,255,.4);
+    border-radius:16px; padding:14px 18px;
+    display:flex; align-items:center; gap:12px;
+    z-index:9999; box-shadow:0 8px 32px rgba(0,0,0,.4);
+    animation: slideInRight .4s cubic-bezier(.34,1.56,.64,1) both;
+    max-width:280px;
+  }
+  .badge-toast.hide {
+    animation: slideInRight .3s ease reverse forwards;
+  }
+
+  /* Level up */
+  @keyframes levelUp {
+    0%   { transform:scale(.6); opacity:0; }
+    60%  { transform:scale(1.05); opacity:1; }
+    100% { transform:scale(1); opacity:1; }
+  }
+  .levelup-overlay {
+    position:fixed; inset:0; background:rgba(0,0,0,.75);
+    z-index:9997; display:flex; align-items:center; justify-content:center;
+    backdrop-filter:blur(6px);
+  }
+  .levelup-card {
+    text-align:center;
+    animation: levelUp .5s cubic-bezier(.34,1.56,.64,1) both;
+  }
+
+  /* Progress bars smooth */
+  .progress-bar-inner { transition: width .6s cubic-bezier(.4,0,.2,1); }
+
 </style>
 </head>
 <body>
@@ -684,6 +859,7 @@
   <div class="nav-item" id="nav-calendrier" onclick="nav('calendrier')"><span class="nav-icon">📅</span> Calendrier</div>
   <div class="nav-section" id="nav-section-savoir">Savoir</div>
   <div class="nav-item" id="nav-notes" onclick="nav('notes')"><span class="nav-icon">◻</span> Notes & Idées</div>
+  <div class="nav-item" id="nav-flashcards" onclick="nav('flashcards')"><span class="nav-icon">🃏</span> Flashcards</div>
   <div class="nav-item" id="nav-cours" onclick="nav('cours')"><span class="nav-icon">◑</span> Cours & Apprentissages</div>
   <div class="nav-item" id="nav-culture" onclick="nav('culture')"><span class="nav-icon">✦</span> Culture Générale</div>
   <div class="nav-item" id="nav-actu" onclick="nav('actu')"><span class="nav-icon">◉</span> Actualités</div>
@@ -715,8 +891,15 @@
 <!-- ===== DASHBOARD ===== -->
 <div id="s-dashboard" class="section active">
   <div class="page-header">
-    <h1 id="dash-greeting">Bonjour 👋</h1>
-    <div class="sub" id="dash-date"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+      <div>
+        <h1 id="dash-greeting">Bonjour 👋</h1>
+        <div class="sub" id="dash-date"></div>
+      </div>
+      <button onclick="voiceCoach()" id="voice-coach-btn" style="display:flex;align-items:center;gap:8px;padding:10px 16px;background:linear-gradient(135deg,rgba(160,96,255,0.12),rgba(200,169,110,0.08));border:1px solid rgba(160,96,255,0.3);border-radius:12px;cursor:pointer;color:var(--text);font-size:13px;font-weight:600;font-family:inherit;transition:all .2s" title="Coach vocal IA">
+        🎙 Coach vocal
+      </button>
+    </div>
   </div>
 
   <!-- Phrase du jour -->
@@ -1131,6 +1314,127 @@
         <button onclick="document.getElementById('cal-modal').style.display='none'" class="btn btn-ghost">Annuler</button>
         <button onclick="calDelete()" id="cal-del-btn" class="btn btn-ghost" style="display:none;color:var(--danger)">Supprimer</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== FLASHCARDS ===== -->
+<div id="s-flashcards" class="section">
+  <div class="page-header">
+    <h1>Flashcards 🃏</h1>
+    <div class="sub">Répétition espacée · Méthode Ebbinghaus</div>
+  </div>
+
+  <!-- Tabs -->
+  <div style="display:flex;gap:0;margin-bottom:20px;background:var(--bg2);border-radius:10px;padding:3px;width:fit-content">
+    <button onclick="fcTab('study')"  id="fc-tab-study"  style="padding:7px 16px;border-radius:8px;border:none;background:var(--accent);color:#0e0e10;font-weight:600;font-size:12px;cursor:pointer">📖 Réviser</button>
+    <button onclick="fcTab('decks')"  id="fc-tab-decks"  style="padding:7px 16px;border-radius:8px;border:none;background:transparent;color:var(--muted);font-size:12px;cursor:pointer">📚 Mes decks</button>
+    <button onclick="fcTab('create')" id="fc-tab-create" style="padding:7px 16px;border-radius:8px;border:none;background:transparent;color:var(--muted);font-size:12px;cursor:pointer">+ Créer</button>
+  </div>
+
+  <!-- PANEL RÉVISION -->
+  <div id="fc-study-panel">
+    <!-- Stats du jour -->
+    <div class="grid3 mb16" id="fc-stats-bar">
+      <div class="stat-mini"><div class="val" id="fc-due-count" style="color:var(--accent)">0</div><div class="lbl">À réviser</div></div>
+      <div class="stat-mini"><div class="val" id="fc-done-today" style="color:var(--success)">0</div><div class="lbl">Révisées aujourd'hui</div></div>
+      <div class="stat-mini"><div class="val" id="fc-total-count">0</div><div class="lbl">Total cartes</div></div>
+    </div>
+
+    <!-- Zone carte -->
+    <div id="fc-study-zone">
+      <div id="fc-no-cards" style="text-align:center;padding:60px 20px;display:none">
+        <div style="font-size:48px;margin-bottom:16px">🎉</div>
+        <div style="font-size:20px;font-weight:700;margin-bottom:8px">Tout est révisé !</div>
+        <div style="font-size:14px;color:var(--muted);margin-bottom:24px">Reviens demain pour la prochaine session.</div>
+        <button onclick="fcTab('create')" class="btn">+ Créer des cartes</button>
+      </div>
+
+      <!-- La carte -->
+      <div id="fc-card-wrap" style="display:none">
+        <!-- Deck label + progression -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <span id="fc-deck-label" style="font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em"></span>
+          <span id="fc-progress-label" style="font-size:12px;color:var(--muted)"></span>
+        </div>
+
+        <!-- Carte flip -->
+        <div id="fc-card" style="perspective:1000px;cursor:pointer;margin-bottom:20px" onclick="fcFlip()">
+          <div id="fc-card-inner" style="position:relative;width:100%;min-height:220px;transform-style:preserve-3d;transition:transform .5s cubic-bezier(.4,0,.2,1)">
+            <!-- Recto -->
+            <div id="fc-front" style="position:absolute;inset:0;backface-visibility:hidden;background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:32px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center">
+              <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:16px">Question</div>
+              <div id="fc-q-text" style="font-size:20px;font-weight:600;line-height:1.4;color:var(--text)"></div>
+              <div style="margin-top:20px;font-size:12px;color:var(--muted)">👆 Clique pour voir la réponse</div>
+            </div>
+            <!-- Verso -->
+            <div id="fc-back" style="position:absolute;inset:0;backface-visibility:hidden;background:var(--bg2);border:1px solid rgba(200,169,110,.3);border-radius:20px;padding:32px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;transform:rotateY(180deg)">
+              <div style="font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;margin-bottom:16px">Réponse</div>
+              <div id="fc-a-text" style="font-size:18px;font-weight:500;line-height:1.5;color:var(--text)"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bouton afficher réponse -->
+        <div id="fc-show-btn" style="text-align:center;margin-bottom:20px">
+          <button onclick="fcFlip()" style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px 28px;font-size:14px;font-weight:600;cursor:pointer;color:var(--text)">👁 Afficher la réponse</button>
+        </div>
+
+        <!-- Boutons de notation (cachés jusqu'au flip) -->
+        <div id="fc-rating-btns" style="display:none">
+          <div style="font-size:12px;color:var(--muted);text-align:center;margin-bottom:12px">Comment tu t'en es sorti ?</div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
+            <button onclick="fcRate(0)" style="padding:12px 6px;border-radius:12px;border:none;background:rgba(255,60,60,.12);cursor:pointer;font-family:inherit">
+              <div style="font-size:20px;margin-bottom:4px">😵</div>
+              <div style="font-size:12px;font-weight:700;color:#ff4040">Encore</div>
+              <div style="font-size:10px;color:var(--muted);margin-top:2px" id="fc-lbl-0">&lt;1 min</div>
+            </button>
+            <button onclick="fcRate(1)" style="padding:12px 6px;border-radius:12px;border:none;background:rgba(255,120,40,.12);cursor:pointer;font-family:inherit">
+              <div style="font-size:20px;margin-bottom:4px">😅</div>
+              <div style="font-size:12px;font-weight:700;color:#ff7828">Difficile</div>
+              <div style="font-size:10px;color:var(--muted);margin-top:2px" id="fc-lbl-1">10 min</div>
+            </button>
+            <button onclick="fcRate(2)" style="padding:12px 6px;border-radius:12px;border:none;background:rgba(64,208,160,.12);cursor:pointer;font-family:inherit">
+              <div style="font-size:20px;margin-bottom:4px">🙂</div>
+              <div style="font-size:12px;font-weight:700;color:#40d0a0">Correct</div>
+              <div style="font-size:10px;color:var(--muted);margin-top:2px" id="fc-lbl-2">1 jour</div>
+            </button>
+            <button onclick="fcRate(3)" style="padding:12px 6px;border-radius:12px;border:none;background:rgba(96,160,255,.12);cursor:pointer;font-family:inherit">
+              <div style="font-size:20px;margin-bottom:4px">😎</div>
+              <div style="font-size:12px;font-weight:700;color:#60a0ff">Facile</div>
+              <div style="font-size:10px;color:var(--muted);margin-top:2px" id="fc-lbl-3">4 jours</div>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PANEL DECKS -->
+  <div id="fc-decks-panel" style="display:none">
+    <button onclick="fcTab('create')" class="btn mb16">+ Nouveau deck</button>
+    <div id="fc-decks-list"></div>
+  </div>
+
+  <!-- PANEL CRÉER -->
+  <div id="fc-create-panel" style="display:none">
+    <div class="card mb16">
+      <div class="card-title">Nouveau deck</div>
+      <div class="field"><label>Nom du deck</label><input type="text" id="fc-new-deck-name" placeholder="ex: BTS SIO, Anglais, Maths..."></div>
+      <div class="field"><label>Emoji (optionnel)</label><input type="text" id="fc-new-deck-emoji" placeholder="ex: 💻" maxlength="2" style="width:80px"></div>
+      <button onclick="fcCreateDeck()" class="btn">Créer le deck</button>
+    </div>
+
+    <div class="card" id="fc-add-card-zone" style="display:none">
+      <div class="card-title">Ajouter une carte</div>
+      <div style="margin-bottom:12px;font-size:13px;color:var(--muted)">Deck : <span id="fc-active-deck-label" style="color:var(--accent);font-weight:600"></span></div>
+      <div class="field"><label>Question (recto)</label><textarea id="fc-new-q" rows="3" placeholder="ex: Qu'est-ce que le protocole TCP ?"></textarea></div>
+      <div class="field"><label>Réponse (verso)</label><textarea id="fc-new-a" rows="3" placeholder="ex: Protocole de transport fiable avec accusé de réception..."></textarea></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button onclick="fcAddCard()" class="btn">+ Ajouter la carte</button>
+        <button onclick="fcAddAndNext()" class="btn btn-ghost">+ Ajouter et continuer</button>
+      </div>
+      <div id="fc-card-count-label" style="margin-top:12px;font-size:12px;color:var(--muted)"></div>
     </div>
   </div>
 </div>
@@ -2894,6 +3198,15 @@
     <button onclick="testNotification()" class="btn btn-ghost" style="width:100%">🔔 Envoyer une notification test</button>
   </div>
 
+  <!-- Dashboard personnalisation -->
+  <div class="card" style="margin-bottom:20px">
+    <div class="card-title">🎛 Personnaliser le Dashboard</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:14px">Active ou désactive les widgets affichés sur ton dashboard.</div>
+    <div id="dash-widgets-list" style="display:flex;flex-direction:column;gap:8px">
+      <!-- Rempli par renderDashWidgets() -->
+    </div>
+  </div>
+
   <!-- Modules -->
   <div class="card" style="margin-bottom:20px">
     <div class="card-title">Modules actifs 🧩</div>
@@ -3030,22 +3343,39 @@
 
     <div style="display:flex;flex-direction:column;gap:10px">
 
+      <!-- v1.9 ACTUEL -->
       <div style="border-left:3px solid var(--accent);padding:10px 14px;background:var(--bg3);border-radius:0 10px 10px 0">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
-          <span style="font-size:11px;font-weight:700;color:var(--accent);font-family:var(--font-mono)">v1.8</span>
+          <span style="font-size:11px;font-weight:700;color:var(--accent);font-family:var(--font-mono)">v1.9</span>
           <span style="font-size:11px;color:var(--muted)">Dernière version</span>
           <span style="background:var(--accent);color:#0e0e10;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;margin-left:auto">ACTUEL</span>
         </div>
         <div style="font-size:12px;color:var(--text);line-height:1.8">
+          🎙 Coach vocal IA — lecture des conseils à voix haute (Web Speech API)<br>
+          📅 Calendrier complet avec import .ics Netypareo/Pronote<br>
+          🃏 Flashcards système Ebbinghaus (répétition espacée SM-2)<br>
+          ✨ Animations & transitions fluides (XP popup, badge toast, level up)<br>
+          🎯 Onboarding personnalisé pour les nouveaux utilisateurs<br>
+          📱 Mode mobile hamburger + drawer latéral<br>
+          🎨 Personnalisation du dashboard (widgets réorganisables)
+        </div>
+      </div>
+
+      <!-- v1.8 -->
+      <div style="border-left:3px solid var(--border);padding:10px 14px;background:var(--bg3);border-radius:0 10px 10px 0">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+          <span style="font-size:11px;font-weight:700;color:var(--muted);font-family:var(--font-mono)">v1.8</span>
+        </div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.8">
           ☁️ Synchronisation Firebase — accès depuis n'importe quel appareil<br>
           🔐 Page de login avec compte utilisateur<br>
           💸 Tracker de dépenses mensuel (12 catégories, budget, graphes)<br>
-          📚 Bibliothèque (42 livres, 11 catégories avec fiches détaillées)<br>
-          💪 Section Sport complète (30 exercices, 8 sports, séances perso)<br>
+          📚 Bibliothèque (130+ livres, 11 catégories avec fiches détaillées)<br>
+          💪 Section Sport complète (30+ exercices, 8 sports, séances perso)<br>
           👤 Profil personnalisé (TDEE, macros, recettes IA, finances)<br>
-          ⭐ Système XP & Badges (10 niveaux, 21 badges, 11 sources XP)<br>
+          ⭐ Système XP & Badges (10 niveaux, 21+ badges)<br>
           🤖 Analyse du jour locale (score, conseil, énergie, sans API)<br>
-          🌸 2 nouveaux thèmes : Midnight Rose & Hacker
+          🌸 Thèmes Midnight Rose & Hacker
         </div>
       </div>
 
@@ -3128,6 +3458,24 @@
           🚀 Lancement : Dashboard, Morning Routine, Objectifs, Habitudes<br>
           📝 Notes & Idées avec graphe de connaissance<br>
           📚 Cours & Apprentissages · 😊 Humeur & Journal
+        </div>
+      </div>
+
+      <!-- v2.0 À VENIR -->
+      <div style="border-left:3px solid rgba(160,96,255,.5);padding:10px 14px;background:linear-gradient(135deg,rgba(160,96,255,0.06),rgba(200,169,110,0.04));border-radius:0 10px 10px 0">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+          <span style="font-size:11px;font-weight:700;color:#a060ff;font-family:var(--font-mono)">v2.0</span>
+          <span style="font-size:11px;color:var(--muted)">Prochaine version</span>
+          <span style="background:rgba(160,96,255,.2);color:#a060ff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;margin-left:auto">À VENIR</span>
+        </div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.8">
+          👥 Système multi-utilisateurs avec invitations<br>
+          💳 Intégration paiement Stripe / Gumroad<br>
+          🔔 Notifications push intelligentes<br>
+          📊 Statistiques avancées & corrélations<br>
+          🤖 Assistant IA conversationnel dans chaque section<br>
+          🌐 Synchronisation temps réel Firebase améliorée<br>
+          🏆 Challenges 7/21/30 jours
         </div>
       </div>
 
@@ -3294,6 +3642,99 @@ body:has(#s-focus.active) .main { overflow: hidden; padding: 0; }
 </style>
 
 <script type="module">
+// ==================== COACH VOCAL IA ====================
+let _voiceSpeaking = false;
+
+function voiceCoach() {
+  if (!('speechSynthesis' in window)) {
+    alert('Ton navigateur ne supporte pas la synthèse vocale. Essaie Chrome ou Edge.');
+    return;
+  }
+  if (_voiceSpeaking) {
+    window.speechSynthesis.cancel();
+    _voiceSpeaking = false;
+    document.getElementById('voice-coach-btn').innerHTML = '🎙 Coach vocal';
+    return;
+  }
+
+  // Construire le message à lire
+  const heure = new Date().getHours();
+  const greeting = heure < 12 ? 'Bonjour' : heure < 18 ? 'Bon après-midi' : 'Bonsoir';
+  const prenom = data.profil?.prenom || '';
+
+  const doneHab = data.habitudes.filter(h => data.habitDone[today() + h.id]).length;
+  const totalHab = data.habitudes.length;
+  const doneObj  = (data.objectifs.jour||[]).filter(o => o.done).length;
+  const totalObj = (data.objectifs.jour||[]).length;
+  const streak   = calcStreakData().streak;
+
+  let msg = `${greeting} ${prenom}. `;
+  if (totalHab > 0) {
+    if (doneHab === totalHab) msg += `Excellent ! Tu as coché toutes tes ${totalHab} habitudes aujourd'hui. `;
+    else if (doneHab > 0)     msg += `Tu as complété ${doneHab} habitude${doneHab>1?'s':''} sur ${totalHab} aujourd'hui. `;
+    else                      msg += `Tu n'as pas encore coché d'habitudes aujourd'hui. `;
+  }
+  if (totalObj > 0) msg += `Pour tes objectifs, ${doneObj} sur ${totalObj} sont accomplis. `;
+  if (streak > 0)   msg += `Tu es sur une série de ${streak} jour${streak>1?'s':''}. Garde ce rythme ! `;
+  if (heure < 9)         msg += `C'est le matin, le meilleur moment pour attaquer tes tâches les plus importantes.`;
+  else if (heure < 12)   msg += `Tu es dans ta fenêtre de concentration optimale. Profite-en !`;
+  else if (heure < 14)   msg += `Après le déjeuner, prends 5 minutes pour faire le point avant de reprendre.`;
+  else if (heure < 17)   msg += `L'après-midi avance. Si tu as des habitudes non cochées, c'est le moment.`;
+  else if (heure < 20)   msg += `La journée touche à sa fin. Note 3 choses positives dans ton journal.`;
+  else                   msg += `Il est tard. Prépare ta liste de demain et repose-toi bien.`;
+  if (data.xp?.today > 0) msg += ` Tu as gagné ${data.xp.today} points d'expérience aujourd'hui. Bravo !`;
+
+  function speak(voice) {
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(msg);
+    u.lang  = 'fr-FR';
+    u.rate  = 0.92;
+    u.pitch = 1.0;
+    u.volume = 1.0;
+    if (voice) u.voice = voice;
+    u.onstart = () => {
+      _voiceSpeaking = true;
+      const btn = document.getElementById('voice-coach-btn');
+      if (btn) btn.innerHTML = '⏹ Arrêter';
+    };
+    u.onend = u.onerror = () => {
+      _voiceSpeaking = false;
+      const btn = document.getElementById('voice-coach-btn');
+      if (btn) btn.innerHTML = '🎙 Coach vocal';
+    };
+    window.speechSynthesis.speak(u);
+  }
+
+  // Les voix sont chargées de manière asynchrone dans certains navigateurs
+  const voices = window.speechSynthesis.getVoices();
+  if (voices.length > 0) {
+    const fr = voices.find(v => v.lang.startsWith('fr')) || null;
+    speak(fr);
+  } else {
+    // Attendre que les voix soient prêtes
+    window.speechSynthesis.onvoiceschanged = () => {
+      const v2 = window.speechSynthesis.getVoices();
+      const fr = v2.find(v => v.lang.startsWith('fr')) || null;
+      speak(fr);
+      window.speechSynthesis.onvoiceschanged = null;
+    };
+    // Fallback si onvoiceschanged ne se déclenche pas
+    setTimeout(() => {
+      if (!_voiceSpeaking) speak(null);
+    }, 500);
+  }
+}
+
+// ==================== DASHBOARD WIDGETS ====================,
+  { id:'xp-widget',        label:'Niveau & XP',             icon:'⭐' },
+  { id:'flux-widget',      label:'Mode Flux 🧠',            icon:'🧠' },
+  { id:'weather-card',     label:'Météo',                   icon:'🌤' },
+  { id:'ai-dashboard-card',label:'Analyse IA',              icon:'✦' },
+];
+
+
+
+
 // ==================== FIREBASE ====================
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
@@ -3388,7 +3829,8 @@ const FluxEngine = {
 
   SUGGESTIONS: {
     flux:       ['Tu es dans le flux — ne t\'arrête pas, continue sur ta lancée ! 🚀', 'État optimal détecté — profites-en pour attaquer ta tâche la plus complexe.', 'Ton cerveau est en pleine forme. Pomodoro lancé ?'],
-    focused:    ['Belle concentration ! Tu travailles méthodiquement.', 'Bonne régularité de frappe — tu es bien ancré dans ta tâche.', 'Concentration solide détectée. Continue comme ça.'],
+  
+  focused:    ['Belle concentration ! Tu travailles méthodiquement.', 'Bonne régularité de frappe — tu es bien ancré dans ta tâche.', 'Concentration solide détectée. Continue comme ça.'],
     distracted: ['Beaucoup de pauses détectées — tu es peut-être distrait. Un verre d\'eau ?', 'Ton rythme est irrégulier. Essaie 5 min de respiration 4-7-8.', 'Distraction détectée — ferme les onglets inutiles et relance un Focus.'],
     tired:      ['Ton activité ralentit — ton corps a peut-être besoin d\'une pause.', 'Signes de fatigue détectés. 10 min de marche peuvent relancer l\'énergie.', 'Fatigue probable — une courte sieste de 20 min peut tout changer.'],
     break:      ['Tu prends une pause — c\'est bien ! Profites-en pour t\'étirer.', 'Pause active — hydrate-toi et regarde au loin 20 secondes.', 'Moment de repos — fais quelques respirations profondes.'],
@@ -3894,6 +4336,7 @@ function renderSection(id) {
     objectifs: renderObjectifs,
     habitudes: renderHabitudes,
     calendrier: () => calRender(),
+    flashcards: renderFlashcards,
     notes: renderNotes,
     cours: renderCours,
     investissements: renderInvestissements,
@@ -3990,12 +4433,18 @@ function gainXP(source, amount) {
   const weekStr = `${new Date().getFullYear()}-W${Math.ceil((new Date().getDate())/7)}`;
   if (data.xp.lastDay !== todayStr) { data.xp.today = 0; data.xp.lastDay = todayStr; }
   if (data.xp.lastWeek !== weekStr) { data.xp.week = 0; data.xp.lastWeek = weekStr; }
+  const oldLevel = getLevelInfo(data.xp.total||0).level;
   data.xp.total  = (data.xp.total  || 0) + amount;
   data.xp.today  = (data.xp.today  || 0) + amount;
   data.xp.week   = (data.xp.week   || 0) + amount;
   if (source === 'focus')   data.xp.focusSessions = (data.xp.focusSessions||0) + 1;
   if (source === 'morning') data.xp.mornings = (data.xp.mornings||0) + 1;
   save();
+  // Animation XP
+  showXPFloat(amount);
+  // Level up ?
+  const newLevel = getLevelInfo(data.xp.total).level;
+  if (newLevel > oldLevel) setTimeout(() => showLevelUp(getLevelInfo(data.xp.total)), 700);
   checkBadges();
   updateXPWidget();
 }
@@ -4003,16 +4452,78 @@ function gainXP(source, amount) {
 function checkBadges() {
   if (!data.xp) return;
   if (!data.xp.earnedBadges) data.xp.earnedBadges = [];
-  let newBadge = false;
+  let lastNew = null;
   BADGES.forEach(b => {
     if (!data.xp.earnedBadges.includes(b.id)) {
-      try { if (b.check()) { data.xp.earnedBadges.push(b.id); newBadge = true; } } catch(e) {}
+      try { if (b.check()) { data.xp.earnedBadges.push(b.id); lastNew = b; } } catch(e) {}
     }
   });
-  if (newBadge) {
+  if (lastNew) {
     save();
     const el = document.getElementById('xp-new-badge');
     if (el) { el.style.display = 'block'; setTimeout(() => el.style.display = 'none', 5000); }
+    setTimeout(() => showBadgeToast(lastNew), 400);
+  }
+}
+
+// ===== ANIMATION HELPERS =====
+function showXPFloat(amount) {
+  const el = document.createElement('div');
+  el.className = 'xp-float';
+  el.textContent = '+' + amount + ' XP ⭐';
+  el.style.left = (window.innerWidth/2 - 40 + (Math.random()-0.5)*100) + 'px';
+  el.style.top  = (window.innerHeight * 0.55) + 'px';
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 950);
+}
+
+function showBadgeToast(badge) {
+  // Retirer l'ancien si présent
+  document.querySelector('.badge-toast')?.remove();
+  const el = document.createElement('div');
+  el.className = 'badge-toast';
+  el.innerHTML = `<div style="font-size:28px">${badge.emoji}</div>
+    <div>
+      <div style="font-size:10px;color:#a060ff;font-weight:700;text-transform:uppercase;letter-spacing:.06em">Badge débloqué !</div>
+      <div style="font-size:13px;font-weight:700;margin-top:1px">${badge.name}</div>
+      <div style="font-size:11px;color:var(--muted)">${badge.desc}</div>
+    </div>`;
+  document.body.appendChild(el);
+  setTimeout(() => { el.classList.add('hide'); setTimeout(() => el.remove(), 350); }, 4000);
+}
+
+function showLevelUp(lvl) {
+  launchConfetti();
+  const overlay = document.createElement('div');
+  overlay.className = 'levelup-overlay';
+  overlay.innerHTML = `<div class="levelup-card">
+    <div style="font-size:80px;margin-bottom:12px">${lvl.emoji}</div>
+    <div style="font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px">Niveau atteint</div>
+    <div style="font-size:42px;font-weight:800;background:linear-gradient(135deg,#a060ff,#c8a96e);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:6px">Niveau ${lvl.level}</div>
+    <div style="font-size:22px;font-weight:600;color:var(--text);margin-bottom:28px">${lvl.name}</div>
+    <button onclick="this.closest('.levelup-overlay').remove()" style="background:linear-gradient(135deg,#a060ff,#c8a96e);border:none;border-radius:12px;padding:12px 32px;color:#fff;font-size:15px;font-weight:700;cursor:pointer">Continuer 🚀</button>
+  </div>`;
+  document.body.appendChild(overlay);
+  overlay.onclick = (e) => { if (e.target===overlay) overlay.remove(); };
+  setTimeout(() => { if (overlay.parentElement) overlay.remove(); }, 8000);
+}
+
+function launchConfetti(n=60) {
+  const colors = ['#a060ff','#c8a96e','#40d0a0','#ff6040','#60a0ff','#ff40a0','#ffcc00'];
+  for (let i=0;i<n;i++) {
+    setTimeout(() => {
+      const el = document.createElement('div');
+      el.className = 'confetti-bit';
+      el.style.left = Math.random()*100+'vw';
+      el.style.top = '-10px';
+      el.style.background = colors[Math.floor(Math.random()*colors.length)];
+      el.style.width  = (Math.random()*8+5)+'px';
+      el.style.height = (Math.random()*8+5)+'px';
+      el.style.borderRadius = Math.random()>.5?'50%':'2px';
+      el.style.animationDuration = (Math.random()*2+1.5)+'s';
+      document.body.appendChild(el);
+      setTimeout(()=>el.remove(), 3500);
+    }, Math.random()*500);
   }
 }
 
@@ -5547,6 +6058,318 @@ function calICSTime(val) {
     return String(Math.floor(hl)).padStart(2,'0')+':'+mi;
   }
   return String(h).padStart(2,'0')+':'+mi;
+}
+
+// ==================== FLASHCARDS (Ebbinghaus SRS) ====================
+// Algorithme SM-2 simplifié basé sur Ebbinghaus
+// Intervalles : Encore=1min, Difficile=10min, Correct=1j, Facile=4j (puis x facteur)
+
+let fcCurrentQueue = [];
+let fcCurrentIndex = 0;
+let fcFlipped = false;
+let fcActiveDeckId = null;
+let fcDoneToday = 0;
+
+function fcGetData() {
+  if (!data.flashcards) data.flashcards = { decks:[], cards:[] };
+  return data.flashcards;
+}
+
+function fcSave() { save(); }
+
+function fcTab(tab) {
+  ['study','decks','create'].forEach(t => {
+    const panel = document.getElementById('fc-' + t + '-panel');
+    const btn   = document.getElementById('fc-tab-' + t);
+    if (panel) panel.style.display = t===tab ? 'block' : 'none';
+    if (btn) {
+      btn.style.background = t===tab ? 'var(--accent)' : 'transparent';
+      btn.style.color      = t===tab ? '#0e0e10' : 'var(--muted)';
+      btn.style.fontWeight = t===tab ? '600' : '400';
+    }
+  });
+  if (tab==='study')  fcInitStudy();
+  if (tab==='decks')  fcRenderDecks();
+  if (tab==='create') fcRenderCreate();
+}
+
+function renderFlashcards() {
+  fcTab('study');
+}
+
+// ===== ALGORITHME SRS Ebbinghaus =====
+function fcNextReview(card, rating) {
+  // rating: 0=Encore, 1=Difficile, 2=Correct, 3=Facile
+  const now = Date.now();
+  let interval; // en millisecondes
+
+  if (rating === 0) {
+    // Encore — revoir dans 1 minute
+    interval = 1 * 60 * 1000;
+    card.ease = Math.max(1.3, (card.ease||2.5) - 0.2);
+    card.step = 0;
+  } else if (rating === 1) {
+    // Difficile — revoir dans 10 minutes
+    interval = 10 * 60 * 1000;
+    card.ease = Math.max(1.3, (card.ease||2.5) - 0.15);
+    card.step = Math.max(0, (card.step||0) - 1);
+  } else if (rating === 2) {
+    // Correct — intervalle normal
+    if (!card.step || card.step === 0) {
+      interval = 1 * 24 * 60 * 60 * 1000; // 1 jour
+    } else {
+      interval = (card.interval || 1) * (card.ease||2.5) * 24 * 60 * 60 * 1000;
+    }
+    card.ease = card.ease || 2.5;
+    card.step = (card.step||0) + 1;
+    card.interval = Math.max(1, Math.round((interval) / (24*60*60*1000)));
+  } else {
+    // Facile — intervalle long
+    if (!card.step || card.step === 0) {
+      interval = 4 * 24 * 60 * 60 * 1000; // 4 jours
+    } else {
+      interval = (card.interval || 1) * (card.ease||2.5) * 1.3 * 24 * 60 * 60 * 1000;
+    }
+    card.ease = Math.min(3.0, (card.ease||2.5) + 0.15);
+    card.step = (card.step||0) + 1;
+    card.interval = Math.max(4, Math.round((interval) / (24*60*60*1000)));
+  }
+  card.nextReview = now + interval;
+  card.lastRating = rating;
+  card.reviews = (card.reviews||0) + 1;
+  return card;
+}
+
+function fcIntervalLabel(rating, card) {
+  if (rating === 0) return '< 1 min';
+  if (rating === 1) return '10 min';
+  if (rating === 2) {
+    if (!card.step || card.step === 0) return '1 jour';
+    const days = Math.round((card.interval||1) * (card.ease||2.5));
+    return days + ' jour' + (days>1?'s':'');
+  }
+  if (rating === 3) {
+    if (!card.step || card.step === 0) return '4 jours';
+    const days = Math.round((card.interval||1) * (card.ease||2.5) * 1.3);
+    return days + ' jour' + (days>1?'s':'');
+  }
+}
+
+// ===== SESSION DE RÉVISION =====
+function fcInitStudy() {
+  const fc = fcGetData();
+  const now = Date.now();
+  // Cartes à réviser = nextReview <= now (ou jamais révisées)
+  fcCurrentQueue = fc.cards.filter(c => !c.nextReview || c.nextReview <= now);
+  // Mélanger
+  fcCurrentQueue = fcCurrentQueue.sort(() => Math.random() - 0.5);
+  fcCurrentIndex = 0;
+  fcFlipped = false;
+
+  // Stats
+  const dueEl   = document.getElementById('fc-due-count');
+  const doneEl  = document.getElementById('fc-done-today');
+  const totalEl = document.getElementById('fc-total-count');
+  if (dueEl)   dueEl.textContent   = fcCurrentQueue.length;
+  if (doneEl)  doneEl.textContent  = fcDoneToday;
+  if (totalEl) totalEl.textContent = fc.cards.length;
+
+  fcShowCard();
+}
+
+function fcShowCard() {
+  const noCards  = document.getElementById('fc-no-cards');
+  const cardWrap = document.getElementById('fc-card-wrap');
+
+  if (fcCurrentIndex >= fcCurrentQueue.length) {
+    // Session terminée
+    if (noCards)  noCards.style.display  = 'block';
+    if (cardWrap) cardWrap.style.display = 'none';
+    gainXP('flashcard', Math.min(fcDoneToday * 2, 30));
+    return;
+  }
+
+  if (noCards)  noCards.style.display  = 'none';
+  if (cardWrap) cardWrap.style.display = 'block';
+
+  const card = fcCurrentQueue[fcCurrentIndex];
+  const fc   = fcGetData();
+  const deck = fc.decks.find(d => d.id === card.deckId);
+
+  // Textes
+  document.getElementById('fc-q-text').textContent = card.q;
+  document.getElementById('fc-a-text').textContent = card.a;
+
+  // Label deck
+  const deckLabel = document.getElementById('fc-deck-label');
+  if (deckLabel) deckLabel.textContent = deck ? (deck.emoji||'🃏') + ' ' + deck.name : '🃏';
+
+  // Progression
+  const progLabel = document.getElementById('fc-progress-label');
+  if (progLabel) progLabel.textContent = (fcCurrentIndex+1) + ' / ' + fcCurrentQueue.length;
+
+  // Intervalles prévisionnels sur les boutons
+  [0,1,2,3].forEach(r => {
+    const el = document.getElementById('fc-lbl-' + r);
+    if (el) el.textContent = fcIntervalLabel(r, card);
+  });
+
+  // Reset flip
+  fcFlipped = false;
+  const inner = document.getElementById('fc-card-inner');
+  if (inner) inner.style.transform = 'rotateY(0deg)';
+  const showBtn = document.getElementById('fc-show-btn');
+  const ratingBtns = document.getElementById('fc-rating-btns');
+  if (showBtn)    showBtn.style.display    = 'block';
+  if (ratingBtns) ratingBtns.style.display = 'none';
+}
+
+function fcFlip() {
+  if (fcFlipped) return;
+  fcFlipped = true;
+  const inner = document.getElementById('fc-card-inner');
+  if (inner) inner.style.transform = 'rotateY(180deg)';
+  const showBtn    = document.getElementById('fc-show-btn');
+  const ratingBtns = document.getElementById('fc-rating-btns');
+  if (showBtn)    showBtn.style.display    = 'none';
+  if (ratingBtns) ratingBtns.style.display = 'block';
+}
+
+function fcRate(rating) {
+  if (!fcFlipped) return;
+  const fc = fcGetData();
+  const card = fcCurrentQueue[fcCurrentIndex];
+  const cardInData = fc.cards.find(c => c.id === card.id);
+  if (cardInData) fcNextReview(cardInData, rating);
+  fcSave();
+  fcDoneToday++;
+  // Si "Encore" ou "Difficile" remettre en fin de queue
+  if (rating <= 1) fcCurrentQueue.push({...card});
+  fcCurrentIndex++;
+
+  // Mettre à jour le compteur
+  const doneEl = document.getElementById('fc-done-today');
+  if (doneEl) doneEl.textContent = fcDoneToday;
+  const dueEl = document.getElementById('fc-due-count');
+  if (dueEl) dueEl.textContent = Math.max(0, fcCurrentQueue.length - fcCurrentIndex);
+
+  // Animation de sortie rapide
+  const inner = document.getElementById('fc-card-inner');
+  if (inner) {
+    inner.style.transition = 'transform .2s ease, opacity .2s ease';
+    inner.style.opacity = '0';
+    inner.style.transform = 'rotateY(180deg) scale(.95)';
+    setTimeout(() => {
+      inner.style.transition = '';
+      inner.style.opacity = '1';
+      inner.style.transform = 'rotateY(0deg)';
+      fcShowCard();
+    }, 200);
+  } else {
+    fcShowCard();
+  }
+}
+
+// ===== DECKS =====
+function fcRenderDecks() {
+  const fc = fcGetData();
+  const el = document.getElementById('fc-decks-list');
+  if (!el) return;
+  if (!fc.decks.length) {
+    el.innerHTML = '<div class="card" style="text-align:center;padding:32px;color:var(--muted)">Aucun deck pour l\'instant.<br><button onclick="fcTab(\'create\')" class="btn" style="margin-top:12px">Créer mon premier deck</button></div>';
+    return;
+  }
+  el.innerHTML = fc.decks.map(deck => {
+    const cards   = fc.cards.filter(c => c.deckId === deck.id);
+    const due     = cards.filter(c => !c.nextReview || c.nextReview <= Date.now()).length;
+    const mastered = cards.filter(c => c.step && c.step >= 3).length;
+    return `<div class="card mb16">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+        <div style="font-size:32px">${deck.emoji||'🃏'}</div>
+        <div style="flex:1">
+          <div style="font-size:16px;font-weight:700">${deck.name}</div>
+          <div style="font-size:12px;color:var(--muted)">${cards.length} cartes · ${mastered} maîtrisées</div>
+        </div>
+        ${due > 0 ? `<div style="background:var(--accent);color:#0e0e10;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700">${due} à réviser</div>` : '<div style="color:var(--success);font-size:12px">✓ À jour</div>'}
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button onclick="fcStudyDeck('${deck.id}')" class="btn" style="font-size:12px">📖 Réviser</button>
+        <button onclick="fcSelectDeck('${deck.id}');fcTab('create')" class="btn btn-ghost" style="font-size:12px">+ Ajouter des cartes</button>
+        <button onclick="fcDeleteDeck('${deck.id}')" class="btn btn-ghost" style="font-size:12px;color:var(--danger)">Supprimer</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function fcRenderCreate() {
+  const fc = fcGetData();
+  if (fcActiveDeckId) {
+    const deck = fc.decks.find(d => d.id === fcActiveDeckId);
+    if (deck) {
+      document.getElementById('fc-add-card-zone').style.display = 'block';
+      document.getElementById('fc-active-deck-label').textContent = (deck.emoji||'🃏') + ' ' + deck.name;
+      const count = fc.cards.filter(c => c.deckId === fcActiveDeckId).length;
+      document.getElementById('fc-card-count-label').textContent = count + ' carte' + (count>1?'s':'') + ' dans ce deck';
+    }
+  } else {
+    document.getElementById('fc-add-card-zone').style.display = 'none';
+  }
+}
+
+function fcCreateDeck() {
+  const name  = document.getElementById('fc-new-deck-name').value.trim();
+  const emoji = document.getElementById('fc-new-deck-emoji').value.trim() || '🃏';
+  if (!name) { document.getElementById('fc-new-deck-name').focus(); return; }
+  const fc = fcGetData();
+  const deck = { id: 'deck_'+Date.now(), name, emoji };
+  fc.decks.push(deck);
+  fcActiveDeckId = deck.id;
+  fcSave();
+  document.getElementById('fc-new-deck-name').value = '';
+  document.getElementById('fc-new-deck-emoji').value = '';
+  fcRenderCreate();
+  document.getElementById('fc-add-card-zone').style.display = 'block';
+}
+
+function fcSelectDeck(id) { fcActiveDeckId = id; }
+
+function fcAddCard(clearAfter) {
+  const q = document.getElementById('fc-new-q').value.trim();
+  const a = document.getElementById('fc-new-a').value.trim();
+  if (!q || !a) { alert('Remplis les deux champs !'); return; }
+  if (!fcActiveDeckId) { alert('Sélectionne un deck !'); return; }
+  const fc = fcGetData();
+  fc.cards.push({ id:'card_'+Date.now(), deckId:fcActiveDeckId, q, a, step:0, ease:2.5, interval:0, nextReview:0, reviews:0 });
+  fcSave();
+  if (clearAfter !== false) {
+    document.getElementById('fc-new-q').value = '';
+    document.getElementById('fc-new-a').value = '';
+    document.getElementById('fc-new-q').focus();
+  }
+  fcRenderCreate();
+}
+
+function fcAddAndNext() { fcAddCard(true); }
+
+function fcStudyDeck(deckId) {
+  fcActiveDeckId = deckId;
+  const fc = fcGetData();
+  const now = Date.now();
+  fcCurrentQueue = fc.cards.filter(c => c.deckId === deckId && (!c.nextReview || c.nextReview <= now))
+    .sort(() => Math.random()-0.5);
+  fcCurrentIndex = 0;
+  fcFlipped = false;
+  fcTab('study');
+}
+
+function fcDeleteDeck(deckId) {
+  if (!confirm('Supprimer ce deck et toutes ses cartes ?')) return;
+  const fc = fcGetData();
+  fc.decks  = fc.decks.filter(d => d.id !== deckId);
+  fc.cards  = fc.cards.filter(c => c.deckId !== deckId);
+  if (fcActiveDeckId === deckId) fcActiveDeckId = null;
+  fcSave();
+  fcRenderDecks();
 }
 
 // ==================== HABITUDES ====================
@@ -10394,6 +11217,7 @@ const MOB_SECTIONS = [
   ]},
   { section:'Savoir', items:[
     { id:'notes',        icon:'◻', label:'Notes & Idées' },
+    { id:'flashcards',   icon:'🃏', label:'Flashcards' },
     { id:'cours',        icon:'◑', label:'Cours' },
     { id:'culture',      icon:'✦', label:'Culture Générale' },
     { id:'actu',         icon:'◉', label:'Actualités' },
@@ -10516,6 +11340,8 @@ function renderParametres() {
   if (focusNameEl) focusNameEl.textContent = names[curFocus] || curFocus;
   // Modules
   renderModulesList();
+  // Dash widgets
+  renderDashWidgets();
   // Sons
   updatePomoSoundUI();
   // Notifications
@@ -10547,6 +11373,7 @@ if (data.theme && data.theme !== 'dark') applyTheme(data.theme);
 applyPomoDurations();
 if (data.mobileMode) applyMobileMode();
 applyModules();
+applyDashWidgets();
 updateDashboardGreeting();
 updateXPWidget();
 checkBadges();
