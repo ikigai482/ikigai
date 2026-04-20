@@ -3371,6 +3371,7 @@
       <label class="btn btn-ghost" style="cursor:pointer">⬆ Importer
         <input type="file" accept=".json" onchange="importData(event)" style="display:none">
       </label>
+      <button class="btn btn-ghost" onclick="logoutUser()" style="color:var(--danger);border-color:var(--danger)">⎋ Se déconnecter</button>
     </div>
     <div style="font-size:12px;color:var(--muted)">Exporte régulièrement pour ne jamais perdre tes données.</div>
   </div>
@@ -4207,7 +4208,7 @@ let obSelectedTheme = 'dark';
 
 function checkOnboarding() {
   // Seulement si connecté et première visite
-  const session = sessionStorage.getItem('ikigai_logged');
+  const session = localStorage.getItem('ikigai_logged');
   if (!session) return; // Pas connecté → pas d'onboarding
   if (!data.onboardingDone) {
     document.getElementById('onboarding').style.display = 'flex';
@@ -4361,7 +4362,8 @@ function obFinish() {
 
 // ==================== LOGIN ====================
 const USERS = [
-  { username: 'admin', password: 'admin2025', name: 'Florian', role: 'admin' },
+  { username: 'admin',  password: 'admin2025',  name: 'Florian', role: 'admin' },
+  { username: 'thomas', password: 'Ikigai#74',  name: 'Thomas',  role: 'user'  },
 ];
 
 function tryLogin() {
@@ -4373,7 +4375,8 @@ function tryLogin() {
   const user = USERS.find(x => x.username === u && x.password === p);
   if (user) {
     // Succès
-    sessionStorage.setItem('ikigai_logged', JSON.stringify({ username: user.username, name: user.name, role: user.role }));
+    localStorage.setItem('ikigai_logged', JSON.stringify({ username: user.username, name: user.name, role: user.role }));
+    localStorage.setItem('ikigai_ever_logged', '1');
     const loginPage = document.getElementById('login-page');
     loginPage.style.transition = 'opacity .4s ease';
     loginPage.style.opacity = '0';
@@ -4404,6 +4407,13 @@ function togglePassVis() {
   if (btn) btn.textContent = inp.type === 'password' ? '👁' : '🙈';
 }
 
+function logoutUser() {
+  if (!confirm('Te déconnecter ? Tu devras rentrer tes identifiants à la prochaine visite.')) return;
+  localStorage.removeItem('ikigai_logged');
+  // Garder ikigai_ever_logged pour ne pas revoir la landing
+  location.reload();
+}
+
 function showLoginBox() {
   const wrap = document.getElementById('login-box-wrap');
   if (wrap) { wrap.style.display = 'flex'; setTimeout(() => document.getElementById('login-user')?.focus(), 100); }
@@ -4414,15 +4424,17 @@ function hideLoginBox() {
 }
 
 function checkLogin() {
-  const session = sessionStorage.getItem('ikigai_logged');
+  const session = localStorage.getItem('ikigai_logged');
+  const everLogged = localStorage.getItem('ikigai_ever_logged');
   if (session) {
     // Déjà connecté — cacher toute la login page
-    const lp = document.getElementById('login-page');
-    if (lp) lp.style.display = 'none';
-  } else {
-    // Pas connecté — montrer landing page (login-page visible par défaut)
-    // La landing est déjà visible, login-box-wrap est caché
+    document.getElementById('login-page').style.display = 'none';
+  } else if (everLogged) {
+    // A déjà eu un compte — montrer direct le login sans landing
+    document.getElementById('landing-section').style.display = 'none';
+    showLoginBox();
   }
+  // Sinon : première visite → landing visible (comportement par défaut)
 }
 
 // ==================== DATA LAYER ====================
