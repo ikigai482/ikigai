@@ -4363,7 +4363,7 @@ function obFinish() {
 // ==================== LOGIN ====================
 const USERS = [
   { username: 'admin',  password: 'admin2025',  name: 'Florian', role: 'admin' },
-  { username: 'thomas', password: 'Ikigai#74',  name: 'Thomas',  role: 'user'  },
+  { username: 'thomas', password: 'Tom#2025!',  name: 'Thomas',  role: 'user'  },
 ];
 
 function tryLogin() {
@@ -4377,6 +4377,9 @@ function tryLogin() {
     // Succès
     localStorage.setItem('ikigai_logged', JSON.stringify({ username: user.username, name: user.name, role: user.role }));
     localStorage.setItem('ikigai_ever_logged', '1');
+    // Charger les données propres à cet utilisateur
+    data = { quote:'', morning:{feeling:'',note:''}, routine:[], affirmations:[], objectifs:{jour:[],mois:[],annee:[]}, habitudes:[], habitDone:{}, trackers:{}, notes:[], cours:[], investissements:[], journal:[], routineDone:{} };
+    load();
     const loginPage = document.getElementById('login-page');
     loginPage.style.transition = 'opacity .4s ease';
     loginPage.style.opacity = '0';
@@ -4438,7 +4441,13 @@ function checkLogin() {
 }
 
 // ==================== DATA LAYER ====================
-const STORE_KEY = 'mavie_v1';
+function getStoreKey() {
+  try {
+    const s = localStorage.getItem('ikigai_logged');
+    if (s) { const u = JSON.parse(s); return 'mavie_v1_' + (u.username||'default'); }
+  } catch(e) {}
+  return 'mavie_v1';
+}
 let data = {
   quote: '',
   morning: { feeling: '', note: '' },
@@ -4456,13 +4465,12 @@ let data = {
 };
 
 function load() {
-  try { const s = localStorage.getItem(STORE_KEY); if (s) data = JSON.parse(s); } catch(e) {}
+  try { const s = localStorage.getItem(getStoreKey()); if (s) data = JSON.parse(s); } catch(e) {}
   window._appData = data;
 }
 function save() {
-  try { localStorage.setItem(STORE_KEY, JSON.stringify(data)); } catch(e) {}
+  try { localStorage.setItem(getStoreKey(), JSON.stringify(data)); } catch(e) {}
   window._appData = data;
-  // Sync Firebase en arrière-plan
   if (window._fbSave) window._fbSave();
 }
 load();
