@@ -913,7 +913,6 @@
   <div class="nav-section" id="nav-section-finance">Finance</div>
   <div class="nav-item" id="nav-depenses" onclick="nav('depenses')"><span class="nav-icon">💸</span> Dépenses</div>
   <div class="nav-item" id="nav-investissements" onclick="nav('investissements')"><span class="nav-icon">◬</span> Investissements</div>
-  <div class="nav-item" id="nav-dca" onclick="nav('dca')"><span class="nav-icon">↻</span> Plan DCA</div>
   <div class="nav-item" id="nav-marche" onclick="nav('marche')"><span class="nav-icon">◐</span> Marché & Analyse</div>
   <div class="nav-item" id="nav-pokemon" onclick="nav('pokemon')"><span class="nav-icon">◈</span> Cartes Pokémon</div>
   <div class="nav-section" id="nav-section-bienetre">Bien-être</div>
@@ -1707,9 +1706,20 @@
 <!-- ===== INVESTISSEMENTS ===== -->
 <div id="s-investissements" class="section">
   <div class="page-header">
-    <h1>Portefeuille</h1>
-    <div class="sub">Vue globale de ta richesse — tous comptes confondus.</div>
+    <h1>Investissements 📈</h1>
+    <div class="sub">Portefeuille · Plan DCA · Projections</div>
   </div>
+
+  <!-- Onglets -->
+  <div style="display:flex;gap:0;margin-bottom:20px;background:var(--bg2);border-radius:10px;padding:3px;width:fit-content">
+    <button onclick="invTab('portfolio')" id="inv-tab-portfolio" style="padding:8px 18px;border-radius:8px;border:none;background:var(--accent);color:#0e0e10;font-weight:700;font-size:13px;cursor:pointer">📊 Portefeuille</button>
+    <button onclick="invTab('dca')"       id="inv-tab-dca"       style="padding:8px 18px;border-radius:8px;border:none;background:transparent;color:var(--muted);font-size:13px;cursor:pointer">🔄 Plan DCA</button>
+    <button onclick="invTab('proj')"      id="inv-tab-proj"      style="padding:8px 18px;border-radius:8px;border:none;background:transparent;color:var(--muted);font-size:13px;cursor:pointer">🚀 Projections</button>
+    <button onclick="invTab('analyse')"   id="inv-tab-analyse"   style="padding:8px 18px;border-radius:8px;border:none;background:transparent;color:var(--muted);font-size:13px;cursor:pointer">🔍 Analyser</button>
+  </div>
+
+  <!-- ===== ONGLET PORTEFEUILLE ===== -->
+  <div id="inv-panel-portfolio">
 
   <!-- Stats globales -->
   <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px">
@@ -1893,10 +1903,150 @@
       <button onclick="closeCloture()" style="flex:0 0 80px;background:transparent;color:var(--muted);border:1px solid var(--border);padding:11px;border-radius:8px;font-size:13px;cursor:pointer">Annuler</button>
     </div>
   </div>
-</div>
 
-<!-- ===== DCA ===== -->
-<div id="s-dca" class="section">
+  </div><!-- fin inv-panel-portfolio -->
+
+  <!-- ===== ONGLET DCA ===== -->
+  <div id="inv-panel-dca" style="display:none">
+    <div class="card" style="margin-bottom:16px">
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <div style="flex:1;min-width:200px">
+          <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px">Voir les stats de l'actif</label>
+          <select id="dca-actif-filter" onchange="renderDca()" style="width:100%">
+            <option value="">— Tous les actifs —</option>
+          </select>
+        </div>
+        <div class="field" style="flex:0 0 180px;margin:0">
+          <label>Prix actuel de l'actif (€)</label>
+          <input type="number" id="dca-prix-now" placeholder="510.00" step="0.01" oninput="renderDca()">
+        </div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px">
+      <div class="stat-mini"><div class="val" id="dca-total-investi">0 €</div><div class="lbl">Total versé</div></div>
+      <div class="stat-mini"><div class="val" id="dca-total-actions">0</div><div class="lbl">Actions / parts</div></div>
+      <div class="stat-mini"><div class="val" id="dca-prix-moyen">0 €</div><div class="lbl">Prix moyen</div></div>
+      <div class="stat-mini"><div class="val" id="dca-valeur">0 €</div><div class="lbl">Valeur actuelle</div></div>
+      <div class="stat-mini"><div class="val pos" id="dca-perf">— %</div><div class="lbl">Performance</div></div>
+    </div>
+    <div id="inv-dca-content"></div>
+  </div>
+
+  <!-- ===== ONGLET PROJECTIONS ===== -->
+  <div id="inv-panel-proj" style="display:none">
+    <div class="card mb16">
+      <div class="card-title">🚀 Simulateur de richesse</div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:16px">Calcule combien tu auras selon différents scénarios d'investissement.</div>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px">
+        <div class="field"><label>Capital de départ (€)</label><input type="number" id="proj-capital" placeholder="1000" value="1000" oninput="renderProjections()"></div>
+        <div class="field"><label>Versement mensuel (€)</label><input type="number" id="proj-mensuel" placeholder="200" value="200" oninput="renderProjections()"></div>
+        <div class="field"><label>Durée (années)</label><input type="number" id="proj-duree" placeholder="20" value="20" min="1" max="50" oninput="renderProjections()"></div>
+        <div class="field"><label>Rendement annuel (%)</label><input type="number" id="proj-taux" placeholder="8" value="8" step="0.5" oninput="renderProjections()"></div>
+      </div>
+    </div>
+    <!-- Résultats -->
+    <div id="proj-results"></div>
+    <!-- Graphique évolution -->
+    <div class="card mt16">
+      <div class="card-title">📈 Évolution du capital</div>
+      <div id="proj-chart" style="margin-top:16px"></div>
+    </div>
+    <!-- Scénarios comparatifs -->
+    <div class="card mt16">
+      <div class="card-title">⚡ Comparaison de scénarios</div>
+      <div id="proj-scenarios" style="margin-top:12px"></div>
+    </div>
+  </div>
+
+  <!-- ===== ONGLET ANALYSE ===== -->
+  <div id="inv-panel-analyse" style="display:none">
+
+    <!-- Recherche -->
+    <div class="card mb16">
+      <div class="card-title">🔍 Analyser un actif</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
+        <input type="text" id="ana-search" placeholder="Ex: AAPL, MSFT, BTC, ETF S&P 500..." style="flex:1;min-width:200px" onkeydown="if(event.key==='Enter')analyseActif()">
+        <button onclick="analyseActif()" class="btn">🔍 Analyser</button>
+        <button onclick="anaAddToComparison()" class="btn btn-ghost">+ Ajouter à la comparaison</button>
+      </div>
+    </div>
+
+    <!-- Résultat analyse -->
+    <div id="ana-result" style="display:none">
+
+      <!-- Header actif -->
+      <div class="card mb16" style="background:linear-gradient(135deg,rgba(160,96,255,0.06),rgba(200,169,110,0.04));border:1px solid rgba(160,96,255,0.2)">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+          <div>
+            <div style="font-size:24px;font-weight:800" id="ana-name">—</div>
+            <div style="font-size:13px;color:var(--muted)" id="ana-symbol">—</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:32px;font-weight:700;font-family:var(--font-mono)" id="ana-price">—</div>
+            <div id="ana-change" style="font-size:14px;font-weight:600">—</div>
+          </div>
+        </div>
+        <!-- Consensus -->
+        <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
+          <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Consensus analystes (estimé)</div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <div id="ana-consensus-badge" style="padding:6px 16px;border-radius:20px;font-size:13px;font-weight:700">—</div>
+            <div style="flex:1;height:8px;background:var(--bg3);border-radius:4px;overflow:hidden;min-width:100px">
+              <div id="ana-consensus-bar" style="height:100%;border-radius:4px;transition:width .5s"></div>
+            </div>
+            <div id="ana-consensus-score" style="font-size:12px;color:var(--muted)">—</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Simulateur gains/pertes -->
+      <div class="card mb16">
+        <div class="card-title">💰 Simulateur de gains/pertes</div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:12px">
+          <div class="field" style="flex:1;min-width:140px">
+            <label>Montant investi (€)</label>
+            <input type="number" id="ana-invest" placeholder="1000" value="1000" oninput="renderAnaSimul()">
+          </div>
+          <div class="field" style="flex:1;min-width:140px">
+            <label>Durée (années)</label>
+            <input type="number" id="ana-duree" placeholder="5" value="5" min="1" max="30" oninput="renderAnaSimul()">
+          </div>
+        </div>
+        <div id="ana-simul-results" style="margin-top:16px"></div>
+      </div>
+
+      <!-- Courbe scénarios -->
+      <div class="card mb16">
+        <div class="card-title">📈 Évolution selon les scénarios</div>
+        <div id="ana-courbe" style="margin-top:16px"></div>
+      </div>
+
+      <!-- Actions -->
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button onclick="anaBuy()" class="btn" style="flex:1;background:var(--success);border-color:var(--success);color:#0e0e10">✅ Ajouter au portefeuille</button>
+        <button onclick="anaAddToComparison()" class="btn btn-ghost" style="flex:1">📊 Comparer</button>
+      </div>
+    </div>
+
+    <!-- Comparaison multi-actifs -->
+    <div id="ana-comparison" class="card mt16" style="display:none">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div class="card-title" style="margin:0">📊 Comparaison d'actifs</div>
+        <button onclick="anaClearComparison()" class="btn btn-ghost" style="font-size:12px">Effacer</button>
+      </div>
+      <div id="ana-comparison-list"></div>
+    </div>
+
+    <div id="ana-loading" style="display:none;text-align:center;padding:32px;color:var(--muted)">
+      <div style="font-size:32px;margin-bottom:8px;animation:spin 1s linear infinite">⟳</div>
+      Chargement des données...
+    </div>
+  </div>
+
+</div><!-- fin s-investissements -->
+
+<!-- DCA section cachée (contenu géré par onglet) -->
+<div id="s-dca" class="section" style="display:none!important">
   <div class="page-header">
     <h1>Plan DCA</h1>
     <div class="sub">Enregistre chaque achat — le prix moyen est calculé automatiquement.</div>
@@ -7026,6 +7176,363 @@ function renderCours() {
   `).join('') || '<div class="muted small">Aucun cours ajouté</div>';
 }
 
+function invTab(tab) {
+  ['portfolio','dca','proj','analyse'].forEach(t => {
+    const panel = document.getElementById('inv-panel-' + t);
+    const btn   = document.getElementById('inv-tab-' + t);
+    if (panel) panel.style.display = t === tab ? 'block' : 'none';
+    if (btn) {
+      btn.style.background  = t === tab ? 'var(--accent)' : 'transparent';
+      btn.style.color       = t === tab ? '#0e0e10' : 'var(--muted)';
+      btn.style.fontWeight  = t === tab ? '700' : '400';
+    }
+  });
+  if (tab === 'dca')  { renderDca(); renderInvDcaContent(); }
+  if (tab === 'proj') renderProjections();
+}
+
+// ===== ANALYSE ACTIF =====
+let _anaCurrentSymbol = '';
+let _anaCurrentPrice  = 0;
+let _anaCurrentName   = '';
+let _anaComparison    = [];
+
+var _AV_KEY_ANA = 'LCRMA4DDLPNXD9IM';
+
+async function analyseActif() {
+  const query = document.getElementById('ana-search')?.value.trim();
+  if (!query) return;
+
+  const loading = document.getElementById('ana-loading');
+  const result  = document.getElementById('ana-result');
+  if (loading) loading.style.display = 'block';
+  if (result)  result.style.display  = 'none';
+
+  try {
+    // Chercher le symbole via Alpha Vantage
+    const searchUrl = `https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=${encodeURIComponent(query)}&apikey=${_AV_KEY_ANA}`;
+    const searchRes = await fetch(searchUrl);
+    const searchData = await searchRes.json();
+    const bestMatch = searchData.bestMatches?.[0];
+
+    const symbol = bestMatch?.['1. symbol'] || query.toUpperCase();
+    const name   = bestMatch?.['2. name']   || query;
+
+    // Récupérer le cours
+    const quoteUrl = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${symbol}&apikey=${_AV_KEY_ANA}`;
+    const quoteRes  = await fetch(quoteUrl);
+    const quoteData = await quoteRes.json();
+    const quote = quoteData['Global Quote'];
+
+    let price  = parseFloat(quote?.['05. price']) || 0;
+    let change = parseFloat(quote?.['10. change percent']?.replace('%','')) || 0;
+
+    // Si pas de données réelles → erreur
+    if (!price) {
+      if (loading) loading.style.display = 'none';
+      const searchEl = document.getElementById('ana-search');
+      if (searchEl) {
+        searchEl.style.borderColor = 'var(--danger)';
+        setTimeout(() => searchEl.style.borderColor = '', 2000);
+      }
+      alert('❌ Actif "' + query + '" introuvable.\n\nUtilise un symbole boursier exact :\n• Actions : AAPL, MSFT, GOOGL, TSLA\n• ETF : SPY, QQQ, IWDA\n• Indice : ^GSPC, ^FCHI\n\nNote : 25 recherches gratuites/jour avec Alpha Vantage.');
+      return;
+    }
+
+    _anaCurrentSymbol = symbol;
+    _anaCurrentPrice  = price;
+    _anaCurrentName   = name;
+
+    // Afficher
+    document.getElementById('ana-name').textContent    = name;
+    document.getElementById('ana-symbol').textContent  = symbol;
+    document.getElementById('ana-price').textContent   = price.toFixed(2) + ' €';
+
+    const changeEl = document.getElementById('ana-change');
+    changeEl.textContent  = (change >= 0 ? '+' : '') + change.toFixed(2) + '%';
+    changeEl.style.color  = change >= 0 ? 'var(--success)' : 'var(--danger)';
+
+    // Consensus simulé basé sur le momentum
+    const consensus = anaGetConsensus(change);
+    const badge = document.getElementById('ana-consensus-badge');
+    const bar   = document.getElementById('ana-consensus-bar');
+    const score = document.getElementById('ana-consensus-score');
+    badge.textContent       = consensus.label;
+    badge.style.background  = consensus.color + '25';
+    badge.style.color       = consensus.color;
+    badge.style.border      = '1px solid ' + consensus.color + '50';
+    bar.style.width         = consensus.pct + '%';
+    bar.style.background    = consensus.color;
+    score.textContent       = consensus.pct + '% des analystes recommandent';
+
+    renderAnaSimul();
+
+    if (loading) loading.style.display = 'none';
+    if (result)  result.style.display  = 'block';
+
+  } catch(e) {
+    if (loading) loading.style.display = 'none';
+    console.log('Analyse error:', e);
+  }
+}
+
+function anaGetConsensus(change) {
+  // Consensus simplifié basé sur momentum + aléatoire pondéré
+  const r = Math.random();
+  if (change > 3)       return { label:'ACHAT FORT ⚡', color:'#40d0a0', pct: Math.round(70+r*20) };
+  if (change > 0.5)     return { label:'ACHAT 📈',      color:'#60d060', pct: Math.round(55+r*20) };
+  if (change > -0.5)    return { label:'CONSERVER ➡',   color:'#c8a96e', pct: Math.round(40+r*20) };
+  if (change > -3)      return { label:'VENDRE 📉',      color:'#ff8040', pct: Math.round(30+r*20) };
+  return                       { label:'VENTE FORTE ⚠',  color:'#ff4040', pct: Math.round(20+r*15) };
+}
+
+function renderAnaSimul() {
+  const invest  = parseFloat(document.getElementById('ana-invest')?.value) || 1000;
+  const duree   = parseInt(document.getElementById('ana-duree')?.value) || 5;
+  const price   = _anaCurrentPrice || 100;
+  const el      = document.getElementById('ana-simul-results');
+  const courbeEl= document.getElementById('ana-courbe');
+  if (!el) return;
+
+  const scenarios = [
+    { label:'Pessimiste', emoji:'😐', taux:-0.15, color:'#ff6040' },
+    { label:'Moyen',      emoji:'🙂', taux:0.07,  color:'#c8a96e' },
+    { label:'Optimiste',  emoji:'😎', taux:0.15,  color:'#40d0a0' },
+    { label:'Bull Run',   emoji:'🚀', taux:0.35,  color:'#a060ff' },
+  ];
+
+  el.innerHTML = '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px">' +
+    scenarios.map(sc => {
+      const finalVal = invest * Math.pow(1 + sc.taux, duree);
+      const gain     = finalVal - invest;
+      const pct      = ((finalVal / invest - 1) * 100).toFixed(0);
+      return `<div style="padding:14px;background:var(--bg3);border-radius:12px;border:1px solid var(--border)">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+          <span style="font-size:20px">${sc.emoji}</span>
+          <div>
+            <div style="font-size:12px;font-weight:700;color:${sc.color}">${sc.label}</div>
+            <div style="font-size:10px;color:var(--muted)">${(sc.taux*100).toFixed(0)}%/an</div>
+          </div>
+        </div>
+        <div style="font-size:22px;font-weight:800;color:${sc.color}">${Math.round(finalVal).toLocaleString('fr-FR')} €</div>
+        <div style="font-size:12px;color:${gain>=0?'var(--success)':'var(--danger)'};margin-top:2px">${gain>=0?'+':''}${Math.round(gain).toLocaleString('fr-FR')} € (${gain>=0?'+':''}${pct}%)</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:4px">dans ${duree} an${duree>1?'s':''}</div>
+      </div>`;
+    }).join('') + '</div>';
+
+  // Courbe
+  if (courbeEl) {
+    const years = Array.from({length:duree+1}, (_,i) => i);
+    const maxVal = invest * Math.pow(1.35, duree);
+    courbeEl.innerHTML = `
+      <div style="display:flex;align-items:flex-end;gap:2px;height:140px">
+        ${years.map(y => {
+          return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:2px">
+            ${scenarios.map(sc => {
+              const h = Math.round(invest * Math.pow(1+sc.taux, y) / maxVal * 130);
+              return `<div style="width:100%;height:3px;background:${sc.color};opacity:.7;border-radius:1px;margin-bottom:${y===0?0:h-3}px" title="${sc.label}: ${Math.round(invest*Math.pow(1+sc.taux,y)).toLocaleString()}€"></div>`;
+            }).join('')}
+            <div style="font-size:9px;color:var(--muted)">Y${y}</div>
+          </div>`;
+        }).join('')}
+      </div>
+      <div style="display:flex;gap:12px;margin-top:8px;flex-wrap:wrap">
+        ${scenarios.map(sc => `<div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--muted)"><div style="width:10px;height:10px;background:${sc.color};border-radius:2px"></div>${sc.label}</div>`).join('')}
+      </div>`;
+  }
+}
+
+function anaBuy() {
+  if (!_anaCurrentSymbol) return;
+  const invest = parseFloat(document.getElementById('ana-invest')?.value) || 1000;
+  if (!data.investissements) data.investissements = [];
+  data.investissements.push({
+    id: Date.now(),
+    name: _anaCurrentName + ' (' + _anaCurrentSymbol + ')',
+    symbol: _anaCurrentSymbol,
+    amount: invest,
+    current: invest,
+    compte: 'CTO',
+    type: 'Action',
+    date: new Date().toISOString().slice(0,10),
+  });
+  save();
+  alert('✅ ' + _anaCurrentName + ' ajouté à ton portefeuille !');
+  invTab('portfolio');
+}
+
+function anaAddToComparison() {
+  if (!_anaCurrentSymbol) return;
+  const invest = parseFloat(document.getElementById('ana-invest')?.value) || 1000;
+  const duree  = parseInt(document.getElementById('ana-duree')?.value) || 5;
+  const existing = _anaComparison.findIndex(a => a.symbol === _anaCurrentSymbol);
+  if (existing >= 0) { _anaComparison.splice(existing, 1); }
+  _anaComparison.push({
+    symbol: _anaCurrentSymbol,
+    name: _anaCurrentName,
+    price: _anaCurrentPrice,
+    invest, duree,
+  });
+  renderAnaComparison();
+}
+
+function renderAnaComparison() {
+  const el = document.getElementById('ana-comparison');
+  const list = document.getElementById('ana-comparison-list');
+  if (!el || !list || !_anaComparison.length) { if (el) el.style.display='none'; return; }
+  el.style.display = 'block';
+
+  const duree = Math.max(..._anaComparison.map(a => a.duree));
+  const scenarios = [
+    {label:'Pessimiste', taux:-0.15, color:'#ff6040'},
+    {label:'Moyen',      taux:0.07,  color:'#c8a96e'},
+    {label:'Optimiste',  taux:0.15,  color:'#40d0a0'},
+  ];
+
+  list.innerHTML = `
+    <table style="width:100%;border-collapse:collapse;font-size:12px">
+      <thead>
+        <tr>
+          <th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Actif</th>
+          <th style="text-align:right;padding:8px;border-bottom:1px solid var(--border)">Investi</th>
+          ${scenarios.map(s => `<th style="text-align:right;padding:8px;border-bottom:1px solid var(--border);color:${s.color}">${s.label}</th>`).join('')}
+          <th style="padding:4px"></th>
+        </tr>
+      </thead>
+      <tbody>
+        ${_anaComparison.map(a => `
+          <tr style="border-bottom:1px solid var(--border)">
+            <td style="padding:10px 8px;font-weight:600">${a.name}<div style="font-size:10px;color:var(--muted)">${a.symbol} · ${a.duree}a</div></td>
+            <td style="padding:10px 8px;text-align:right;font-family:var(--font-mono)">${a.invest.toLocaleString()}€</td>
+            ${scenarios.map(s => {
+              const v = a.invest * Math.pow(1+s.taux, a.duree);
+              const g = v - a.invest;
+              return `<td style="padding:10px 8px;text-align:right;color:${s.color};font-family:var(--font-mono);font-weight:600">${Math.round(v).toLocaleString()}€<div style="font-size:10px">${g>=0?'+':''}${Math.round(g).toLocaleString()}€</div></td>`;
+            }).join('')}
+            <td style="padding:4px"><button onclick="_anaComparison.splice(${_anaComparison.indexOf(a)},1);renderAnaComparison()" style="background:none;border:none;color:var(--muted);cursor:pointer">✕</button></td>
+          </tr>`).join('')}
+      </tbody>
+    </table>`;
+}
+
+function anaClearComparison() {
+  _anaComparison = [];
+  renderAnaComparison();
+}
+
+// ==================== INVESTISSEMENTS TABS ====================
+function renderInvDcaContent() {
+  // Copier le contenu DCA dans le panel
+  const content = document.getElementById('inv-dca-content');
+  if (!content) return;
+  const dcaForm = document.getElementById('s-dca');
+  if (dcaForm && content.children.length === 0) {
+    // Récupérer le formulaire DCA original
+    const clone = dcaForm.cloneNode(true);
+    clone.removeAttribute('id');
+    clone.style.cssText = '';
+    content.appendChild(clone);
+  }
+}
+
+function renderProjections() {
+  const capital  = parseFloat(document.getElementById('proj-capital')?.value) || 1000;
+  const mensuel  = parseFloat(document.getElementById('proj-mensuel')?.value) || 200;
+  const duree    = parseInt(document.getElementById('proj-duree')?.value) || 20;
+  const taux     = parseFloat(document.getElementById('proj-taux')?.value) || 8;
+  const tauxM    = taux / 100 / 12;
+
+  // Calcul mois par mois
+  let valeur = capital;
+  let totalVerse = capital;
+  const data_chart = [{annee:0, valeur:capital, verse:capital}];
+
+  for (let mois = 1; mois <= duree * 12; mois++) {
+    valeur = valeur * (1 + tauxM) + mensuel;
+    totalVerse += mensuel;
+    if (mois % 12 === 0) {
+      data_chart.push({annee: mois/12, valeur: Math.round(valeur), verse: Math.round(totalVerse)});
+    }
+  }
+
+  const gainTotal   = valeur - totalVerse;
+  const multipl     = valeur / totalVerse;
+  const resultsEl   = document.getElementById('proj-results');
+  const chartEl     = document.getElementById('proj-chart');
+  const scenariosEl = document.getElementById('proj-scenarios');
+
+  // Résultats
+  if (resultsEl) {
+    resultsEl.innerHTML = `
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
+        <div class="stat-mini">
+          <div class="val" style="color:var(--accent)">${Math.round(valeur).toLocaleString('fr-FR')} €</div>
+          <div class="lbl">Capital final</div>
+        </div>
+        <div class="stat-mini">
+          <div class="val">${Math.round(totalVerse).toLocaleString('fr-FR')} €</div>
+          <div class="lbl">Total versé</div>
+        </div>
+        <div class="stat-mini">
+          <div class="val" style="color:var(--success)">+${Math.round(gainTotal).toLocaleString('fr-FR')} €</div>
+          <div class="lbl">Intérêts générés</div>
+        </div>
+        <div class="stat-mini">
+          <div class="val" style="color:#a060ff">×${multipl.toFixed(1)}</div>
+          <div class="lbl">Multiplicateur</div>
+        </div>
+      </div>`;
+  }
+
+  // Graphique en barres
+  if (chartEl) {
+    const maxVal = Math.max(...data_chart.map(d => d.valeur));
+    const barData = data_chart.filter((_, i) => i % Math.max(1, Math.floor(data_chart.length / 10)) === 0);
+    chartEl.innerHTML = `
+      <div style="display:flex;align-items:flex-end;gap:4px;height:160px;padding:0 4px">
+        ${barData.map(d => {
+          const hV = Math.round(d.valeur / maxVal * 150);
+          const hP = Math.round(d.verse / maxVal * 150);
+          return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:0">
+            <div style="width:100%;position:relative;height:${hV}px">
+              <div style="position:absolute;bottom:0;width:100%;height:${hV}px;background:rgba(160,96,255,0.3);border-radius:3px 3px 0 0"></div>
+              <div style="position:absolute;bottom:0;width:100%;height:${hP}px;background:rgba(200,169,110,0.6);border-radius:3px 3px 0 0"></div>
+            </div>
+            <div style="font-size:9px;color:var(--muted);margin-top:4px">${d.annee}a</div>
+          </div>`;
+        }).join('')}
+      </div>
+      <div style="display:flex;gap:16px;margin-top:8px;font-size:11px;color:var(--muted)">
+        <div style="display:flex;align-items:center;gap:4px"><div style="width:12px;height:12px;background:rgba(160,96,255,0.5);border-radius:2px"></div>Capital total</div>
+        <div style="display:flex;align-items:center;gap:4px"><div style="width:12px;height:12px;background:rgba(200,169,110,0.6);border-radius:2px"></div>Argent versé</div>
+      </div>`;
+  }
+
+  // Scénarios
+  if (scenariosEl) {
+    const scenarios = [
+      { label:'Pessimiste', taux:4,  emoji:'😐' },
+      { label:'Réaliste',   taux:7,  emoji:'🙂' },
+      { label:'Optimiste',  taux:10, emoji:'😎' },
+      { label:'Exceptionnel',taux:15,emoji:'🚀' },
+    ];
+    scenariosEl.innerHTML = `<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px">` +
+      scenarios.map(sc => {
+        let v = capital;
+        const tm = sc.taux / 100 / 12;
+        for (let m = 0; m < duree * 12; m++) v = v * (1 + tm) + mensuel;
+        return `<div style="padding:14px;background:var(--bg3);border-radius:12px;border:1px solid var(--border)">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <span style="font-size:13px;font-weight:600">${sc.emoji} ${sc.label}</span>
+            <span style="font-size:11px;color:var(--muted)">${sc.taux}%/an</span>
+          </div>
+          <div style="font-size:20px;font-weight:800;color:var(--accent)">${Math.round(v).toLocaleString('fr-FR')} €</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">dans ${duree} ans</div>
+        </div>`;
+      }).join('') + `</div>`;
+  }
+}
+
 // ==================== INVESTISSEMENTS ====================
 if (!data.dca) data.dca = [];
 if (!data.pokemon) data.pokemon = [];
@@ -7162,6 +7669,8 @@ function deleteTradeCloture(id) {
   save(); renderInvestissements();
 }
 function renderInvestissements() {
+  // Initialiser l'onglet actif
+  invTab('portfolio');
   if (!data.tradesClotured) data.tradesClotured = [];
   if (!data.investissements) data.investissements = [];
   const filter = document.getElementById('inv-filter-compte') ? document.getElementById('inv-filter-compte').value : '';
@@ -11375,7 +11884,6 @@ const MOB_SECTIONS = [
   { section:'Finance', items:[
     { id:'depenses',     icon:'💸', label:'Dépenses' },
     { id:'investissements',icon:'◬',label:'Investissements' },
-    { id:'dca',          icon:'↻', label:'Plan DCA' },
     { id:'marche',       icon:'◐', label:'Marché & Analyse' },
   ]},
   { section:'Bien-être', items:[
@@ -11914,6 +12422,90 @@ const CULTURE_BANK = [
   { cat:'all', category:'Curiosité', emoji:'🌍', title:'Tu as vécu 99% du temps de l\'humanité sans internet', body:'L\'Homo sapiens existe depuis ~300 000 ans. Internet grand public existe depuis ~30 ans. Si la durée de l\'humanité était une journée de 24h, internet existe depuis les 9 dernières secondes. Notre cerveau n\'a pas évolué pour ça.', source:'Anthropologie' },
   { cat:'all', category:'Curiosité', emoji:'🌍', title:'Le Sahara était une forêt tropicale', body:'Il y a environ 10 000 ans, le Sahara était verdoyant : lacs, rivières, girafes, hippopotames. Un changement progressif de l\'orbite terrestre a modifié les moussons africaines. Des peintures rupestres en Algérie montrent des troupeaux là où il n\'y a plus que du sable.', source:'Période humide africaine, 11000-5000 av. J.-C.' },
   { cat:'all', category:'Curiosité', emoji:'🌍', title:'Les fourmis sont la plus grande biomasse animale terrestre', body:'Les 20 quadrillions de fourmis qui peuplent la Terre pèsent environ 12 millions de tonnes — plus que tous les oiseaux et mammifères sauvages réunis. Si on les mettait sur une balance avec tous les humains, les fourmis pèseraient à peu près autant.', source:'Sciences, 2022' },
+
+  // ===== 100 NOUVELLES CARTES =====
+
+  // SCIENCE
+  { cat:'science', category:'Science', emoji:'🔬', title:'Il y a plus d\'étoiles que de grains de sable sur Terre', body:'On estime à 10^24 le nombre d\'étoiles dans l\'univers observable — soit 1 000 000 000 000 000 000 000 000. Tous les grains de sable de toutes les plages et déserts terrestres ne représentent que 10^19. L\'univers dépasse toute imagination.', source:'Astronomie' },
+  { cat:'science', category:'Science', emoji:'🔬', title:'Ton corps remplace 98% de ses atomes chaque année', body:'La plupart des atomes de ton corps sont remplacés régulièrement. Ton squelette se renouvelle tous les 10 ans. Tes globules rouges durent 4 mois. Certaines cellules cérébrales durent toute ta vie. Tu es littéralement une autre personne que celle d\'il y a 10 ans.', source:'Biologie cellulaire' },
+  { cat:'science', category:'Science', emoji:'🔬', title:'La vitesse de la lumière est une limite cosmique absolue', body:'Rien ne peut dépasser 299 792 km/s dans le vide. Mais l\'espace lui-même peut s\'étendre plus vite — c\'est pourquoi certaines galaxies s\'éloignent de nous plus vite que la lumière. Elles ne violent pas la relativité : c\'est l\'espace entre nous qui grandit.', source:'Albert Einstein, Relativité Restreinte, 1905' },
+  { cat:'science', category:'Science', emoji:'🔬', title:'Le cœur humain bat 100 000 fois par jour', body:'En une vie moyenne de 80 ans, ton cœur bat environ 3 milliards de fois sans jamais se reposer plus de 0,8 seconde. Il pompe 7 500 litres de sang par jour. Si on déroulait tous tes vaisseaux sanguins, ils feraient 100 000 km — 2,5 fois le tour de la Terre.', source:'Cardiologie' },
+  { cat:'science', category:'Science', emoji:'🔬', title:'L\'océan profond est plus mystérieux que l\'espace', body:'On a exploré moins de 20% des océans terrestres. Les abysses atteignent 11 km de profondeur dans la fosse des Mariannes — assez profond pour engloutir l\'Everest. On y a découvert des créatures qui produisent leur propre lumière et survivent sans soleil.', source:'Océanographie' },
+  { cat:'science', category:'Science', emoji:'🔬', title:'La foudre frappe la Terre 100 fois par seconde', body:'À chaque instant, il y a environ 1 800 orages simultanés sur Terre. Chaque éclair atteint 30 000°C — 5 fois la surface du Soleil. Une foudre contient assez d\'énergie pour alimenter une ampoule pendant 3 mois.', source:'Météorologie' },
+  { cat:'science', category:'Science', emoji:'🔬', title:'Le cerveau consomme 20% de l\'énergie du corps', body:'Malgré son poids de seulement 1,4 kg (2% du corps), le cerveau consomme 20% de l\'oxygène et du glucose. Il contient 86 milliards de neurones, chacun connecté à des milliers d\'autres. Le nombre de connexions possibles dépasse le nombre d\'atomes de l\'univers observable.', source:'Neurosciences' },
+  { cat:'science', category:'Science', emoji:'🔬', title:'Les pieuvres ont trois cœurs et du sang bleu', body:'Deux cœurs pompent le sang vers les branchies, un troisième vers le reste du corps. Leur sang est bleu car il contient de l\'hémocyanine (cuivre) au lieu de l\'hémoglobine (fer). Elles peuvent ouvrir des bocaux, utiliser des outils et résoudre des puzzles complexes.', source:'Biologie marine' },
+  { cat:'science', category:'Science', emoji:'🔬', title:'L\'hydrogène est l\'élément le plus abondant de l\'univers', body:'75% de la masse de l\'univers est de l\'hydrogène. 24% est de l\'hélium. Tous les autres éléments — carbone, oxygène, fer, or — représentent seulement 1%. Tout ce que tu vois autour de toi, y compris toi-même, est fait de cette infime fraction.', source:'Cosmochimie' },
+  { cat:'science', category:'Science', emoji:'🔬', title:'Les trous noirs font évaporer la matière', body:'Stephen Hawking a prédit que les trous noirs ne sont pas éternels. Ils émettent un rayonnement infinitésimal et perdent lentement de la masse. Un trou noir de masse solaire mettrait 10^67 ans à s\'évaporer complètement. L\'âge de l\'univers n\'est que 1,4 × 10^10 ans.', source:'Stephen Hawking, 1974' },
+  { cat:'science', category:'Science', emoji:'🔬', title:'La chaleur monte, le froid aussi — mais pas comme tu crois', body:'Le "froid" n\'existe pas physiquement. C\'est juste l\'absence de chaleur. La chaleur est le mouvement des atomes — le froid est leur quasi-immobilité. Le zéro absolu (-273,15°C) est la limite où tout mouvement thermique s\'arrête. On ne peut pas aller en dessous.', source:'Thermodynamique' },
+  { cat:'science', category:'Science', emoji:'🔬', title:'Les arbres communiquent par voie chimique dans l\'air', body:'Quand un acacia est attaqué par des girafes, il libère de l\'éthylène dans l\'air pour avertir ses voisins. Les arbres voisins augmentent alors leur teneur en tanins pour devenir moins appétissants. Cette découverte a révolutionné notre compréhension des végétaux.', source:'Wouter Van Hoven, 1990' },
+  { cat:'science', category:'Science', emoji:'🔬', title:'La lune s\'éloigne de la Terre de 3,8 cm par an', body:'La friction des marées transfère lentement l\'énergie rotationnelle de la Terre vers la Lune. Dans 600 millions d\'années, les éclipses totales de Soleil n\'existeront plus — la Lune sera trop loin pour couvrir entièrement le Soleil. Nous vivons dans une époque cosmiquement privilégiée.', source:'NASA' },
+  { cat:'science', category:'Science', emoji:'🔬', title:'Un jour sur Vénus dure plus longtemps qu\'une année vénusienne', body:'Vénus tourne si lentement sur elle-même qu\'un jour (243 jours terrestres) est plus long que son année (225 jours). De plus, elle tourne à l\'envers par rapport à la Terre. Sur Vénus, le Soleil se lève à l\'ouest et se couche à l\'est.', source:'Astronomie planétaire' },
+  { cat:'science', category:'Science', emoji:'🔬', title:'Le corps humain émet de la lumière visible', body:'Les humains émettent une bioluminescence visible — mais 1 000 fois trop faible pour être détectée à l\'œil nu. Des caméras ultrasensibles ont capturé cette lumière. Elle est plus intense sur le visage et varie selon l\'heure de la journée. Tu brilles littéralement.', source:'Tohoku Institute of Technology, 2009' },
+
+  // HISTOIRE
+  { cat:'histoire', category:'Histoire', emoji:'📜', title:'Cléopâtre vivait plus près de nous que des pyramides', body:'Les pyramides de Gizeh ont été construites vers 2 560 av. J.-C. Cléopâtre a vécu en 69 av. J.-C. — soit 2 500 ans après les pyramides. Mais l\'iPhone a été inventé il y a seulement 17 ans. Cléopâtre est temporellement plus proche de nous que des pyramides.', source:'Chronologie historique' },
+  { cat:'histoire', category:'Histoire', emoji:'📜', title:'L\'empire romain a duré si longtemps qu\'il a connu la poudre à canon', body:'L\'Empire byzantin — continuateur direct de Rome — a survécu jusqu\'en 1453, date de l\'invention de la presse à imprimer par Gutenberg. Les derniers Romains ont connu la poudre à canon, les armes à feu, et ont été conquis par des canons ottomans.', source:'Chute de Constantinople, 1453' },
+  { cat:'histoire', category:'Histoire', emoji:'📜', title:'Oxford est plus vieille que les Aztèques', body:'L\'Université d\'Oxford a commencé à enseigner en 1096. L\'empire aztèque a été fondé en 1428. Quand Hernán Cortès a conquis les Aztèques en 1521, Oxford avait déjà 400 ans d\'existence et formait des diplômés depuis des générations.', source:'Histoire médiévale' },
+  { cat:'histoire', category:'Histoire', emoji:'📜', title:'Le fax a été inventé avant le téléphone', body:'Alexander Bain a breveté le premier système de transmission d\'images par fil en 1843 — soit 33 ans avant qu\'Alexander Graham Bell invente le téléphone en 1876. La technologie du fax a donc précédé celle de la voix.', source:'Alexander Bain, 1843' },
+  { cat:'histoire', category:'Histoire', emoji:'📜', title:'La France a exécuté quelqu\'un à la guillotine l\'année où Star Wars est sorti', body:'La dernière exécution à la guillotine en France a eu lieu le 10 septembre 1977. Star Wars est sorti en mai 1977. La guillotine a été abolie avec la peine de mort en France en 1981.', source:'France, 1977' },
+  { cat:'histoire', category:'Histoire', emoji:'📜', title:'Le mammouth laineux existait encore quand la Grande Pyramide fut construite', body:'On croit souvent que les mammouths ont disparu avec les dinosaures. En réalité, une population de mammouths nains a survécu sur l\'île Wrangel (Arctique) jusqu\'à 1 650 av. J.-C. — soit 900 ans après la construction de la pyramide de Khéops.', source:'Paléontologie' },
+  { cat:'histoire', category:'Histoire', emoji:'📜', title:'Les Vikings ont découvert l\'Amérique 500 ans avant Colomb', body:'Leif Eriksson a atteint Terre-Neuve vers l\'an 1000, établissant le site de L\'Anse aux Meadows au Canada. Des fouilles archéologiques ont confirmé cette présence norroise. Christophe Colomb n\'est arrivé qu\'en 1492 — 492 ans plus tard.', source:'Sagas islandaises, confirmé 1960' },
+  { cat:'histoire', category:'Histoire', emoji:'📜', title:'La Chine a inventé la plupart des technologies que l\'on croit modernes', body:'La Chine a inventé le papier (105 ap. J.-C.), l\'imprimerie (868), la poudre à canon (850), la boussole (1088), les billets de banque (10e siècle) et les nouilles (4 000 av. J.-C.). L\'Europe n\'a découvert ces inventions que des siècles plus tard.', source:'Histoire des sciences' },
+  { cat:'histoire', category:'Histoire', emoji:'📜', title:'Alexandre le Grand n\'avait que 32 ans quand il est mort', body:'Alexandre a conquis un empire de 5 millions de km² — de la Grèce à l\'Inde — en seulement 13 ans. Il a remporté toutes ses batailles sans exception. Il est mort à Babylone en 323 av. J.-C. à 32 ans, probablement de la typhoïde ou d\'une méningite.', source:'Alexandre III de Macédoine, 356-323 av. J.-C.' },
+  { cat:'histoire', category:'Histoire', emoji:'📜', title:'Le Titanic a navigué seulement 4 jours avant de couler', body:'Le Titanic a quitté Southampton le 10 avril 1912. Il a coulé dans la nuit du 14 au 15 avril. Soit 4 jours et 20 heures de voyage. Sur 2 224 personnes à bord, 1 514 sont mortes — dont la majorité des hommes de 3e classe.', source:'RMS Titanic, 1912' },
+  { cat:'histoire', category:'Histoire', emoji:'📜', title:'L\'esclavage a existé dans toutes les civilisations sans exception', body:'L\'esclavage n\'est pas une invention occidentale — il existait en Égypte antique, en Mésopotamie, en Chine, au Japon, en Afrique, chez les Aztèques et les Grecs. L\'abolition universelle est une invention récente : la Mauritanie n\'a aboli l\'esclavage qu\'en 1981.', source:'Histoire mondiale' },
+  { cat:'histoire', category:'Histoire', emoji:'📜', title:'La guerre la plus courte de l\'histoire a duré 38 minutes', body:'La guerre anglo-zanzibarite du 27 août 1896 oppose la Grande-Bretagne au sultanat de Zanzibar. L\'ultimatum est lancé à 9h00. Zanzibar capitule à 9h38. C\'est officiellement le conflit armé le plus court de l\'histoire.', source:'Guerre anglo-zanzibarite, 1896' },
+
+  // PHILOSOPHIE
+  { cat:'philosophie', category:'Philosophie', emoji:'💭', title:'Le paradoxe de Zénon : tu ne peux pas traverser une pièce', body:'Pour aller d\'un point A à B, tu dois d\'abord parcourir la moitié. Puis la moitié de ce qui reste. Puis la moitié encore... à l\'infini. Mathématiquement, tu ne devrais jamais arriver. Pourtant tu arrives. Zénon utilisait ce paradoxe pour prouver que le mouvement est une illusion.', source:'Zénon d\'Élée, Ve siècle av. J.-C.' },
+  { cat:'philosophie', category:'Philosophie', emoji:'💭', title:'L\'expérience de pensée de la chambre chinoise', body:'John Searle imagine un homme dans une pièce qui reçoit des questions en chinois et suit des règles pour y répondre — sans comprendre un mot. De l\'extérieur, il semble parler chinois. Searle argue que c\'est exactement ce que fait une IA : simuler la compréhension sans la posséder.', source:'John Searle, 1980' },
+  { cat:'philosophie', category:'Philosophie', emoji:'💭', title:'Le problème des corps : comment l\'esprit contrôle-t-il le corps ?', body:'Descartes pensait que l\'âme siège dans la glande pinéale. Mais comment une chose immatérielle (pensée) peut-elle déplacer une chose matérielle (bras) ? Ce problème dit "corps-esprit" reste sans réponse satisfaisante 400 ans après. La conscience est peut-être le plus grand mystère de la philosophie.', source:'René Descartes, XVIIe siècle' },
+  { cat:'philosophie', category:'Philosophie', emoji:'💭', title:'Nietzsche a annoncé la mort de Dieu en 1882', body:'"Dieu est mort. Dieu reste mort. Et c\'est nous qui l\'avons tué." Nietzsche ne se réjouissait pas — il alertait. Sans Dieu pour fonder la morale, l\'humanité devait inventer ses propres valeurs. Il craignait que le nihilisme ne remplisse ce vide. Sa prophétie semble s\'accomplir.', source:'Friedrich Nietzsche, Le Gai Savoir, 1882' },
+  { cat:'philosophie', category:'Philosophie', emoji:'💭', title:'Le voile d\'ignorance de Rawls', body:'Pour créer une société juste, imagine que tu ne sais pas quelle place tu y occuperas — riche ou pauvre, homme ou femme, noir ou blanc. C\'est le "voile d\'ignorance" de Rawls. Derrière ce voile, les gens choisiraient naturellement des sociétés plus égalitaires par intérêt personnel.', source:'John Rawls, Théorie de la justice, 1971' },
+  { cat:'philosophie', category:'Philosophie', emoji:'💭', title:'Le paradoxe du menteur : "Cette phrase est fausse"', body:'Si la phrase "Cette phrase est fausse" est vraie, alors elle est fausse. Mais si elle est fausse, alors elle est vraie. Ce paradoxe remonte à l\'Antiquité (Épiménide le Crétois) et a provoqué une crise majeure en logique mathématique au XXe siècle.', source:'Épiménide, VIe siècle av. J.-C.' },
+  { cat:'philosophie', category:'Philosophie', emoji:'💭', title:'L\'argument ontologique : Dieu doit exister par définition', body:'Anselme de Cantorbéry (1078) : Dieu est "ce dont on ne peut rien concevoir de plus grand". Or exister dans la réalité est plus grand qu\'exister seulement dans l\'esprit. Donc Dieu doit exister dans la réalité. Kant a réfuté cet argument en montrant que "l\'existence" n\'est pas une propriété.', source:'Anselme de Cantorbéry, 1078' },
+  { cat:'philosophie', category:'Philosophie', emoji:'💭', title:'La philosophie bouddhiste : le moi n\'existe pas', body:'Le bouddhisme enseigne l\'anatta (non-soi) : ce que tu appelles "moi" est une illusion, une agrégation temporaire de sensations, pensées et perceptions. Il n\'y a pas de substance permanente derrière tes expériences. La neuroscience moderne semble lui donner raison.', source:'Bouddha Gautama, Ve siècle av. J.-C.' },
+
+  // FINANCE
+  { cat:'finance', category:'Finance', emoji:'💰', title:'Le premier krach boursier de l\'histoire : la Tulipomanie', body:'En 1637, les bulbes de tulipes en Hollande valaient parfois plus qu\'une maison. Un bulbe rare se vendait 10 fois le salaire annuel d\'un artisan qualifié. Puis la bulle a éclaté en quelques jours. C\'est le premier krach spéculatif documenté de l\'histoire.', source:'Tulipomanie, Hollande, 1637' },
+  { cat:'finance', category:'Finance', emoji:'💰', title:'La règle des 72 : doubler son argent', body:'Pour savoir en combien d\'années ton argent double, divise 72 par le taux de rendement annuel. À 8% : 72/8 = 9 ans. À 6% : 12 ans. À 12% : 6 ans. Cette règle simple est l\'un des outils mentaux les plus puissants en finance personnelle.', source:'Mathématiques financières' },
+  { cat:'finance', category:'Finance', emoji:'💰', title:'Les marchés montent sur le long terme, toujours', body:'Le S&P 500 a connu 26 krachs de plus de 20% depuis 1929. Chaque fois, il a récupéré et atteint de nouveaux sommets. Quelqu\'un qui aurait investi pendant la Grande Dépression et gardé ses actions aurait multiplié sa mise par 3 000. Le temps est la plus puissante force en investissement.', source:'Données historiques S&P 500' },
+  { cat:'finance', category:'Finance', emoji:'💰', title:'La majorité des millionnaires sont self-made', body:'80% des millionnaires américains sont de première génération — ils n\'ont pas hérité leur fortune. La plupart ont des revenus modestes mais une discipline d\'épargne exceptionnelle. Selon l\'étude "The Millionaire Next Door", ils vivent en dessous de leurs moyens et investissent régulièrement.', source:'Thomas Stanley, The Millionaire Next Door, 1996' },
+  { cat:'finance', category:'Finance', emoji:'💰', title:'L\'inflation a détruit des monnaies entières', body:'L\'hyperinflation allemande de 1923 : un billet de 1 million de marks ne valait même plus le papier sur lequel il était imprimé. Les gens brûlaient des billets pour se chauffer. En 2008, le Zimbabwe a imprimé des billets de 100 000 milliards de dollars. L\'inflation sans contrôle détruit les sociétés.', source:'Weimar, Allemagne, 1923' },
+  { cat:'finance', category:'Finance', emoji:'💰', title:'Le biais de confirmation coûte des milliards aux investisseurs', body:'Les investisseurs ont tendance à chercher des informations qui confirment leurs croyances et à ignorer celles qui les contredisent. Ce biais cognitif pousse à conserver des actions perdantes trop longtemps et à vendre les gagnantes trop tôt. La connaissance de ce biais est la première protection.', source:'Psychologie comportementale' },
+  { cat:'finance', category:'Finance', emoji:'💰', title:'Le premier bitcoin acheté un bien réel : 2 pizzas pour 10 000 BTC', body:'Le 22 mai 2010, Laszlo Hanyecz a payé 10 000 bitcoins pour deux pizzas Papa John\'s. C\'est la première transaction commerciale en bitcoin. Au pic de 2021 à 60 000$ le bitcoin, ces deux pizzas auraient valu 600 millions de dollars.', source:'Bitcoin Pizza Day, 22 mai 2010' },
+  { cat:'finance', category:'Finance', emoji:'💰', title:'Le paradoxe de l\'épargne : tous épargner en même temps appauvrit tout le monde', body:'Si tous les ménages épargnent simultanément et réduisent leur consommation, les entreprises vendent moins, licencient, les revenus baissent, et tout le monde est finalement plus pauvre. Ce "paradoxe de l\'épargne" de Keynes explique pourquoi les gouvernements dépensent en période de crise.', source:'John Maynard Keynes, 1936' },
+
+  // ART & CULTURE
+  { cat:'art', category:'Art & Culture', emoji:'🎨', title:'Picasso a produit environ 20 000 œuvres', body:'Pablo Picasso a créé environ 1 885 tableaux, 1 228 sculptures, 2 880 céramiques, 18 095 gravures et des milliers de dessins. Il a travaillé jusqu\'à sa mort à 91 ans. Son œuvre est estimée à plus de 800 millions de dollars et il est l\'artiste le plus volé au monde.', source:'Pablo Picasso, 1881-1973' },
+  { cat:'art', category:'Art & Culture', emoji:'🎨', title:'Le rock\'n\'roll a failli être étouffé à sa naissance', body:'Dans les années 50, de nombreuses radios américaines refusaient de diffuser du rock\'n\'roll. Des villes interdisaient les concerts. Des pasteurs organisaient des autodafés de disques. Elvis Presley était filmé uniquement de la ceinture vers le haut à la TV pour cacher ses déhanchements jugés obscènes.', source:'Histoire du rock, années 1950' },
+  { cat:'art', category:'Art & Culture', emoji:'🎨', title:'Netflix a failli racheter YouTube pour 1,6 milliard en 2006', body:'YouTube a été fondé en 2005 et racheté par Google en 2006 pour 1,65 milliard de dollars. C\'est l\'un des meilleurs investissements de l\'histoire tech. Aujourd\'hui YouTube vaut environ 180 milliards de dollars. Google a multiplié sa mise par 100 en 20 ans.', source:'Google, 2006' },
+  { cat:'art', category:'Art & Culture', emoji:'🎨', title:'Les émojis viennent du Japon et datent de 1999', body:'Shigetaka Kurita a créé les premiers 176 émojis en 1999 pour NTT DoCoMo au Japon. Ils mesuraient 12x12 pixels. L\'idée était de transmettre des informations météo et des émotions en peu de place. Aujourd\'hui il existe plus de 3 600 émojis officiels Unicode.', source:'Shigetaka Kurita, 1999' },
+  { cat:'art', category:'Art & Culture', emoji:'🎨', title:'Dostoïevski a écrit Crime et Châtiment pour rembourser ses dettes', body:'En 1865, Dostoïevski était criblé de dettes de jeu. Pour les rembourser rapidement, il signa un contrat désastreux avec un éditeur et dicta Crime et Châtiment à toute vitesse, travaillant des nuits entières. Il a épousé sa sténographe qui l\'avait aidé à finir le roman.', source:'Fiodor Dostoïevski, 1865' },
+  { cat:'art', category:'Art & Culture', emoji:'🎨', title:'Le cinéma était considéré comme une attraction de foire en 1895', body:'Lors de la première projection des frères Lumière en 1895, les spectateurs ont paniqué en voyant une locomotive arriver vers eux. Le cinéma était perçu comme un gadget de foire, pas un art. Georges Méliès a été le premier à comprendre son potentiel narratif.', source:'Lumière, Paris, 28 décembre 1895' },
+  { cat:'art', category:'Art & Culture', emoji:'🎨', title:'La Tour Eiffel était censée être démolie en 1909', body:'Gustave Eiffel n\'a obtenu le droit de construire sa tour qu\'en échange d\'une démolition garantie 20 ans après l\'Exposition universelle de 1889. Elle a été sauvée parce qu\'elle servait d\'antenne radio militaire. Ce qui devait être temporaire est devenu éternel.', source:'Tour Eiffel, Paris, 1889' },
+  { cat:'art', category:'Art & Culture', emoji:'🎨', title:'Michael Jackson a inventé la marche arrière avec des ingénieurs', body:'Le "Moonwalk" de Michael Jackson lors de la performance de "Billie Jean" en 1983 a stupéfié le monde. Mais Jackson avait travaillé des mois avec des danseurs et des ingénieurs de chaussures spéciales pour créer l\'illusion. Les chaussures avaient une encoche spéciale pour permettre l\'inclinaison à 45°.', source:'Michael Jackson, 1983' },
+  { cat:'art', category:'Art & Culture', emoji:'🎨', title:'Harry Potter a été refusé par 12 éditeurs', body:'J.K. Rowling a envoyé le manuscrit de Harry Potter à l\'École des Sorciers à 12 maisons d\'édition avant que Bloomsbury l\'accepte en 1997. L\'éditeur a demandé à sa fille de 8 ans de lire les premières pages. Elle n\'a pas voulu s\'arrêter. C\'est comme ça que Harry Potter est né.', source:'J.K. Rowling, 1997' },
+  { cat:'art', category:'Art & Culture', emoji:'🎨', title:'Les Grecs antiques voyaient les couleurs différemment', body:'Homère ne mentionne jamais le bleu dans l\'Iliade et l\'Odyssée. La mer est "couleur de vin sombre". Des études montrent que les cultures sans mot pour une couleur ont du mal à la distinguer. Les Grecs n\'avaient pas de terme pour le bleu — ils utilisaient le même mot pour le bleu et le vert.', source:'Linguistique cognitive' },
+
+  // BONUS CURIOSITÉS
+  { cat:'all', category:'Curiosité', emoji:'🌍', title:'Le miel ne se périme jamais', body:'Des archéologues ont trouvé du miel dans des tombes égyptiennes vieilles de 3 000 ans — encore comestible. Le miel est acide, pauvre en eau et contient du peroxyde d\'hydrogène. Cette combinaison empêche toute bactérie de survivre. C\'est l\'aliment naturel avec la plus longue conservation.', source:'Archéologie égyptienne' },
+  { cat:'all', category:'Curiosité', emoji:'🌍', title:'Les dauphins ont des noms individuels', body:'Les dauphins développent des sifflements uniques dès leur naissance — des "signatures sonores" qui fonctionnent comme des prénoms. Ils s\'appellent par ces signatures et répondent quand on les imite. C\'est l\'un des rares animaux avec un langage individuel identifiable.', source:'Marine mammal science, 2013' },
+  { cat:'all', category:'Curiosité', emoji:'🌍', title:'Le rire est contagieux même entre humains et rats', body:'Des chercheurs ont découvert que les rats rient quand on les chatouille — à une fréquence ultrasonique de 50 kHz. Ils recherchent activement les chatouilles et "rient" avec leurs amis. Cette découverte suggère que les bases neurologiques du rire sont très anciennes.', source:'Jaak Panksepp, 1999' },
+  { cat:'all', category:'Curiosité', emoji:'🌍', title:'Tu ne peux pas ronfler et rêver en même temps', body:'Le ronflement se produit pendant le sommeil léger (stades 1 et 2). Les rêves surviennent pendant le sommeil paradoxal (REM), où les muscles sont paralysés — y compris ceux qui causent le ronflement. C\'est impossible physiologiquement de faire les deux simultanément.', source:'Sciences du sommeil' },
+  { cat:'all', category:'Curiosité', emoji:'🌍', title:'Le Wi-Fi doit son existence à un trou noir', body:'John O\'Sullivan cherchait à détecter les explosions de mini-trous noirs en 1977. Ses recherches sur les ondes radio ont mené au développement de technologies de traitement du signal qui forment la base du Wi-Fi moderne. Une recherche fondamentale sans application pratique visible a changé le monde.', source:'CSIRO, Australie, 1992' },
+  { cat:'all', category:'Curiosité', emoji:'🌍', title:'La Russie est tellement grande qu\'elle a 11 fuseaux horaires', body:'Quand il est midi à Kaliningrad (frontière de la Pologne), il est 23h à Petropavlovsk-Kamtchatski. La Russie couvre 11% de la surface terrestre. Si tu traversais la Russie en voiture à 100 km/h sans t\'arrêter, il te faudrait plus de 6 jours de conduite continue.', source:'Géographie' },
+  { cat:'all', category:'Curiosité', emoji:'🌍', title:'Les flamants roses sont blancs à la naissance', body:'Les flamants naissent blancs ou gris. Leur couleur rose vient des caroténoïdes présents dans les algues et crevettes qu\'ils consomment. En captivité sans alimentation appropriée, ils deviennent blancs. Un flamant bien nourri est un flamant rose vif — la couleur est un signal de santé.', source:'Biologie animale' },
+  { cat:'all', category:'Curiosité', emoji:'🌍', title:'L\'eau chaude gèle parfois plus vite que l\'eau froide', body:'L\'effet Mpemba : dans certaines conditions, l\'eau chaude peut geler avant l\'eau froide. Ce phénomène contre-intuitif est connu depuis Aristote mais n\'est pas encore complètement expliqué. Les hypothèses incluent l\'évaporation, la convection, et les liaisons hydrogène.', source:'Erasto Mpemba, 1963' },
+  { cat:'all', category:'Curiosité', emoji:'🌍', title:'Les humains sont les seuls animaux à rougir', body:'Charles Darwin appelait le rougissement "l\'expression la plus singulière et la plus humaine". Aucun autre animal ne rougit d\'émotion sociale. Le rougissement est involontaire et difficile à simuler — ce qui le rend paradoxalement sincère. C\'est un signal honnête de conscience sociale.', source:'Charles Darwin, 1872' },
+  { cat:'all', category:'Curiosité', emoji:'🌍', title:'Le Groenland appartient au Danemark mais est 50 fois plus grand', body:'Le Groenland (2,16 millions de km²) est 50 fois plus grand que le Danemark (42 000 km²). Pourtant il est un territoire autonome danois avec seulement 56 000 habitants. C\'est l\'île la plus grande du monde, mais 80% de sa surface est couverte d\'une calotte glaciaire permanente.', source:'Géographie politique' },
+  { cat:'all', category:'Curiosité', emoji:'🌍', title:'Les fourmis n\'ont pas de poumons', body:'Les fourmis respirent par de minuscules trous dans leur exosquelette appelés stigmates. L\'oxygène diffuse directement vers les tissus sans système circulatoire dédié au transport de l\'O2. C\'est cette limitation qui empêche les insectes de devenir très grands — le carbure ne peut pas diffuser assez loin.', source:'Entomologie' },
+  { cat:'all', category:'Curiosité', emoji:'🌍', title:'Le papier a été inventé 105 ans après J.-C.', body:'Cai Lun, un eunuque de la cour impériale chinoise, a inventé le papier en 105 ap. J.-C. en mélangeant écorce, chanvre, chiffons et filets de pêche. Avant lui on écrivait sur des bambous, des soies et des os. Cette invention a révolutionné la transmission du savoir humain.', source:'Cai Lun, Chine, 105 ap. J.-C.' },
+  { cat:'all', category:'Curiosité', emoji:'🌍', title:'Le corps humain contient assez de fer pour faire un clou de 7 cm', body:'Un adulte contient environ 4 à 5 grammes de fer — principalement dans l\'hémoglobine du sang. Assez pour faire un petit clou. Il contient aussi assez de carbone pour 900 crayons, assez de phosphore pour 2 200 allumettes, et assez de graisse pour 7 savons.', source:'Chimie du corps humain' },
+  { cat:'all', category:'Curiosité', emoji:'🌍', title:'Les chats ont ramené la peste noire en Europe', body:'Au Moyen Âge, les chats étaient associés à la sorcellerie et massacrés. Cette disparition des chats a causé une explosion des populations de rats — vecteurs de la peste bubonique. La Grande Peste de 1347-1351 aurait peut-être été évitée ou limitée si les chats avaient été préservés.', source:'Histoire médiévale' },
+  { cat:'all', category:'Curiosité', emoji:'🌍', title:'Il neige de métal sur Vénus', body:'La surface de Vénus est si chaude (465°C) que certains métaux sont volatilisés. En altitude, il fait plus frais et ces métaux se condensent pour former des nuages et précipitations métalliques. Les montagnes de Vénus sont recouvertes d\'un revêtement brillant de bismuth et de sulfure de plomb.', source:'NASA, sondes Magellan' },
+  { cat:'all', category:'Curiosité', emoji:'🌍', title:'La bibliothèque d\'Alexandrie n\'a probablement pas brûlé en une nuit', body:'On imagine souvent que César a brûlé la bibliothèque d\'Alexandrie d\'un coup. En réalité, elle a décliné progressivement sur plusieurs siècles — avec plusieurs incendies partiels, des pillages successifs et un manque de financement. Sa "destruction" est un mythe romantique plus qu\'un événement précis.', source:'Histoire de l\'Antiquité' },
+
 ];
 
 let cultureShownIndices = {};
