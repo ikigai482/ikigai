@@ -3263,7 +3263,7 @@
     <div class="card-title">☁️ Synchronisation cloud</div>
     <div style="font-size:12px;color:var(--muted);margin-bottom:12px">Connecte-toi pour accéder à tes données depuis n'importe quel appareil.</div>
     <div id="firebase-status" style="font-size:12px;margin-bottom:12px;color:var(--muted)">Chargement...</div>
-    <button id="firebase-btn" onclick="if(window._fbSignIn){window._fbSignIn()}else{alert('Firebase non chargé, réessaie dans 2 secondes.')}" class="btn" style="width:100%">🔵 Connexion Google</button>
+    <button id="firebase-btn" id="firebase-btn-inner" onclick="(window._fbSignIn||function(){setTimeout(function(){if(window._fbSignIn)window._fbSignIn();},100)})()" class="btn" style="width:100%">🔵 Connexion Google</button>
   </div>
 
   <!-- Mode Mobile -->
@@ -3722,31 +3722,8 @@ window._fbDb   = db;
 window._fbDoc  = doc;
 window._fbSetDoc = setDoc;
 window._fbGetDoc = getDoc;
-
-window._fbSignIn = () => {
-  const provider = new GoogleAuthProvider();
-  provider.setCustomParameters({ prompt: 'select_account' });
-  return signInWithPopup(auth, provider)
-    .catch(e => {
-      console.log('SignIn error:', e.code, e.message);
-      if (e.code === 'auth/popup-blocked') {
-        alert('Le popup a été bloqué par ton navigateur. Autorise les popups pour ce site dans les paramètres.');
-      } else if (e.code === 'auth/unauthorized-domain') {
-        alert('Domaine non autorisé dans Firebase.');
-      }
-    });
-};
+window._fbSignIn = () => signInWithPopup(auth, new GoogleAuthProvider());
 window._fbSignOut = () => signOut(auth);
-
-// Rendre le bouton cliquable dès que Firebase est prêt
-document.addEventListener('DOMContentLoaded', () => {
-  const btn = document.getElementById('firebase-btn');
-  if (btn) {
-    btn.onclick = () => {
-      if (window._fbSignIn) window._fbSignIn();
-    };
-  }
-});
 
 onAuthStateChanged(auth, async (user) => {
   window._fbUser = user;
@@ -4386,7 +4363,7 @@ function obFinish() {
 // ==================== LOGIN ====================
 const USERS = [
   { username: 'admin',  password: 'admin2025',  name: 'Florian', role: 'admin' },
-  { username: 'thomas', password: 'Tom#2025!',  name: 'Thomas',  role: 'user'  },
+  { username: 'thomas', password: 'Ikigai#74',  name: 'Thomas',  role: 'user'  },
 ];
 
 function tryLogin() {
@@ -4462,7 +4439,6 @@ function checkLogin() {
 
 // ==================== DATA LAYER ====================
 const STORE_KEY = 'mavie_v1';
-
 let data = {
   quote: '',
   morning: { feeling: '', note: '' },
