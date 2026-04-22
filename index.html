@@ -3722,7 +3722,21 @@ window._fbDb   = db;
 window._fbDoc  = doc;
 window._fbSetDoc = setDoc;
 window._fbGetDoc = getDoc;
-window._fbSignIn = () => signInWithPopup(auth, new GoogleAuthProvider());
+
+// Exposer en global pour le bouton HTML
+window._fbSignIn = () => {
+  const provider = new GoogleAuthProvider();
+  provider.setCustomParameters({ prompt: 'select_account' });
+  return signInWithPopup(auth, provider)
+    .catch(e => {
+      console.log('SignIn error:', e.code, e.message);
+      if (e.code === 'auth/popup-blocked') {
+        alert('Le popup a été bloqué par ton navigateur. Autorise les popups pour ce site dans les paramètres.');
+      } else if (e.code === 'auth/unauthorized-domain') {
+        alert('Domaine non autorisé dans Firebase. Va dans Firebase Console → Authentication → Authorized domains et ajoute ikigai482.github.io');
+      }
+    });
+};
 window._fbSignOut = () => signOut(auth);
 
 onAuthStateChanged(auth, async (user) => {
@@ -4377,9 +4391,6 @@ function tryLogin() {
     // Succès
     localStorage.setItem('ikigai_logged', JSON.stringify({ username: user.username, name: user.name, role: user.role }));
     localStorage.setItem('ikigai_ever_logged', '1');
-    // Charger les données propres à cet utilisateur
-    data = { quote:'', morning:{feeling:'',note:''}, routine:[], affirmations:[], objectifs:{jour:[],mois:[],annee:[]}, habitudes:[], habitDone:{}, trackers:{}, notes:[], cours:[], investissements:[], journal:[], routineDone:{} };
-    load();
     const loginPage = document.getElementById('login-page');
     loginPage.style.transition = 'opacity .4s ease';
     loginPage.style.opacity = '0';
@@ -4441,13 +4452,8 @@ function checkLogin() {
 }
 
 // ==================== DATA LAYER ====================
-function getStoreKey() {
-  try {
-    const s = localStorage.getItem('ikigai_logged');
-    if (s) { const u = JSON.parse(s); return 'mavie_v1_' + (u.username||'default'); }
-  } catch(e) {}
-  return 'mavie_v1';
-}
+const STORE_KEY = 'mavie_v1';
+
 let data = {
   quote: '',
   morning: { feeling: '', note: '' },
@@ -4465,11 +4471,11 @@ let data = {
 };
 
 function load() {
-  try { const s = localStorage.getItem(getStoreKey()); if (s) data = JSON.parse(s); } catch(e) {}
+  try { const s = localStorage.getItem(STORE_KEY); if (s) data = JSON.parse(s); } catch(e) {}
   window._appData = data;
 }
 function save() {
-  try { localStorage.setItem(getStoreKey(), JSON.stringify(data)); } catch(e) {}
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(data)); } catch(e) {}
   window._appData = data;
   if (window._fbSave) window._fbSave();
 }
