@@ -3263,7 +3263,7 @@
     <div class="card-title">☁️ Synchronisation cloud</div>
     <div style="font-size:12px;color:var(--muted);margin-bottom:12px">Connecte-toi pour accéder à tes données depuis n'importe quel appareil.</div>
     <div id="firebase-status" style="font-size:12px;margin-bottom:12px;color:var(--muted)">Chargement...</div>
-    <button id="firebase-btn" id="firebase-btn-inner" onclick="(window._fbSignIn||function(){setTimeout(function(){if(window._fbSignIn)window._fbSignIn();},100)})()" class="btn" style="width:100%">🔵 Connexion Google</button>
+    <button id="firebase-btn" onclick="window._fbSignIn && window._fbSignIn()" class="btn" style="width:100%">🔵 Connexion Google</button>
   </div>
 
   <!-- Mode Mobile -->
@@ -3687,14 +3687,6 @@ body:has(#s-focus.active) .main { overflow: hidden; padding: 0; }
 </style>
 
 <script type="module">
-// ==================== COACH VOCAL IA ====================
-
-// ==================== DASHBOARD WIDGETS ====================,
-  { id:'xp-widget',        label:'Niveau & XP',             icon:'⭐' },
-  { id:'flux-widget',      label:'Mode Flux 🧠',            icon:'🧠' },
-  { id:'weather-card',     label:'Météo',                   icon:'🌤' },
-  { id:'ai-dashboard-card',label:'Analyse IA',              icon:'✦' },
-];
 
 
 
