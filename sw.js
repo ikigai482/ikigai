@@ -1,4 +1,4 @@
-const CACHE = 'ikigai-v1.8';
+const CACHE = 'ikigai-v1.9';
 const FILES = ['/ikigai/', '/ikigai/index.html', '/ikigai/manifest.json', '/ikigai/icon-192.png', '/ikigai/icon-512.png'];
 
 self.addEventListener('install', e => {
@@ -11,15 +11,20 @@ self.addEventListener('activate', e => {
 
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
-  // Laisser passer les APIs externes
-  const external = ['anthropic','open-meteo','nominatim','workers.dev','firebase','googleapis','gstatic','currentsapi','alphavantage','cdnjs','d3js','unpkg'];
-  if (external.some(s => url.hostname.includes(s))) return;
 
+  // Laisser passer TOUT ce qui n'est pas le site lui-même
+  // Firebase, Google, CDN, APIs — tout passe directement
+  if (url.hostname !== 'ikigai482.github.io') {
+    return; // Pas d'interception — requête normale
+  }
+
+  // Pour les fichiers du site uniquement : cache first
   e.respondWith(
     caches.match(e.request).then(cached => {
       if (cached) {
-        // Mettre à jour en arrière-plan
-        fetch(e.request).then(r => { if(r?.ok) caches.open(CACHE).then(c => c.put(e.request, r)); }).catch(()=>{});
+        fetch(e.request).then(r => {
+          if (r?.ok) caches.open(CACHE).then(c => c.put(e.request, r));
+        }).catch(()=>{});
         return cached;
       }
       return fetch(e.request).then(r => {
