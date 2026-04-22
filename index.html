@@ -3263,7 +3263,7 @@
     <div class="card-title">☁️ Synchronisation cloud</div>
     <div style="font-size:12px;color:var(--muted);margin-bottom:12px">Connecte-toi pour accéder à tes données depuis n'importe quel appareil.</div>
     <div id="firebase-status" style="font-size:12px;margin-bottom:12px;color:var(--muted)">Chargement...</div>
-    <button id="firebase-btn" onclick="window._fbSignIn && window._fbSignIn()" class="btn" style="width:100%">🔵 Connexion Google</button>
+    <button id="firebase-btn" onclick="if(typeof window._fbSignIn==='function'){window._fbSignIn();}else{alert('Chargement en cours, réessaie.');}" class="btn" style="width:100%">🔵 Connexion Google</button>
   </div>
 
   <!-- Mode Mobile -->
@@ -3714,7 +3714,11 @@ window._fbDb   = db;
 window._fbDoc  = doc;
 window._fbSetDoc = setDoc;
 window._fbGetDoc = getDoc;
-window._fbSignIn = () => signInWithPopup(auth, new GoogleAuthProvider());
+window._fbSignIn = function() {
+  return signInWithPopup(auth, new GoogleAuthProvider());
+};
+// S'assurer que c'est bien global
+globalThis._fbSignIn = window._fbSignIn;
 window._fbSignOut = () => signOut(auth);
 
 onAuthStateChanged(auth, async (user) => {
