@@ -3263,7 +3263,7 @@
     <div class="card-title">☁️ Synchronisation cloud</div>
     <div style="font-size:12px;color:var(--muted);margin-bottom:12px">Connecte-toi pour accéder à tes données depuis n'importe quel appareil.</div>
     <div id="firebase-status" style="font-size:12px;margin-bottom:12px;color:var(--muted)">Chargement...</div>
-    <button id="firebase-btn" onclick="window._fbSignIn && window._fbSignIn()" class="btn" style="width:100%">🔵 Connexion Google</button>
+    <button id="firebase-btn" onclick="if(window._fbSignIn){window._fbSignIn()}else{alert('Firebase non chargé, réessaie dans 2 secondes.')}" class="btn" style="width:100%">🔵 Connexion Google</button>
   </div>
 
   <!-- Mode Mobile -->
@@ -3723,7 +3723,6 @@ window._fbDoc  = doc;
 window._fbSetDoc = setDoc;
 window._fbGetDoc = getDoc;
 
-// Exposer en global pour le bouton HTML
 window._fbSignIn = () => {
   const provider = new GoogleAuthProvider();
   provider.setCustomParameters({ prompt: 'select_account' });
@@ -3733,11 +3732,21 @@ window._fbSignIn = () => {
       if (e.code === 'auth/popup-blocked') {
         alert('Le popup a été bloqué par ton navigateur. Autorise les popups pour ce site dans les paramètres.');
       } else if (e.code === 'auth/unauthorized-domain') {
-        alert('Domaine non autorisé dans Firebase. Va dans Firebase Console → Authentication → Authorized domains et ajoute ikigai482.github.io');
+        alert('Domaine non autorisé dans Firebase.');
       }
     });
 };
 window._fbSignOut = () => signOut(auth);
+
+// Rendre le bouton cliquable dès que Firebase est prêt
+document.addEventListener('DOMContentLoaded', () => {
+  const btn = document.getElementById('firebase-btn');
+  if (btn) {
+    btn.onclick = () => {
+      if (window._fbSignIn) window._fbSignIn();
+    };
+  }
+});
 
 onAuthStateChanged(auth, async (user) => {
   window._fbUser = user;
