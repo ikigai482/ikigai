@@ -16,7 +16,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="description" content="Ton espace de développement personnel — habitudes, focus, sport, finance et plus.">
 <title>Ikigai — Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&family=Inter:wght@300;400;500&family=Nunito:wght@300;400;500&family=Poppins:wght@300;400;500&family=Raleway:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
 <style>
@@ -453,6 +453,15 @@
   body.mobile-mode .culture-card { height: 380px; }
   body.mobile-mode .culture-card-title { font-size: 18px; }
 
+  /* Font selector */
+  .font-btn {
+    padding:12px 16px;border-radius:10px;border:2px solid var(--border);
+    background:var(--bg2);color:var(--text);font-size:14px;cursor:pointer;
+    text-align:left;transition:all .15s;
+  }
+  .font-btn:hover { border-color:var(--accent); }
+  .font-btn.active { border-color:var(--accent);background:rgba(200,169,110,0.1); }
+
   /* Scrollbar */
   ::-webkit-scrollbar { width: 5px; }
   ::-webkit-scrollbar-track { background: transparent; }
@@ -575,6 +584,362 @@
   /* Progress bars smooth */
   .progress-bar-inner { transition: width .6s cubic-bezier(.4,0,.2,1); }
 
+
+/* ===== FINANCE PAGE ===== */
+
+
+
+
+
+/* NAV */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; height: 52px;
+  background: var(--bg2); border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; padding: 0 24px; gap: 4px; z-index: 100;
+}
+.nav-logo { font-weight: 700; font-size: 15px; margin-right: 16px; letter-spacing: -.02em; }
+.nav-btn {
+  padding: 6px 14px; border-radius: 6px; border: none;
+  background: transparent; color: var(--muted); font-size: 13px;
+  cursor: pointer; font-family: inherit; transition: all .15s;
+}
+.nav-btn:hover { background: var(--bg2); color: var(--text); }
+.nav-btn.active { background: var(--text); color: #fff; }
+.nav-right { margin-left: auto; display: flex; gap: 8px; }
+.nav-action { padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg2); color: var(--text); font-size: 12px; cursor: pointer; font-family: inherit; }
+.nav-action:hover { background: var(--bg2); }
+
+/* MAIN */
+main { margin-top: 52px; padding: 32px 24px; max-width: 1200px; margin-left: auto; margin-right: auto; }
+.section { display: none; }
+.section.active { display: block; }
+
+/* TYPOGRAPHY */
+h2 { font-size: 22px; font-weight: 700; letter-spacing: -.02em; margin-bottom: 4px; }
+h3 { font-size: 15px; font-weight: 600; margin-bottom: 12px; }
+.subtitle { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+
+/* CARDS */
+.cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; margin-bottom: 28px; }
+.kpi-card { background: var(--bg2); border-radius: 10px; padding: 16px; border: 1px solid var(--border); }
+.kpi-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
+.kpi-value { font-size: 22px; font-weight: 700; font-family: var(--mono); color: var(--accent); }
+.kpi-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+/* CHARTS ROW */
+.charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 28px; }
+.chart-box { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 20px; }
+.chart-box canvas { max-height: 200px; }
+
+/* ENVELOPPES TABLE */
+.env-table-wrap { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 28px; }
+
+/* TABLE */
+table { width: 100%; border-collapse: collapse; }
+th { padding: 10px 12px; text-align: left; font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; background: var(--bg3); border-bottom: 1px solid var(--border); }
+td { padding: 10px 12px; border-bottom: 1px solid var(--border); font-size: 13px; vertical-align: middle; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: var(--bg3); }
+.td-mono { font-family: var(--mono); font-size: 12px; }
+.td-ticker { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+.td-bold { font-weight: 600; }
+.total-row td { font-weight: 700; background: var(--bg3); }
+
+/* BADGES */
+.badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 500; }
+.badge-green { background: var(--green-bg); color: var(--green); }
+.badge-orange { background: var(--orange-bg); color: #c8a96e; }
+.badge-red { background: var(--red-bg); color: var(--danger); }
+.badge-blue { background: var(--blue-bg); color: var(--accent); }
+.badge-gray { background: var(--bg3); color: var(--muted); }
+
+/* BUTTONS */
+.btn { padding: 8px 16px; border-radius: 7px; border: none; cursor: pointer; font-family: inherit; font-size: 13px; font-weight: 500; transition: all .15s; }
+.btn-primary { background: var(--text); color: #fff; }
+.btn-primary:hover { opacity: .85; }
+.btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--text); }
+.btn-ghost:hover { background: var(--bg2); }
+.btn-danger { background: var(--red-bg); color: var(--danger); border: 1px solid rgba(163,45,45,.2); }
+.btn-sm { padding: 4px 10px; font-size: 12px; }
+.btn-icon { padding: 4px 8px; font-size: 14px; border-radius: 5px; }
+
+/* TOOLBAR */
+.toolbar { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+
+/* MODAL */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 500; display: none; align-items: center; justify-content: center; }
+.modal-overlay.open { display: flex; }
+.modal { background: var(--bg2); border-radius: 14px; padding: 28px; width: 90%; max-width: 580px; max-height: 85vh; overflow-y: auto; border: 1px solid var(--border); box-shadow: 0 20px 60px rgba(0,0,0,.15); }
+.modal h3 { margin-bottom: 20px; }
+.modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.modal-footer { display: flex; gap: 8px; margin-top: 20px; justify-content: flex-end; }
+
+/* FORM */
+.field { display: flex; flex-direction: column; gap: 4px; }
+.field label { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+#s-investissements input, #s-investissements select, #s-investissements textarea,
+#asset-modal input, #asset-modal select, #asset-modal textarea {
+  padding: 8px 10px; border: 1px solid var(--border); border-radius: 7px;
+  font-family: inherit; font-size: 13px; background: var(--bg2);
+  color: var(--text); outline: none; transition: border .15s;
+  width: 100%;
+}
+#s-investissements input:focus, #s-investissements select:focus, #s-investissements textarea:focus,
+#asset-modal input:focus, #asset-modal select:focus, #asset-modal textarea:focus { border-color: var(--accent); }
+#s-investissements textarea { resize: vertical; min-height: 72px; }
+
+/* POCHE COLORS */
+.poche-base { color: var(--green); font-weight: 500; }
+.poche-boost { color: #c8a96e; font-weight: 500; }
+.poche-solide { color: var(--accent); font-weight: 500; }
+.poche-specu { color: var(--danger); font-weight: 500; }
+.poche-levier { background: var(--red-bg); color: var(--danger); padding: 1px 6px; border-radius: 3px; font-size: 11px; font-weight: 600; }
+
+/* FICHES CARDS */
+.fiches-filters { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 20px; }
+.filter-btn { padding: 5px 12px; border-radius: 20px; border: 1px solid var(--border); background: var(--bg2); color: var(--muted); font-size: 12px; cursor: pointer; transition: all .15s; }
+.filter-btn.active { background: var(--text); color: #fff; border-color: var(--text); }
+.fiches-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+.fiche-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 18px; cursor: pointer; transition: all .15s; }
+.fiche-card:hover { border-color: #999; box-shadow: 0 2px 12px rgba(0,0,0,.06); }
+.fiche-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+.fiche-name { font-weight: 700; font-size: 14px; }
+.fiche-ticker { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+.fiche-row { font-size: 12px; margin-bottom: 6px; }
+.fiche-row strong { color: var(--text); }
+.fiche-row .label { color: var(--muted); }
+.fiche-achat { font-size: 12px; padding: 6px 10px; border-radius: 6px; background: var(--green-bg); color: var(--green); margin-top: 8px; }
+.fiche-vente { font-size: 12px; padding: 6px 10px; border-radius: 6px; background: var(--orange-bg); color: #c8a96e; margin-top: 4px; }
+.fiche-these { font-size: 11px; color: var(--muted); font-style: italic; margin-top: 8px; }
+
+/* PROJECTIONS */
+.proj-inputs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px; }
+.proj-chart-wrap { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 20px; margin-bottom: 24px; }
+.proj-jalons { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; margin-bottom: 24px; }
+.jalon-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 12px; text-align: center; }
+.jalon-year { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+.jalon-val { font-size: 17px; font-weight: 700; font-family: var(--mono); color: var(--accent); }
+.jalon-dca { font-size: 11px; color: var(--muted); }
+
+/* STRATÉGIE */
+.rules-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; margin-bottom: 28px; }
+.rule-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 18px; }
+.rule-num { font-size: 28px; font-weight: 900; color: var(--border); margin-bottom: 6px; }
+.rule-title { font-weight: 700; margin-bottom: 6px; }
+.rule-text { font-size: 13px; color: var(--muted); line-height: 1.6; }
+.rule-edit-btn { display: none; margin-top: 10px; }
+.rule-card:hover .rule-edit-btn { display: inline-block; }
+
+/* REBAL TABLE */
+.rebal-wrap { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 28px; }
+
+/* NOTES */
+.notes-area { width: 100%; min-height: 200px; font-size: 14px; padding: 16px; border: 1px solid var(--border); border-radius: 10px; resize: vertical; }
+
+/* VALEUR INPUT */
+.val-input { width: 90px; padding: 4px 8px; border: 1px solid var(--border); border-radius: 5px; font-family: var(--mono); font-size: 12px; text-align: right; }
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  main { padding: 20px 12px; }
+  .charts-row { grid-template-columns: 1fr; }
+  .modal-grid { grid-template-columns: 1fr; }
+  .proj-inputs { grid-template-columns: 1fr; }
+}
+
+/* ALERTE REBAL */
+.alerte-ok { color: var(--green); }
+.alerte-warn { color: #c8a96e; }
+.alerte-danger { color: var(--danger); font-weight: 700; }
+
+/* PHASE TIMELINE */
+.phases-list { display: flex; flex-direction: column; gap: 8px; }
+.phase-item { display: flex; gap: 14px; align-items: flex-start; padding: 12px 14px; background: var(--bg2); border-radius: 8px; border: 1px solid var(--border); }
+.phase-num { font-weight: 800; font-size: 18px; color: var(--blue-bg); background: var(--accent); width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 13px; }
+.phase-content { flex: 1; }
+.phase-title { font-weight: 600; font-size: 13px; }
+.phase-text { font-size: 12px; color: var(--muted); }
+
+/* SEPARATOR */
+.sep { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
+
+.levier-warn { background: var(--red-bg); border: 1px solid rgba(163,45,45,.25); border-radius: 6px; padding: 6px 10px; font-size: 11px; color: var(--danger); font-weight: 600; margin-top: 4px; }
+
+
+
+  .fin-nav-btn { padding:6px 12px;border-radius:6px;border:none;background:transparent;color:var(--muted);font-size:12px;cursor:pointer;font-family:inherit;transition:all .15s; }
+  .fin-nav-btn:hover { background:transparent;color:var(--text); }
+  .fin-nav-btn.active { background:var(--accent);color:#0e0e10;font-weight:700; }
+  .fin-section { }
+
+/* ===== FINANCE INTEGRATION ===== */
+
+#fin-nav{position:sticky;top:0;background:rgba(14,14,16,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:2px;z-index:100;flex-wrap:wrap;min-height:50px}
+.nav-logo{font-weight:800;font-size:15px;margin-right:12px;letter-spacing:-.02em;color:var(--accent)}
+.nav-btn{padding:7px 13px;border-radius:7px;border:none;background:transparent;color:var(--muted);font-size:12px;font-weight:500;cursor:pointer;font-family:var(--font);transition:all .15s}
+.nav-btn:hover{color:var(--text)}
+.nav-btn.active{background:var(--accent);color:#fff;font-weight:700}
+.nav-right{margin-left:auto;display:flex;gap:6px;align-items:center}
+.nav-action{padding:5px 11px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:11px;cursor:pointer;font-family:var(--font);transition:all .15s}
+.nav-action:hover{color:var(--text);border-color:var(--accent)}
+main{padding:28px 20px;max-width:1200px;margin:0 auto}
+.section{display:none}.section.active{display:block}
+h2{font-size:20px;font-weight:800;letter-spacing:-.02em;margin-bottom:4px}
+.subtitle{font-size:12px;color:var(--muted);margin-bottom:20px}
+h3{font-size:14px;font-weight:600;margin-bottom:12px;color:var(--text)}
+
+/* KPI */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:20px}
+.kpi{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px 16px}
+.kpi-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:6px}
+.kpi-val{font-size:22px;font-weight:800;font-family:var(--mono)}
+.kpi-sub{font-size:11px;color:var(--muted);margin-top:2px}
+
+/* CHARTS ROW */
+.charts-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px}
+.chart-box{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px}
+.chart-box canvas{max-height:180px}
+@media(max-width:600px){.charts-row{grid-template-columns:1fr}}
+
+/* TABLE */
+.tbl-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:20px}
+.tbl-wrap table{width:100%;border-collapse:collapse}
+.tbl-wrap th{padding:9px 10px;text-align:left;font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;background:var(--bg3);border-bottom:1px solid var(--border);white-space:nowrap}
+.tbl-wrap td{padding:9px 10px;border-bottom:1px solid var(--border);font-size:12px;vertical-align:middle}
+.tbl-wrap tr:last-child td{border-bottom:none}
+.tbl-wrap tfoot td{font-weight:700;background:var(--bg3);font-size:12px;padding:9px 10px}
+
+/* EDITABLE CELLS */
+.editable{font-family:var(--mono);font-size:11px;background:rgba(200,169,110,.08);border:1px solid rgba(200,169,110,.3);border-radius:5px;padding:3px 7px;color:var(--warn);cursor:text;min-width:70px;display:inline-block;text-align:right}
+.editable:focus{outline:none;border-color:var(--warn);background:rgba(200,169,110,.12)}
+.updated{font-size:9px;color:var(--muted);display:block;margin-top:1px}
+
+/* BADGES */
+.badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:600}
+.b-actif{background:rgba(64,208,160,.12);color:var(--success)}
+.b-surv{background:rgba(200,169,110,.12);color:var(--warn)}
+.b-stop{background:rgba(255,64,96,.12);color:var(--danger)}
+.b-rebal{background:rgba(255,64,96,.15);color:var(--danger);animation:blink 1s infinite}
+@keyframes fin-blink{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* POCHE */
+.p-base{color:var(--success)}
+.p-boost{color:var(--blue)}
+.p-solide{color:var(--muted)}
+.p-specu{color:var(--orange)}
+.p-levier{background:rgba(255,64,96,.15);color:var(--danger);padding:1px 5px;border-radius:3px;font-size:10px;font-weight:700}
+.p-heritage{color:#777}
+.p-cash{color:var(--muted)}
+.p-crypto{color:#f7931a}
+.p-actions{color:var(--blue)}
+
+/* PERFORMANCE */
+.pos{color:var(--success)}.neg{color:var(--danger)}.neutral{color:var(--muted)}
+
+/* ECART */
+.e-ok{color:var(--success)}.e-warn{color:var(--orange)}.e-danger{color:var(--danger);font-weight:700}
+
+/* BUTTONS */
+.btn{padding:7px 14px;border-radius:8px;border:none;cursor:pointer;font-family:var(--font);font-size:12px;font-weight:500;transition:all .15s}
+.btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{opacity:.85}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--text)}.btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
+.btn-danger{background:rgba(255,64,96,.1);color:var(--danger);border:1px solid rgba(255,64,96,.2)}
+.btn-sm{padding:3px 8px;font-size:11px}
+.btn-icon{padding:4px 7px;font-size:13px;border-radius:5px;background:transparent;border:1px solid var(--border);cursor:pointer;transition:all .15s}
+.btn-icon:hover{border-color:var(--accent)}
+
+/* MODAL */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);z-index:500;display:none;align-items:center;justify-content:center}
+.overlay.open{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:24px;width:90%;max-width:560px;max-height:88vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,.5)}
+.modal-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+.modal-footer{display:flex;gap:8px;margin-top:16px;justify-content:flex-end}
+
+/* FORM */
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.field input,.field select,.field textarea{padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg3);color:var(--text);font-family:var(--font);font-size:12px;outline:none;transition:border .15s;width:100%}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent)}
+.field textarea{resize:vertical;min-height:60px}
+.full{grid-column:1/-1}
+
+/* PROJ INPUTS */
+.proj-inputs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+@media(max-width:600px){.proj-inputs{grid-template-columns:1fr}}
+.proj-chart-box{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:14px}
+.jalons{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:20px}
+.jalon{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px;text-align:center}
+.jalon-yr{font-size:10px;color:var(--muted)}
+.jalon-val{font-size:16px;font-weight:800;font-family:var(--mono);color:var(--accent)}
+.jalon-dca{font-size:10px;color:var(--muted)}
+
+/* PARAMS */
+.params-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:20px}
+@media(max-width:600px){.params-grid{grid-template-columns:1fr}}
+.sparkline-box{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:20px}
+
+/* TOOLBAR */
+.toolbar{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center}
+.toolbar span{font-size:11px;color:var(--muted)}
+
+/* ENV TABLE */
+.env-tbl{background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:20px}
+
+/* GRAPH SECTION */
+.graph-box{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:14px}
+
+/* RESPONSIVE TABLE */
+@media(max-width:700px){
+  .tbl-wrap{overflow-x:auto}
+  .hide-mobile{display:none}
+}
+
+.fin-nb{padding:7px 13px;border-radius:7px;border:none;background:transparent;color:var(--muted);font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .15s}
+.fin-nb:hover{color:var(--text)}
+.fin-nb.active{background:var(--accent);color:#fff;font-weight:700}
+.fin-s{display:none}
+#s-investissements .editable{font-family:var(--font-mono);font-size:11px;background:rgba(200,169,110,.1);border:1px solid rgba(200,169,110,.3);border-radius:5px;padding:3px 7px;color:var(--warn);cursor:text;min-width:70px;display:inline-block;text-align:right}
+#s-investissements .editable:focus{outline:none;border-color:var(--warn)}
+#s-investissements .tbl-wrap tr:hover td{background:transparent}
+#s-investissements .kpi{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px 16px}
+#s-investissements .kpi-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:6px}
+#s-investissements .kpi-val{font-size:20px;font-weight:800;font-family:var(--font-mono)}
+#s-investissements .kpi-sub{font-size:11px;color:var(--muted);margin-top:2px}
+#s-investissements .kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:18px}
+#s-investissements .charts-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px}
+#s-investissements .chart-box{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px}
+#s-investissements .chart-box canvas{max-height:170px}
+#s-investissements .tbl-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px}
+#s-investissements .tbl-wrap table{width:100%;border-collapse:collapse}
+#s-investissements .tbl-wrap th{padding:8px 10px;text-align:left;font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;background:var(--bg3);border-bottom:1px solid var(--border);white-space:nowrap}
+#s-investissements .tbl-wrap td{padding:8px 10px;border-bottom:1px solid var(--border);font-size:12px;vertical-align:middle}
+#s-investissements .tbl-wrap tr:last-child td{border-bottom:none}
+#s-investissements .tbl-wrap tfoot td{font-weight:700;background:var(--bg3);font-size:12px;padding:8px 10px}
+#s-investissements .b-actif{background:rgba(64,208,160,.12);color:var(--success)}
+#s-investissements .b-surv{background:rgba(200,169,110,.12);color:var(--warn)}
+#s-investissements .b-stop{background:rgba(255,64,96,.12);color:var(--danger)}
+#s-investissements .b-rebal{background:rgba(255,64,96,.15);color:var(--danger);animation:fin-blink 1s infinite}
+#s-investissements .graph-box{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px}
+#s-investissements .sparkline-box{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px}
+#s-investissements .jalons{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
+#s-investissements .jalon{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px;text-align:center}
+#s-investissements .jalon-yr{font-size:10px;color:var(--muted)}
+#s-investissements .jalon-val{font-size:15px;font-weight:800;font-family:var(--font-mono);color:var(--accent)}
+#s-investissements .jalon-dca{font-size:10px;color:var(--muted)}
+#s-investissements .params-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px}
+#s-investissements .proj-chart-box{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);z-index:600;display:none;align-items:center;justify-content:center}
+.overlay.open{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:22px;width:90%;max-width:560px;max-height:88vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,.5)}
+.modal-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+@keyframes fin-blink{0%,100%{opacity:1}50%{opacity:.4}}
+.hide-mobile{}
+@media(max-width:700px){.hide-mobile{display:none}.modal-grid{grid-template-columns:1fr}}
+.pos{color:var(--success)}.neg{color:var(--danger)}.neutral{color:var(--muted)}
+.e-ok{color:var(--success)}.e-warn{color:var(--warn)}.e-danger{color:var(--danger);font-weight:700}
+.p-base{color:var(--success)}.p-boost{color:#60a0ff}.p-solide{color:var(--muted)}.p-specu{color:var(--warn)}.p-levier{background:rgba(255,64,96,.15);color:var(--danger);padding:1px 5px;border-radius:3px;font-size:10px;font-weight:700}.p-heritage{color:#777}.p-cash{color:var(--muted)}.p-crypto{color:#f7931a}.p-actions{color:#60a0ff}
+.btn-icon{padding:4px 7px;font-size:12px;border-radius:5px;background:transparent;border:1px solid var(--border);cursor:pointer;transition:all .15s;color:var(--muted)}
+.btn-icon:hover{border-color:var(--accent);color:var(--text)}
 </style>
 </head>
 <body>
@@ -1703,347 +2068,134 @@
   </div>
 </div>
 
-<!-- ===== INVESTISSEMENTS ===== -->
+<!-- ===== INVESTISSEMENTS FINANCE ===== -->
 <div id="s-investissements" class="section">
-  <div class="page-header">
-    <h1>Investissements 📈</h1>
-    <div class="sub">Portefeuille · Plan DCA · Projections</div>
-  </div>
+  <div style="margin: -20px -20px 0; padding: 20px 20px 0; background: var(--bg);">
 
-  <!-- Onglets -->
-  <div style="display:flex;gap:0;margin-bottom:20px;background:var(--bg2);border-radius:10px;padding:3px;width:fit-content">
-    <button onclick="invTab('portfolio')" id="inv-tab-portfolio" style="padding:8px 18px;border-radius:8px;border:none;background:var(--accent);color:#0e0e10;font-weight:700;font-size:13px;cursor:pointer">📊 Portefeuille</button>
-    <button onclick="invTab('dca')"       id="inv-tab-dca"       style="padding:8px 18px;border-radius:8px;border:none;background:transparent;color:var(--muted);font-size:13px;cursor:pointer">🔄 Plan DCA</button>
-    <button onclick="invTab('proj')"      id="inv-tab-proj"      style="padding:8px 18px;border-radius:8px;border:none;background:transparent;color:var(--muted);font-size:13px;cursor:pointer">🚀 Projections</button>
-    <button onclick="invTab('analyse')"   id="inv-tab-analyse"   style="padding:8px 18px;border-radius:8px;border:none;background:transparent;color:var(--muted);font-size:13px;cursor:pointer">🔍 Analyser</button>
-  </div>
-
-  <!-- ===== ONGLET PORTEFEUILLE ===== -->
-  <div id="inv-panel-portfolio">
-
-  <!-- Stats globales -->
-  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px">
-    <div class="stat-mini"><div class="val" id="inv-total">0 €</div><div class="lbl">Total investi</div></div>
-    <div class="stat-mini"><div class="val" id="inv-current-total">0 €</div><div class="lbl">Valeur actuelle</div></div>
-    <div class="stat-mini"><div class="val pos" id="inv-perf">+0%</div><div class="lbl">Performance</div></div>
-    <div class="stat-mini"><div class="val" id="inv-pnl">0 €</div><div class="lbl">+/- value</div></div>
-  </div>
-
-  <!-- Comptes -->
-  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px" id="inv-accounts-row"></div>
-
-  <div class="grid2">
-    <!-- Ajout position -->
-    <div class="card">
-      <div class="card-title">Ajouter une position</div>
-      <div class="field"><label>Nom (ex: S&P 500, Apple, LVMH)</label><input type="text" id="inv-name" placeholder="S&P 500 ETF"></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        <div class="field">
-          <label>Compte</label>
-          <select id="inv-compte" onchange="toggleInvMode()">
-            <option value="PEA">PEA</option>
-            <option value="CTO">CTO</option>
-            <option value="Épargne">Épargne</option>
-            <option value="Crypto">Crypto</option>
-            <option value="Autre">Autre</option>
-          </select>
-        </div>
-        <div class="field">
-          <label>Type</label>
-          <select id="inv-type">
-            <option>ETF</option><option>Action</option><option>Crypto</option><option>Obligation</option><option>Immobilier</option><option>Matière première</option><option>Autre</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- Mode actions (PEA / CTO) -->
-      <div id="inv-mode-shares">
-        <div style="background:rgba(200,169,110,0.07);border:1px solid rgba(200,169,110,0.2);border-radius:8px;padding:12px;margin-bottom:12px">
-          <div style="font-size:11px;color:var(--accent);font-weight:500;margin-bottom:10px;letter-spacing:0.06em">MODE ACTIONS ENTIÈRES</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-            <div class="field" style="margin:0">
-              <label>Nb d'actions achetées</label>
-              <input type="number" id="inv-nb-actions" placeholder="3" min="0.0001" step="any" oninput="calcInvTotal()">
-            </div>
-            <div class="field" style="margin:0">
-              <label>Prix d'une action à l'achat (€)</label>
-              <input type="number" id="inv-prix-achat" placeholder="165.00" step="0.01" oninput="calcInvTotal()">
-            </div>
-          </div>
-          <div style="margin-top:10px;padding:8px 12px;background:var(--bg3);border-radius:6px;display:flex;justify-content:space-between;align-items:center">
-            <span style="font-size:12px;color:var(--muted)">Total investi calculé</span>
-            <span class="mono accent" id="inv-calc-total" style="font-size:16px;font-weight:500">0 €</span>
-          </div>
-          <div class="field" style="margin-top:10px;margin-bottom:0">
-            <label>Prix actuel d'une action (€)</label>
-            <input type="number" id="inv-prix-now" placeholder="180.00" step="0.01" oninput="calcInvCurrent()">
-          </div>
-          <div style="margin-top:8px;padding:8px 12px;background:var(--bg3);border-radius:6px;display:flex;justify-content:space-between;align-items:center">
-            <span style="font-size:12px;color:var(--muted)">Valeur actuelle calculée</span>
-            <span class="mono" id="inv-calc-current" style="font-size:16px;font-weight:500;color:var(--success)">0 €</span>
-          </div>
-        </div>
-        <!-- champs cachés pour compatibilité -->
-        <input type="hidden" id="inv-amount">
-        <input type="hidden" id="inv-current">
-      </div>
-
-      <!-- Mode montant libre (Épargne / Crypto / Autre) -->
-      <div id="inv-mode-amount" style="display:none">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-          <div class="field"><label>Montant investi (€)</label><input type="number" id="inv-amount-free" placeholder="500"></div>
-          <div class="field"><label>Valeur actuelle (€)</label><input type="number" id="inv-current-free" placeholder="560"></div>
-        </div>
-      </div>
-
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        <div class="field"><label>Date d'achat</label><input type="date" id="inv-date"></div>
-        <div class="field"><label>Horizon</label>
-          <select id="inv-horizon"><option>Long terme</option><option>Moyen terme</option><option>Court terme</option></select>
-        </div>
-      </div>
-      <div class="field"><label>Notes</label><input type="text" id="inv-notes" placeholder="Stratégie, raison d'achat..."></div>
-      <button class="btn" onclick="addInvestissement()">Ajouter la position</button>
-    </div>
-
-    <!-- Charts -->
-    <div style="display:flex;flex-direction:column;gap:14px">
-      <div class="card">
-        <div class="card-title">Répartition par compte</div>
-        <div class="chart-wrap" style="height:180px;"><canvas id="inv-pie" role="img" aria-label="Répartition par compte">Répartition.</canvas></div>
-      </div>
-      <div class="card">
-        <div class="card-title">Répartition par type</div>
-        <div class="chart-wrap" style="height:160px;"><canvas id="inv-type-bar" role="img" aria-label="Répartition par type d'actif">Types.</canvas></div>
+    <!-- Nav finance intégrée -->
+    <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border)">
+      <span style="font-weight:700;font-size:15px;margin-right:12px;letter-spacing:-.02em">💹 Finance</span>
+      <button class="fin-nav-btn active" onclick="finShowSection('overview')">Vue d'ensemble</button>
+      <button class="fin-nav-btn" onclick="finShowSection('pea')">PEA</button>
+      <button class="fin-nav-btn" onclick="finShowSection('cto')">CTO / Crypto</button>
+      <button class="fin-nav-btn" onclick="finShowSection('fiches')">Fiches actifs</button>
+      <button class="fin-nav-btn" onclick="finShowSection('projections')">Projections</button>
+      <button class="fin-nav-btn" onclick="finShowSection('strategie')">Stratégie</button>
+      <div style="margin-left:auto;display:flex;gap:6px">
+        <button onclick="exportData()" style="padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:11px;cursor:pointer;font-family:inherit">⬇ Export</button>
+        <label style="padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:11px;cursor:pointer">⬆ Import<input type="file" accept=".json" onchange="importData(event)" style="display:none"></label>
+        <button onclick="if(confirm('Remettre les données par défaut ?'))resetData()" style="padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:var(--bg2);color:#A32D2D;font-size:11px;cursor:pointer;font-family:inherit">↺ Reset</button>
       </div>
     </div>
-  </div>
 
-  <!-- Tableau positions -->
-  <!-- Tableau positions OUVERTES -->
-  <div class="card mt16">
-    <div class="row" style="margin-bottom:12px">
-      <div class="card-title" style="margin:0">Positions ouvertes</div>
-      <div class="flex gap8">
-        <select id="inv-filter-compte" onchange="renderInvestissements()" style="width:auto;padding:5px 10px;font-size:12px">
-          <option value="">Tous les comptes</option>
-          <option>PEA</option><option>CTO</option><option>Épargne</option><option>Crypto</option><option>Autre</option>
-        </select>
+    <!-- Sections finance -->
+    <div id="fin-s-overview" class="fin-section" style="display:block">
+      <h2 style="font-size:20px;font-weight:700;margin-bottom:4px">Vue d'ensemble</h2>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:20px">Résumé de ton patrimoine financier</p>
+      <div class="cards-grid" id="kpi-grid"></div>
+      <div class="charts-row">
+        <div class="chart-box"><h3>Répartition géographique</h3><canvas id="chart-geo"></canvas></div>
+        <div class="chart-box"><h3>Répartition sectorielle</h3><canvas id="chart-sector"></canvas></div>
+      </div>
+      <div class="env-table-wrap"><table id="env-table"><thead><tr><th>Enveloppe</th><th>Valeur</th><th>%</th><th>Actifs</th><th>Statut</th></tr></thead><tbody></tbody></table></div>
+      <h3 style="font-size:15px;font-weight:600;margin-bottom:12px">Paramètres</h3>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+        <div class="field"><label>DCA mensuel (€)</label><input type="number" id="set-dca" oninput="saveSettings()"></div>
+        <div class="field"><label>Capital départ (€)</label><input type="number" id="set-capital" oninput="saveSettings()"></div>
+        <div class="field"><label>Rendement visé (%)</label><input type="number" id="set-rendement" oninput="saveSettings()"></div>
       </div>
     </div>
-    <div style="overflow-x:auto">
-      <table style="width:100%;border-collapse:collapse;font-size:13px">
-        <thead>
-          <tr style="border-bottom:1px solid var(--border);color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:0.08em">
-            <th style="text-align:left;padding:6px 8px;font-weight:500">Actif</th>
-            <th style="text-align:left;padding:6px 8px;font-weight:500">Compte</th>
-            <th style="text-align:right;padding:6px 8px;font-weight:500">Nb actions</th>
-            <th style="text-align:right;padding:6px 8px;font-weight:500">Prix achat</th>
-            <th style="text-align:right;padding:6px 8px;font-weight:500">Investi</th>
-            <th style="text-align:right;padding:6px 8px;font-weight:500">Valeur</th>
-            <th style="text-align:right;padding:6px 8px;font-weight:500">+/- val.</th>
-            <th style="text-align:right;padding:6px 8px;font-weight:500">Perf.</th>
-            <th style="text-align:right;padding:6px 8px;font-weight:500">Horizon</th>
-            <th style="padding:6px 4px"></th>
-          </tr>
-        </thead>
-        <tbody id="inv-tbody"></tbody>
-      </table>
+
+    <div id="fin-s-pea" class="fin-section" style="display:none">
+      <h2 style="font-size:20px;font-weight:700;margin-bottom:4px">Portefeuille PEA</h2>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Plan d'Épargne en Actions</p>
+      <div style="display:flex;gap:8px;margin-bottom:16px"><button class="btn btn-primary" onclick="openAddModal('pea')">+ Ajouter</button></div>
+      <div style="overflow-x:auto"><table><thead><tr><th>Actif</th><th>Ticker</th><th>Poche</th><th>% Cible</th><th>Valeur (€)</th><th>% Réel</th><th>Écart</th><th>DCA/mois</th><th>Statut</th><th></th></tr></thead><tbody id="pea-tbody"></tbody><tfoot><tr class="total-row" id="pea-total"></tr></tfoot></table></div>
     </div>
-  </div>
-  <div class="card mt16">
-    <div class="row" style="margin-bottom:12px">
-      <div class="card-title" style="margin:0">Positions clôturées</div>
-      <span class="mono" id="inv-pnl-cloture" style="font-size:14px;font-weight:500">0 €</span>
+
+    <div id="fin-s-cto" class="fin-section" style="display:none">
+      <h2 style="font-size:20px;font-weight:700;margin-bottom:4px">CTO & Crypto</h2>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Compte-Titres international + actifs hors PEA</p>
+      <div style="display:flex;gap:8px;margin-bottom:16px"><button class="btn btn-primary" onclick="openAddModal('cto')">+ Ajouter</button></div>
+      <div style="overflow-x:auto"><table><thead><tr><th>Actif</th><th>Ticker</th><th>Type</th><th>% Cible</th><th>Valeur (€)</th><th>% Réel</th><th>Écart</th><th>DCA/mois</th><th>Statut</th><th></th></tr></thead><tbody id="cto-tbody"></tbody><tfoot><tr class="total-row" id="cto-total"></tr></tfoot></table></div>
     </div>
-    <div style="overflow-x:auto">
-      <table style="width:100%;border-collapse:collapse;font-size:13px">
-        <thead>
-          <tr style="border-bottom:1px solid var(--border);color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:0.08em">
-            <th style="text-align:left;padding:6px 8px;font-weight:500">Actif</th>
-            <th style="text-align:left;padding:6px 8px;font-weight:500">Compte</th>
-            <th style="text-align:right;padding:6px 8px;font-weight:500">Nb actions</th>
-            <th style="text-align:right;padding:6px 8px;font-weight:500">Prix achat</th>
-            <th style="text-align:right;padding:6px 8px;font-weight:500">Prix vente</th>
-            <th style="text-align:right;padding:6px 8px;font-weight:500">Investi</th>
-            <th style="text-align:right;padding:6px 8px;font-weight:500">Vendu</th>
-            <th style="text-align:right;padding:6px 8px;font-weight:500">P&L</th>
-            <th style="text-align:right;padding:6px 8px;font-weight:500">Perf.</th>
-            <th style="padding:6px 4px"></th>
-          </tr>
-        </thead>
-        <tbody id="inv-tbody-closed"></tbody>
-      </table>
+
+    <div id="fin-s-fiches" class="fin-section" style="display:none">
+      <h2 style="font-size:20px;font-weight:700;margin-bottom:16px">Fiches actifs</h2>
+      <div class="fiches-filters">
+        <button class="filter-btn active" onclick="filterFiches('all',this)">Tous</button>
+        <button class="filter-btn" onclick="filterFiches('pea',this)">PEA</button>
+        <button class="filter-btn" onclick="filterFiches('cto',this)">CTO/Crypto</button>
+        <button class="filter-btn" onclick="filterFichesPoche('Base',this)">Base</button>
+        <button class="filter-btn" onclick="filterFichesPoche('Boost',this)">Boost</button>
+        <button class="filter-btn" onclick="filterFichesPoche('Solide',this)">Solide</button>
+        <button class="filter-btn" onclick="filterFichesPoche('Spéculatif',this)">Spéculatif</button>
+        <button class="filter-btn" onclick="filterFichesStatut('actif',this)">Actif</button>
+        <button class="filter-btn" onclick="filterFichesStatut('surveillance',this)">Surveillance</button>
+      </div>
+      <div class="fiches-grid" id="fiches-grid"></div>
     </div>
+
+    <div id="fin-s-projections" class="fin-section" style="display:none">
+      <h2 style="font-size:20px;font-weight:700;margin-bottom:16px">Projections patrimoniales</h2>
+      <div class="proj-inputs">
+        <div class="field"><label>DCA mensuel (€)</label><input type="number" id="proj-dca" oninput="renderProjections()" value="300"></div>
+        <div class="field"><label>Capital départ (€)</label><input type="number" id="proj-capital" oninput="renderProjections()" value="1000"></div>
+        <div class="field"><label>Durée (années)</label><input type="number" id="proj-duree" oninput="renderProjections()" value="20" min="1" max="40"></div>
+      </div>
+      <div class="proj-chart-wrap"><canvas id="proj-chart" height="100"></canvas></div>
+      <div class="proj-jalons" id="proj-jalons"></div>
+    </div>
+
+    <div id="fin-s-strategie" class="fin-section" style="display:none">
+      <h2 style="font-size:20px;font-weight:700;margin-bottom:16px">Stratégie & Règles</h2>
+      <h3 style="font-size:15px;font-weight:600;margin-bottom:12px">Règles d'or</h3>
+      <div class="rules-grid" id="rules-grid"></div>
+      <hr style="border:none;border-top:1px solid #E5E5E3;margin:24px 0">
+      <h3 style="font-size:15px;font-weight:600;margin-bottom:12px">Plan de rebalancing</h3>
+      <div class="rebal-wrap"><table><thead><tr><th>Actif</th><th>% Cible</th><th>Seuil bas</th><th>Seuil haut</th><th>% Réel</th><th>Alerte</th></tr></thead><tbody id="rebal-tbody"></tbody></table></div>
+      <hr style="border:none;border-top:1px solid #E5E5E3;margin:24px 0">
+      <h3 style="font-size:15px;font-weight:600;margin-bottom:12px">Plan DCA — Phases</h3>
+      <div class="phases-list" id="phases-list"></div>
+      <hr style="border:none;border-top:1px solid #E5E5E3;margin:24px 0">
+      <h3 style="font-size:15px;font-weight:600;margin-bottom:12px">Notes</h3>
+      <textarea class="notes-area" id="notes-area" oninput="saveNotes()" placeholder="Tes réflexions..."></textarea>
+    </div>
+
   </div>
 </div>
 
-<!-- MODAL CLÔTURE -->
-<div id="cloture-modal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.75);z-index:9999;align-items:flex-start;justify-content:center;padding-top:60px">
-  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:28px;width:420px;max-width:95vw">
-    <div style="font-family:var(--font-display);font-size:20px;color:var(--accent);margin-bottom:4px">Clôturer la position</div>
-    <div style="font-size:14px;font-weight:500;margin-bottom:4px" id="cloture-nom"></div>
-    <div style="font-size:12px;color:var(--muted);margin-bottom:18px">Investi : <span id="cloture-investi"></span></div>
-
-    <div id="cloture-nb-actions-label" style="display:none">
-      <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px">Nombre d'actions vendues</label>
-      <input type="number" id="cloture-nb-actions-sell" placeholder="3" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:9px 12px;font-size:13.5px;outline:none;margin-bottom:10px" oninput="calcCloturePreview()">
+<!-- Modal actif finance -->
+<div class="modal-overlay" id="asset-modal">
+  <div class="modal">
+    <h3 id="modal-title">Ajouter un actif</h3>
+    <div class="modal-grid">
+      <div class="field"><label>Nom</label><input id="f-nom" placeholder="ETF S&P 500"></div>
+      <div class="field"><label>Ticker</label><input id="f-ticker" placeholder="ESE"></div>
+      <div class="field"><label>ISIN</label><input id="f-isin"></div>
+      <div class="field"><label>Poche</label><select id="f-poche"><option>Base</option><option>Boost</option><option>Solide</option><option>Spéculatif</option><option>Levier</option><option>Liquidités</option></select></div>
+      <div class="field"><label>Secteur</label><input id="f-secteur"></div>
+      <div class="field"><label>Zone géo</label><input id="f-zone"></div>
+      <div class="field"><label>% Cible</label><input id="f-pct-cible" type="number"></div>
+      <div class="field"><label>DCA mensuel (€)</label><input id="f-dca" type="number"></div>
+      <div class="field"><label>Valeur actuelle (€)</label><input id="f-valeur" type="number"></div>
+      <div class="field"><label>Seuil rebal bas (%)</label><input id="f-seuil-bas" type="number"></div>
+      <div class="field"><label>Seuil rebal haut (%)</label><input id="f-seuil-haut" type="number"></div>
+      <div class="field"><label>Stop loss</label><input id="f-stop"></div>
+      <div class="field"><label>Take profit</label><input id="f-tp"></div>
+      <div class="field"><label>Statut</label><select id="f-statut"><option value="actif">Actif</option><option value="surveillance">Surveillance</option><option value="stop">Stop</option></select></div>
+      <div class="field" style="grid-column:1/-1"><label>Quand acheter</label><textarea id="f-acheter" rows="2"></textarea></div>
+      <div class="field" style="grid-column:1/-1"><label>Quand vendre / Alertes</label><textarea id="f-vendre" rows="2"></textarea></div>
+      <div class="field" style="grid-column:1/-1"><label>Thèse</label><textarea id="f-these" rows="2"></textarea></div>
+      <div class="field" style="grid-column:1/-1"><label>Notes</label><textarea id="f-notes" rows="2"></textarea></div>
     </div>
-
-    <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px">Prix de vente (par action si applicable)</label>
-    <input type="number" id="cloture-prix-vente" placeholder="185.00" step="0.01" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:9px 12px;font-size:13.5px;outline:none;margin-bottom:10px" oninput="calcCloturePreview()">
-
-    <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px">Date de vente</label>
-    <input type="date" id="cloture-date" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:9px 12px;font-size:13.5px;outline:none;margin-bottom:14px">
-
-    <div style="background:var(--bg3);border-radius:8px;padding:12px 14px;margin-bottom:18px;font-size:13px" id="cloture-preview">Entrez un prix de vente pour voir le résultat</div>
-
-    <div style="display:flex;gap:10px">
-      <button onclick="confirmCloture()" style="flex:1;background:var(--success);color:#0e0e10;border:none;padding:11px;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer">Confirmer la vente</button>
-      <button onclick="closeCloture()" style="flex:0 0 80px;background:transparent;color:var(--muted);border:1px solid var(--border);padding:11px;border-radius:8px;font-size:13px;cursor:pointer">Annuler</button>
-    </div>
-  </div>
-
-  </div><!-- fin inv-panel-portfolio -->
-
-  <!-- ===== ONGLET DCA ===== -->
-  <div id="inv-panel-dca" style="display:none">
-    <div class="card" style="margin-bottom:16px">
-      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-        <div style="flex:1;min-width:200px">
-          <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px">Voir les stats de l'actif</label>
-          <select id="dca-actif-filter" onchange="renderDca()" style="width:100%">
-            <option value="">— Tous les actifs —</option>
-          </select>
-        </div>
-        <div class="field" style="flex:0 0 180px;margin:0">
-          <label>Prix actuel de l'actif (€)</label>
-          <input type="number" id="dca-prix-now" placeholder="510.00" step="0.01" oninput="renderDca()">
-        </div>
-      </div>
-    </div>
-    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px">
-      <div class="stat-mini"><div class="val" id="dca-total-investi">0 €</div><div class="lbl">Total versé</div></div>
-      <div class="stat-mini"><div class="val" id="dca-total-actions">0</div><div class="lbl">Actions / parts</div></div>
-      <div class="stat-mini"><div class="val" id="dca-prix-moyen">0 €</div><div class="lbl">Prix moyen</div></div>
-      <div class="stat-mini"><div class="val" id="dca-valeur">0 €</div><div class="lbl">Valeur actuelle</div></div>
-      <div class="stat-mini"><div class="val pos" id="dca-perf">— %</div><div class="lbl">Performance</div></div>
-    </div>
-    <div id="inv-dca-content"></div>
-  </div>
-
-  <!-- ===== ONGLET PROJECTIONS ===== -->
-  <div id="inv-panel-proj" style="display:none">
-    <div class="card mb16">
-      <div class="card-title">🚀 Simulateur de richesse</div>
-      <div style="font-size:13px;color:var(--muted);margin-bottom:16px">Calcule combien tu auras selon différents scénarios d'investissement.</div>
-      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px">
-        <div class="field"><label>Capital de départ (€)</label><input type="number" id="proj-capital" placeholder="1000" value="1000" oninput="renderProjections()"></div>
-        <div class="field"><label>Versement mensuel (€)</label><input type="number" id="proj-mensuel" placeholder="200" value="200" oninput="renderProjections()"></div>
-        <div class="field"><label>Durée (années)</label><input type="number" id="proj-duree" placeholder="20" value="20" min="1" max="50" oninput="renderProjections()"></div>
-        <div class="field"><label>Rendement annuel (%)</label><input type="number" id="proj-taux" placeholder="8" value="8" step="0.5" oninput="renderProjections()"></div>
-      </div>
-    </div>
-    <!-- Résultats -->
-    <div id="proj-results"></div>
-    <!-- Graphique évolution -->
-    <div class="card mt16">
-      <div class="card-title">📈 Évolution du capital</div>
-      <div id="proj-chart" style="margin-top:16px"></div>
-    </div>
-    <!-- Scénarios comparatifs -->
-    <div class="card mt16">
-      <div class="card-title">⚡ Comparaison de scénarios</div>
-      <div id="proj-scenarios" style="margin-top:12px"></div>
+    <div style="display:flex;gap:8px;margin-top:20px;justify-content:flex-end">
+      <button class="btn btn-danger" id="modal-delete-btn" onclick="deleteAsset()" style="display:none;margin-right:auto">🗑 Supprimer</button>
+      <button class="btn btn-ghost" onclick="closeModal()">Annuler</button>
+      <button class="btn btn-primary" onclick="saveAsset()">Enregistrer</button>
     </div>
   </div>
-
-  <!-- ===== ONGLET ANALYSE ===== -->
-  <div id="inv-panel-analyse" style="display:none">
-
-    <!-- Recherche -->
-    <div class="card mb16">
-      <div class="card-title">🔍 Analyser un actif</div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
-        <input type="text" id="ana-search" placeholder="Ex: AAPL, MSFT, BTC, ETF S&P 500..." style="flex:1;min-width:200px" onkeydown="if(event.key==='Enter')analyseActif()">
-        <button onclick="analyseActif()" class="btn">🔍 Analyser</button>
-        <button onclick="anaAddToComparison()" class="btn btn-ghost">+ Ajouter à la comparaison</button>
-      </div>
-    </div>
-
-    <!-- Résultat analyse -->
-    <div id="ana-result" style="display:none">
-
-      <!-- Header actif -->
-      <div class="card mb16" style="background:linear-gradient(135deg,rgba(160,96,255,0.06),rgba(200,169,110,0.04));border:1px solid rgba(160,96,255,0.2)">
-        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
-          <div>
-            <div style="font-size:24px;font-weight:800" id="ana-name">—</div>
-            <div style="font-size:13px;color:var(--muted)" id="ana-symbol">—</div>
-          </div>
-          <div style="text-align:right">
-            <div style="font-size:32px;font-weight:700;font-family:var(--font-mono)" id="ana-price">—</div>
-            <div id="ana-change" style="font-size:14px;font-weight:600">—</div>
-          </div>
-        </div>
-        <!-- Consensus -->
-        <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
-          <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Consensus analystes (estimé)</div>
-          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-            <div id="ana-consensus-badge" style="padding:6px 16px;border-radius:20px;font-size:13px;font-weight:700">—</div>
-            <div style="flex:1;height:8px;background:var(--bg3);border-radius:4px;overflow:hidden;min-width:100px">
-              <div id="ana-consensus-bar" style="height:100%;border-radius:4px;transition:width .5s"></div>
-            </div>
-            <div id="ana-consensus-score" style="font-size:12px;color:var(--muted)">—</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Simulateur gains/pertes -->
-      <div class="card mb16">
-        <div class="card-title">💰 Simulateur de gains/pertes</div>
-        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:12px">
-          <div class="field" style="flex:1;min-width:140px">
-            <label>Montant investi (€)</label>
-            <input type="number" id="ana-invest" placeholder="1000" value="1000" oninput="renderAnaSimul()">
-          </div>
-          <div class="field" style="flex:1;min-width:140px">
-            <label>Durée (années)</label>
-            <input type="number" id="ana-duree" placeholder="5" value="5" min="1" max="30" oninput="renderAnaSimul()">
-          </div>
-        </div>
-        <div id="ana-simul-results" style="margin-top:16px"></div>
-      </div>
-
-      <!-- Courbe scénarios -->
-      <div class="card mb16">
-        <div class="card-title">📈 Évolution selon les scénarios</div>
-        <div id="ana-courbe" style="margin-top:16px"></div>
-      </div>
-
-      <!-- Actions -->
-      <div style="display:flex;gap:10px;flex-wrap:wrap">
-        <button onclick="anaBuy()" class="btn" style="flex:1;background:var(--success);border-color:var(--success);color:#0e0e10">✅ Ajouter au portefeuille</button>
-        <button onclick="anaAddToComparison()" class="btn btn-ghost" style="flex:1">📊 Comparer</button>
-      </div>
-    </div>
-
-    <!-- Comparaison multi-actifs -->
-    <div id="ana-comparison" class="card mt16" style="display:none">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-        <div class="card-title" style="margin:0">📊 Comparaison d'actifs</div>
-        <button onclick="anaClearComparison()" class="btn btn-ghost" style="font-size:12px">Effacer</button>
-      </div>
-      <div id="ana-comparison-list"></div>
-    </div>
-
-    <div id="ana-loading" style="display:none;text-align:center;padding:32px;color:var(--muted)">
-      <div style="font-size:32px;margin-bottom:8px;animation:spin 1s linear infinite">⟳</div>
-      Chargement des données...
-    </div>
-  </div>
-
-</div><!-- fin s-investissements -->
+</div>
 
 <!-- DCA section cachée (contenu géré par onglet) -->
 <div id="s-dca" class="section" style="display:none!important">
@@ -3037,11 +3189,49 @@
 <!-- ===== PARAMÈTRES ===== -->
 <div id="s-parametres" class="section">
   <div class="page-header">
-    <h1>Paramètres</h1>
-    <div class="sub">Personnalise ton expérience</div>
+    <h1>Paramètres ⚙</h1>
+    <div class="sub">Personnalise ton expérience Ikigai</div>
   </div>
 
-  <!-- Thèmes -->
+  <!-- Navigation catégories -->
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:28px" id="param-cats">
+    <button onclick="paramCat('apparence')"   id="pc-apparence"   class="param-cat-btn active">🎨 Apparence</button>
+    <button onclick="paramCat('dashboard')"   id="pc-dashboard"   class="param-cat-btn">🎛 Dashboard</button>
+    <button onclick="paramCat('focus')"       id="pc-focus"       class="param-cat-btn">⏱ Focus</button>
+    <button onclick="paramCat('notifs')"      id="pc-notifs"      class="param-cat-btn">🔔 Notifications</button>
+    <button onclick="paramCat('compte')"      id="pc-compte"      class="param-cat-btn">☁️ Compte</button>
+    <button onclick="paramCat('donnees')"     id="pc-donnees"     class="param-cat-btn">🗄 Données</button>
+    <button onclick="paramCat('appli')"       id="pc-appli"       class="param-cat-btn">📱 Application</button>
+    <button onclick="paramCat('apropos')"     id="pc-apropos"     class="param-cat-btn">📋 À propos</button>
+  </div>
+
+  <style>
+    .param-cat-btn {
+      padding:12px 16px;border-radius:12px;border:1px solid var(--border);
+      background:var(--bg2);color:var(--muted);font-size:13px;font-weight:500;
+      cursor:pointer;font-family:inherit;transition:all .15s;text-align:center;
+    }
+    .param-cat-btn:hover { border-color:var(--accent);color:var(--text); }
+    .param-cat-btn.active { background:var(--accent);color:#0e0e10;border-color:var(--accent);font-weight:700; }
+  </style>
+
+  <!-- ===== APPARENCE ===== -->
+  <div id="param-panel-apparence">
+    <!-- Sélecteur de police -->
+    <div class="card" style="margin-bottom:20px">
+      <div class="card-title">🔤 Police d'écriture</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:14px">Choisir la police utilisée dans tout le site.</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px" id="font-selector">
+        <button onclick="applyFont('DM Sans')"         class="font-btn" data-font="DM Sans"         style="font-family:'DM Sans',sans-serif">DM Sans <span style="font-size:10px;color:var(--muted)">(défaut)</span></button>
+        <button onclick="applyFont('Inter')"           class="font-btn" data-font="Inter"           style="font-family:'Inter',sans-serif">Inter</button>
+        <button onclick="applyFont('Nunito')"          class="font-btn" data-font="Nunito"          style="font-family:'Nunito',sans-serif">Nunito</button>
+        <button onclick="applyFont('Poppins')"         class="font-btn" data-font="Poppins"         style="font-family:'Poppins',sans-serif">Poppins</button>
+        <button onclick="applyFont('Raleway')"         class="font-btn" data-font="Raleway"         style="font-family:'Raleway',sans-serif">Raleway</button>
+        <button onclick="applyFont('Playfair Display')" class="font-btn" data-font="Playfair Display" style="font-family:'Playfair Display',serif">Playfair Display</button>
+        <button onclick="applyFont('JetBrains Mono')" class="font-btn" data-font="JetBrains Mono"  style="font-family:'JetBrains Mono',monospace">JetBrains Mono</button>
+      </div>
+    </div>
+    <!-- Thèmes -->
   <div class="card" style="margin-bottom:20px">
     <div class="card-title">Thème visuel</div>
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px">
@@ -3064,7 +3254,7 @@
         </div>
         <div style="padding:9px 12px;background:#fff;border-top:1px solid #e0ddd8">
           <div style="font-size:13px;font-weight:500;color:#1a1a1a">Clair</div>
-          <div style="font-size:11px;color:#888;margin-top:1px">Mode jour ☀</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:1px">Mode jour ☀</div>
         </div>
       </div>
 
@@ -3189,8 +3379,7 @@
 
     </div>
   </div>
-
-  <!-- Thème Mode Focus -->
+    <!-- Thème Mode Focus -->
   <div class="card" style="margin-bottom:20px">
     <div class="card-title">Thème du mode Focus</div>
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px">
@@ -3308,9 +3497,114 @@
 
     </div>
     <div style="margin-top:12px;font-size:13px;color:var(--muted)">Focus actuel : <span id="current-focus-theme-name" style="color:var(--accent);font-weight:500">Thème de base</span></div>
-  
+  </div>
 
-  <!-- Notifications -->
+  <!-- ===== DASHBOARD ===== -->
+  <div id="param-panel-dashboard" style="display:none">
+    <!-- Dashboard personnalisation -->
+  <div class="card" style="margin-bottom:20px">
+    <div class="card-title">🎛 Personnaliser le Dashboard</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:14px">Active ou désactive les widgets affichés sur ton dashboard.</div>
+    <div id="dash-widgets-list" style="display:flex;flex-direction:column;gap:8px">
+      <!-- Rempli par renderDashWidgets() -->
+    </div>
+  </div>
+    <!-- Modules -->
+  <div class="card" style="margin-bottom:20px">
+    <div class="card-title">Modules actifs 🧩</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:14px">Active ou désactive les sections selon tes besoins. Les sections désactivées disparaissent de la sidebar.</div>
+    <div style="display:flex;flex-direction:column;gap:8px" id="modules-list"></div>
+  </div>
+  </div>
+
+  <!-- ===== FOCUS ===== -->
+  <div id="param-panel-focus" style="display:none">
+    <!-- Durées Pomodoro -->
+  <div class="card" style="margin-bottom:20px">
+    <div class="card-title">Durées du Pomodoro ⏱</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+      <div>
+        <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px">🎯 Focus (min)</label>
+        <input type="number" id="pomo-dur-work" min="1" max="120" value="25"
+          oninput="savePomodurations()"
+          style="width:100%;text-align:center;font-size:22px;font-family:var(--font-mono);font-weight:500;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px;color:var(--accent)">
+      </div>
+      <div>
+        <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px">☕ Pause courte (min)</label>
+        <input type="number" id="pomo-dur-short" min="1" max="60" value="5"
+          oninput="savePomodurations()"
+          style="width:100%;text-align:center;font-size:22px;font-family:var(--font-mono);font-weight:500;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px;color:var(--success)">
+      </div>
+      <div>
+        <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px">🛋 Grande pause (min)</label>
+        <input type="number" id="pomo-dur-long" min="1" max="120" value="15"
+          oninput="savePomodurations()"
+          style="width:100%;text-align:center;font-size:22px;font-family:var(--font-mono);font-weight:500;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px;color:var(--accent3)">
+      </div>
+    </div>
+    <div style="margin-top:12px;font-size:12px;color:var(--muted)">Les changements s'appliquent au prochain démarrage du Pomodoro.</div>
+  </div>
+    <!-- Sons Pomodoro -->
+  <div class="card" style="margin-bottom:20px">
+    <div class="card-title">Sons du Pomodoro 🔔</div>
+
+    <!-- On/Off global -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding:12px 14px;background:var(--bg3);border-radius:10px">
+      <div>
+        <div style="font-size:14px;font-weight:500">Sons activés</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px">Jouer un son à chaque fin de session</div>
+      </div>
+      <div onclick="togglePomoSound()" id="pomo-sound-toggle" style="width:44px;height:24px;border-radius:12px;background:var(--accent);cursor:pointer;position:relative;transition:background .2s">
+        <div id="pomo-sound-knob" style="position:absolute;top:3px;right:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:right .2s"></div>
+      </div>
+    </div>
+
+    <!-- Volume sons -->
+    <div style="margin-bottom:16px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+        <span style="font-size:13px">Volume des sons</span>
+        <span style="font-size:13px;color:var(--accent)" id="pomo-sound-vol-label">70%</span>
+      </div>
+      <input type="range" min="0" max="100" value="70" id="pomo-sound-vol" oninput="setPomoSoundVol(this.value)" style="width:100%;accent-color:var(--accent)">
+    </div>
+
+    <div style="font-size:12px;color:var(--muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:.08em">Sons par type</div>
+
+    <!-- Fin de focus -->
+    <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--bg3);border-radius:10px;margin-bottom:8px">
+      <div style="font-size:22px">🔔</div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:500">Fin de focus (25min)</div>
+        <div style="font-size:11px;color:var(--muted)">Cloche douce — accomplissement</div>
+      </div>
+      <button onclick="previewPomoSound('work')" style="background:var(--bg2);border:1px solid var(--border);color:var(--muted);padding:6px 12px;border-radius:8px;font-size:12px;cursor:pointer">▶ Test</button>
+    </div>
+
+    <!-- Fin de pause courte -->
+    <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--bg3);border-radius:10px;margin-bottom:8px">
+      <div style="font-size:22px">☕</div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:500">Fin de pause courte (5min)</div>
+        <div style="font-size:11px;color:var(--muted)">Bip vif — retour au travail</div>
+      </div>
+      <button onclick="previewPomoSound('short')" style="background:var(--bg2);border:1px solid var(--border);color:var(--muted);padding:6px 12px;border-radius:8px;font-size:12px;cursor:pointer">▶ Test</button>
+    </div>
+
+    <!-- Fin de grande pause -->
+    <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--bg3);border-radius:10px">
+      <div style="font-size:22px">🎉</div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:500">Fin de grande pause (15min)</div>
+        <div style="font-size:11px;color:var(--muted)">Fanfare courte — nouvelle série</div>
+      </div>
+      <button onclick="previewPomoSound('long')" style="background:var(--bg2);border:1px solid var(--border);color:var(--muted);padding:6px 12px;border-radius:8px;font-size:12px;cursor:pointer">▶ Test</button>
+    </div>
+  </div>
+  </div>
+
+  <!-- ===== NOTIFICATIONS ===== -->
+  <div id="param-panel-notifs" style="display:none">
+    <!-- Notifications -->
   <div class="card" style="margin-bottom:20px">
     <div class="card-title">Notifications 🔔</div>
 
@@ -3391,32 +3685,43 @@
 
     <button onclick="testNotification()" class="btn btn-ghost" style="width:100%">🔔 Envoyer une notification test</button>
   </div>
-
-  <!-- Dashboard personnalisation -->
-  <div class="card" style="margin-bottom:20px">
-    <div class="card-title">🎛 Personnaliser le Dashboard</div>
-    <div style="font-size:12px;color:var(--muted);margin-bottom:14px">Active ou désactive les widgets affichés sur ton dashboard.</div>
-    <div id="dash-widgets-list" style="display:flex;flex-direction:column;gap:8px">
-      <!-- Rempli par renderDashWidgets() -->
-    </div>
   </div>
 
-  <!-- Modules -->
-  <div class="card" style="margin-bottom:20px">
-    <div class="card-title">Modules actifs 🧩</div>
-    <div style="font-size:12px;color:var(--muted);margin-bottom:14px">Active ou désactive les sections selon tes besoins. Les sections désactivées disparaissent de la sidebar.</div>
-    <div style="display:flex;flex-direction:column;gap:8px" id="modules-list"></div>
-  </div>
-
-  <!-- Sync Firebase -->
+  <!-- ===== COMPTE ===== -->
+  <div id="param-panel-compte" style="display:none">
+    <!-- Sync Firebase -->
   <div class="card" style="margin-bottom:20px;border:1px solid rgba(66,133,244,0.3);background:linear-gradient(135deg,rgba(66,133,244,0.06),rgba(52,168,83,0.04))">
     <div class="card-title">☁️ Synchronisation cloud</div>
     <div style="font-size:12px;color:var(--muted);margin-bottom:12px">Connecte-toi pour accéder à tes données depuis n'importe quel appareil.</div>
     <div id="firebase-status" style="font-size:12px;margin-bottom:12px;color:var(--muted)">Chargement...</div>
     <button id="firebase-btn" onclick="if(typeof window._fbSignIn==='function'){window._fbSignIn();}else{alert('Chargement en cours, réessaie.');}" class="btn" style="width:100%">🔵 Connexion Google</button>
   </div>
+    <div class="card" style="margin-bottom:20px;border:1px solid rgba(255,60,60,0.2)">
+      <div class="card-title">⎋ Déconnexion</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:12px">Te déconnecter de ton compte Ikigai. Tes données restent sauvegardées localement.</div>
+      <button onclick="logoutUser()" class="btn btn-ghost" style="color:var(--danger);border-color:var(--danger)">⎋ Se déconnecter</button>
+    </div>
+  </div>
 
-  <!-- Mode Mobile -->
+  <!-- ===== DONNÉES ===== -->
+  <div id="param-panel-donnees" style="display:none">
+    <!-- Export / Import -->
+  <div class="card" style="margin-bottom:20px">
+    <div class="card-title">Données</div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px">
+      <button class="btn" onclick="exportData()">⬇ Exporter (JSON)</button>
+      <label class="btn btn-ghost" style="cursor:pointer">⬆ Importer
+        <input type="file" accept=".json" onchange="importData(event)" style="display:none">
+      </label>
+      <button class="btn btn-ghost" onclick="logoutUser()" style="color:var(--danger);border-color:var(--danger)">⎋ Se déconnecter</button>
+    </div>
+    <div style="font-size:12px;color:var(--muted)">Exporte régulièrement pour ne jamais perdre tes données.</div>
+  </div>
+  </div>
+
+  <!-- ===== APPLICATION ===== -->
+  <div id="param-panel-appli" style="display:none">
+    <!-- Mode Mobile -->
   <div class="card" style="margin-bottom:20px">
     <div class="card-title">Mode Mobile 📱</div>
     <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--bg3);border-radius:10px">
@@ -3429,104 +3734,11 @@
       </div>
     </div>
   </div>
-
-  <!-- Durées Pomodoro -->
-  <div class="card" style="margin-bottom:20px">
-    <div class="card-title">Durées du Pomodoro ⏱</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
-      <div>
-        <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px">🎯 Focus (min)</label>
-        <input type="number" id="pomo-dur-work" min="1" max="120" value="25"
-          oninput="savePomodurations()"
-          style="width:100%;text-align:center;font-size:22px;font-family:var(--font-mono);font-weight:500;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px;color:var(--accent)">
-      </div>
-      <div>
-        <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px">☕ Pause courte (min)</label>
-        <input type="number" id="pomo-dur-short" min="1" max="60" value="5"
-          oninput="savePomodurations()"
-          style="width:100%;text-align:center;font-size:22px;font-family:var(--font-mono);font-weight:500;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px;color:var(--success)">
-      </div>
-      <div>
-        <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px">🛋 Grande pause (min)</label>
-        <input type="number" id="pomo-dur-long" min="1" max="120" value="15"
-          oninput="savePomodurations()"
-          style="width:100%;text-align:center;font-size:22px;font-family:var(--font-mono);font-weight:500;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px;color:var(--accent3)">
-      </div>
-    </div>
-    <div style="margin-top:12px;font-size:12px;color:var(--muted)">Les changements s'appliquent au prochain démarrage du Pomodoro.</div>
   </div>
 
-  <!-- Sons Pomodoro -->
-  <div class="card" style="margin-bottom:20px">
-    <div class="card-title">Sons du Pomodoro 🔔</div>
-
-    <!-- On/Off global -->
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding:12px 14px;background:var(--bg3);border-radius:10px">
-      <div>
-        <div style="font-size:14px;font-weight:500">Sons activés</div>
-        <div style="font-size:12px;color:var(--muted);margin-top:2px">Jouer un son à chaque fin de session</div>
-      </div>
-      <div onclick="togglePomoSound()" id="pomo-sound-toggle" style="width:44px;height:24px;border-radius:12px;background:var(--accent);cursor:pointer;position:relative;transition:background .2s">
-        <div id="pomo-sound-knob" style="position:absolute;top:3px;right:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:right .2s"></div>
-      </div>
-    </div>
-
-    <!-- Volume sons -->
-    <div style="margin-bottom:16px">
-      <div style="display:flex;justify-content:space-between;margin-bottom:6px">
-        <span style="font-size:13px">Volume des sons</span>
-        <span style="font-size:13px;color:var(--accent)" id="pomo-sound-vol-label">70%</span>
-      </div>
-      <input type="range" min="0" max="100" value="70" id="pomo-sound-vol" oninput="setPomoSoundVol(this.value)" style="width:100%;accent-color:var(--accent)">
-    </div>
-
-    <div style="font-size:12px;color:var(--muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:.08em">Sons par type</div>
-
-    <!-- Fin de focus -->
-    <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--bg3);border-radius:10px;margin-bottom:8px">
-      <div style="font-size:22px">🔔</div>
-      <div style="flex:1">
-        <div style="font-size:13px;font-weight:500">Fin de focus (25min)</div>
-        <div style="font-size:11px;color:var(--muted)">Cloche douce — accomplissement</div>
-      </div>
-      <button onclick="previewPomoSound('work')" style="background:var(--bg2);border:1px solid var(--border);color:var(--muted);padding:6px 12px;border-radius:8px;font-size:12px;cursor:pointer">▶ Test</button>
-    </div>
-
-    <!-- Fin de pause courte -->
-    <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--bg3);border-radius:10px;margin-bottom:8px">
-      <div style="font-size:22px">☕</div>
-      <div style="flex:1">
-        <div style="font-size:13px;font-weight:500">Fin de pause courte (5min)</div>
-        <div style="font-size:11px;color:var(--muted)">Bip vif — retour au travail</div>
-      </div>
-      <button onclick="previewPomoSound('short')" style="background:var(--bg2);border:1px solid var(--border);color:var(--muted);padding:6px 12px;border-radius:8px;font-size:12px;cursor:pointer">▶ Test</button>
-    </div>
-
-    <!-- Fin de grande pause -->
-    <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--bg3);border-radius:10px">
-      <div style="font-size:22px">🎉</div>
-      <div style="flex:1">
-        <div style="font-size:13px;font-weight:500">Fin de grande pause (15min)</div>
-        <div style="font-size:11px;color:var(--muted)">Fanfare courte — nouvelle série</div>
-      </div>
-      <button onclick="previewPomoSound('long')" style="background:var(--bg2);border:1px solid var(--border);color:var(--muted);padding:6px 12px;border-radius:8px;font-size:12px;cursor:pointer">▶ Test</button>
-    </div>
-  </div>
-
-  <!-- Export / Import -->
-  <div class="card" style="margin-bottom:20px">
-    <div class="card-title">Données</div>
-    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px">
-      <button class="btn" onclick="exportData()">⬇ Exporter (JSON)</button>
-      <label class="btn btn-ghost" style="cursor:pointer">⬆ Importer
-        <input type="file" accept=".json" onchange="importData(event)" style="display:none">
-      </label>
-      <button class="btn btn-ghost" onclick="logoutUser()" style="color:var(--danger);border-color:var(--danger)">⎋ Se déconnecter</button>
-    </div>
-    <div style="font-size:12px;color:var(--muted)">Exporte régulièrement pour ne jamais perdre tes données.</div>
-  </div>
-
-  <!-- Infos + Changelog -->
+  <!-- ===== À PROPOS ===== -->
+  <div id="param-panel-apropos" style="display:none">
+    <!-- Infos + Changelog -->
   <div class="card">
     <div class="card-title">À propos & Changelog</div>
     <div style="font-size:13px;color:var(--muted);line-height:2;margin-bottom:16px">
@@ -3677,8 +3889,13 @@
     </div>
   </div>
 </div>
+  </div>
 
-</div><!-- /main -->
+</div>
+
+
+<div></div><!-- /main -->
+<div></div><!-- balance -->
 </div><!-- /app -->
 
 <!-- FOCUS SECTION - full screen overlay approach -->
@@ -3841,7 +4058,20 @@ body:has(#s-focus.active) .main { overflow: hidden; padding: 0; }
 
 
 
-// ==================== FIREBASE ====================
+// ==================== FONT ====================
+function applyFont(fontName) {
+  document.documentElement.style.setProperty('--font-body', "'" + fontName + "', sans-serif");
+  document.body.style.fontFamily = "'" + fontName + "', sans-serif";
+  data.selectedFont = fontName;
+  save();
+  document.querySelectorAll('.font-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.font === fontName);
+  });
+}
+
+function loadFont() {
+  if (data.selectedFont) applyFont(data.selectedFont);
+}
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 import { getFirestore, doc, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
@@ -6356,6 +6586,20 @@ function calICSTime(val) {
   return String(h).padStart(2,'0')+':'+mi;
 }
 
+
+// ===== FINANCE NAV =====
+function finShowSection(id) {
+  document.querySelectorAll('.fin-section').forEach(s => s.style.display = 'none');
+  document.querySelectorAll('.fin-nav-btn').forEach(b => b.classList.remove('active'));
+  const el = document.getElementById('fin-s-' + id);
+  if (el) el.style.display = 'block';
+  document.querySelectorAll('.fin-nav-btn').forEach(b => {
+    const txt = b.textContent.toLowerCase();
+    if ((id==='overview' && txt.includes('vue')) || txt.includes(id.slice(0,4))) b.classList.add('active');
+  });
+  if (id === 'projections') setTimeout(renderProjections, 50);
+}
+
 // ==================== FLASHCARDS (Ebbinghaus SRS) ====================
 // Algorithme SM-2 simplifié basé sur Ebbinghaus
 // Intervalles : Encore=1min, Difficile=10min, Correct=1j, Facile=4j (puis x facteur)
@@ -7191,6 +7435,224 @@ function invTab(tab) {
   if (tab === 'proj') renderProjections();
 }
 
+// ===== GRAPHIQUE & INDICATEURS =====
+let _anaChart = null;
+let _anaChartPeriod = '1D';
+
+async function loadChart(period) {
+  _anaChartPeriod = period;
+  if (!_anaCurrentSymbol) return;
+
+  // Update boutons
+  ['1D','5D','1M','3M','1Y'].forEach(p => {
+    const btn = document.getElementById('chart-btn-' + p);
+    if (btn) {
+      btn.style.background  = p === period ? 'var(--accent)' : 'transparent';
+      btn.style.color       = p === period ? '#0e0e10' : 'var(--muted)';
+      btn.style.fontWeight  = p === period ? '700' : '400';
+    }
+  });
+
+  const loading = document.getElementById('ana-chart-loading');
+  if (loading) loading.style.display = 'flex';
+
+  try {
+    // Choisir la fonction Alpha Vantage selon période
+    let fn, interval, outputsize;
+    if (period === '1D' || period === '5D') {
+      fn = 'TIME_SERIES_INTRADAY'; interval = '60min'; outputsize = 'compact';
+    } else if (period === '1M') {
+      fn = 'TIME_SERIES_DAILY'; interval = null; outputsize = 'compact';
+    } else {
+      fn = 'TIME_SERIES_DAILY'; interval = null; outputsize = 'full';
+    }
+
+    let url = `https://ikigai-proxy.dussaux-florianjdr.workers.dev/av?function=${fn}&symbol=${_anaCurrentSymbol}`;
+    if (interval) url += `&interval=${interval}`;
+    if (outputsize) url += `&outputsize=${outputsize}`;
+
+    const res  = await fetch(url);
+    const json = await res.json();
+
+    // Extraire les données
+    const seriesKey = Object.keys(json).find(k => k.includes('Time Series'));
+    if (!seriesKey || !json[seriesKey]) {
+      renderSimulatedChart(period);
+      return;
+    }
+
+    const raw = json[seriesKey];
+    let entries = Object.entries(raw).map(([date, val]) => ({
+      date,
+      close: parseFloat(val['4. close'] || val['4a. close (USD)'] || 0),
+      high:  parseFloat(val['2. high'] || 0),
+      low:   parseFloat(val['3. low'] || 0),
+      vol:   parseInt(val['5. volume'] || 0),
+    })).reverse();
+
+    // Filtrer selon période
+    const now = new Date();
+    if (period === '1D')  entries = entries.slice(-24);
+    else if (period === '5D')  entries = entries.slice(-120);
+    else if (period === '1M')  entries = entries.slice(-22);
+    else if (period === '3M')  entries = entries.slice(-66);
+    else entries = entries.slice(-252);
+
+    drawChart(entries.map(e => e.close), entries.map(e => e.date.slice(0,10)));
+    computeIndicators(entries.map(e => e.close));
+
+  } catch(e) {
+    renderSimulatedChart(period);
+  }
+
+  if (loading) loading.style.display = 'none';
+}
+
+function renderSimulatedChart(period) {
+  // Générer des données simulées réalistes basées sur le prix actuel
+  const pts = period === '1D' ? 24 : period === '5D' ? 40 : period === '1M' ? 22 : period === '3M' ? 66 : 252;
+  const prices = [];
+  let p = _anaCurrentPrice * (0.85 + Math.random() * 0.1);
+  for (let i = 0; i < pts; i++) {
+    p = p * (1 + (Math.random() - 0.48) * 0.025);
+    prices.push(parseFloat(p.toFixed(2)));
+  }
+  // Forcer le dernier point au prix actuel
+  prices[prices.length-1] = _anaCurrentPrice;
+  const labels = Array.from({length:pts}, (_,i) => 'J-'+(pts-i));
+  drawChart(prices, labels);
+  computeIndicators(prices);
+  const loading = document.getElementById('ana-chart-loading');
+  if (loading) loading.style.display = 'none';
+}
+
+function drawChart(prices, labels) {
+  const canvas = document.getElementById('ana-chart-canvas');
+  if (!canvas) return;
+
+  if (_anaChart) { _anaChart.destroy(); _anaChart = null; }
+
+  const isUp = prices[prices.length-1] >= prices[0];
+  const color = isUp ? '#40d0a0' : '#ff6040';
+
+  _anaChart = new Chart(canvas, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        data: prices,
+        borderColor: color,
+        borderWidth: 2,
+        fill: true,
+        backgroundColor: (ctx) => {
+          const gradient = ctx.chart.ctx.createLinearGradient(0, 0, 0, 200);
+          gradient.addColorStop(0, color + '40');
+          gradient.addColorStop(1, color + '00');
+          return gradient;
+        },
+        pointRadius: 0,
+        tension: 0.3,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: {
+        callbacks: { label: ctx => ctx.parsed.y.toFixed(2) + ' €' }
+      }},
+      scales: {
+        x: { display: false },
+        y: {
+          grid: { color: 'rgba(255,255,255,0.05)' },
+          ticks: { color: 'rgba(255,255,255,0.4)', font: { size: 10 },
+            callback: v => v.toFixed(0) + '€' }
+        }
+      }
+    }
+  });
+}
+
+function computeIndicators(prices) {
+  // RSI 14
+  const n = 14;
+  let gains = 0, losses = 0;
+  for (let i = prices.length - n; i < prices.length; i++) {
+    const diff = prices[i] - prices[i-1];
+    if (diff > 0) gains += diff; else losses -= diff;
+  }
+  const avgGain = gains / n;
+  const avgLoss = losses / n;
+  const rs  = avgLoss === 0 ? 100 : avgGain / avgLoss;
+  const rsi = Math.round(100 - 100 / (1 + rs));
+
+  // MM 20
+  const slice20 = prices.slice(-20);
+  const ma20 = slice20.reduce((a,b) => a+b, 0) / slice20.length;
+  const currentPrice = prices[prices.length-1];
+  const aboveMa = currentPrice > ma20;
+
+  // Tendance (pente sur 10 derniers points)
+  const slice10 = prices.slice(-10);
+  const trend = (slice10[slice10.length-1] - slice10[0]) / slice10[0] * 100;
+
+  // Afficher RSI
+  const rsiEl = document.getElementById('ind-rsi');
+  const rsiLbl = document.getElementById('ind-rsi-label');
+  if (rsiEl) rsiEl.textContent = rsi;
+  if (rsiEl) rsiEl.style.color = rsi > 70 ? '#ff6040' : rsi < 30 ? '#40d0a0' : 'var(--text)';
+  if (rsiLbl) {
+    rsiLbl.textContent = rsi > 70 ? '⚠ Suracheté' : rsi < 30 ? '✅ Survendu' : '➡ Neutre';
+    rsiLbl.style.color = rsi > 70 ? '#ff6040' : rsi < 30 ? '#40d0a0' : 'var(--muted)';
+  }
+
+  // Afficher MA20
+  const ma20El  = document.getElementById('ind-ma20');
+  const ma20Lbl = document.getElementById('ind-ma20-label');
+  if (ma20El)  ma20El.textContent = ma20.toFixed(2) + '€';
+  if (ma20El)  ma20El.style.color = aboveMa ? '#40d0a0' : '#ff6040';
+  if (ma20Lbl) {
+    ma20Lbl.textContent = aboveMa ? '📈 Prix au-dessus' : '📉 Prix en-dessous';
+    ma20Lbl.style.color = aboveMa ? '#40d0a0' : '#ff6040';
+  }
+
+  // Tendance
+  const trendEl  = document.getElementById('ind-trend');
+  const trendLbl = document.getElementById('ind-trend-label');
+  if (trendEl)  trendEl.textContent = (trend >= 0 ? '+' : '') + trend.toFixed(1) + '%';
+  if (trendEl)  trendEl.style.color = trend >= 0 ? '#40d0a0' : '#ff6040';
+  if (trendLbl) {
+    trendLbl.textContent = trend > 2 ? '🔥 Haussière' : trend < -2 ? '❄ Baissière' : '➡ Latérale';
+    trendLbl.style.color = trend > 2 ? '#40d0a0' : trend < -2 ? '#ff6040' : 'var(--muted)';
+  }
+
+  // Signal global
+  let bullSignals = 0;
+  if (rsi < 50) bullSignals++;
+  if (aboveMa) bullSignals++;
+  if (trend > 0) bullSignals++;
+
+  const signalEl = document.getElementById('ana-signal-global');
+  if (signalEl) {
+    if (bullSignals === 3) {
+      signalEl.textContent = '🟢 Signal ACHAT — 3/3 indicateurs haussiers';
+      signalEl.style.background = 'rgba(64,208,160,0.12)';
+      signalEl.style.color = '#40d0a0';
+    } else if (bullSignals === 2) {
+      signalEl.textContent = '🟡 Signal NEUTRE/POSITIF — 2/3 indicateurs haussiers';
+      signalEl.style.background = 'rgba(200,169,110,0.12)';
+      signalEl.style.color = '#c8a96e';
+    } else if (bullSignals === 1) {
+      signalEl.textContent = '🟠 Signal NEUTRE/NÉGATIF — 1/3 indicateurs haussiers';
+      signalEl.style.background = 'rgba(255,120,40,0.12)';
+      signalEl.style.color = '#ff8040';
+    } else {
+      signalEl.textContent = '🔴 Signal VENTE — 0/3 indicateurs haussiers';
+      signalEl.style.background = 'rgba(255,60,64,0.12)';
+      signalEl.style.color = '#ff4040';
+    }
+  }
+}
+
 // ===== ANALYSE ACTIF =====
 let _anaCurrentSymbol = '';
 let _anaCurrentPrice  = 0;
@@ -7210,7 +7672,7 @@ async function analyseActif() {
 
   try {
     // Chercher le symbole via Alpha Vantage
-    const searchUrl = `https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=${encodeURIComponent(query)}&apikey=${_AV_KEY_ANA}`;
+    const searchUrl = `https://ikigai-proxy.dussaux-florianjdr.workers.dev/av?function=SYMBOL_SEARCH&keywords=${encodeURIComponent(query)}`;
     const searchRes = await fetch(searchUrl);
     const searchData = await searchRes.json();
     const bestMatch = searchData.bestMatches?.[0];
@@ -7219,7 +7681,7 @@ async function analyseActif() {
     const name   = bestMatch?.['2. name']   || query;
 
     // Récupérer le cours
-    const quoteUrl = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${symbol}&apikey=${_AV_KEY_ANA}`;
+    const quoteUrl = `https://ikigai-proxy.dussaux-florianjdr.workers.dev/av?function=GLOBAL_QUOTE&symbol=${symbol}`;
     const quoteRes  = await fetch(quoteUrl);
     const quoteData = await quoteRes.json();
     const quote = quoteData['Global Quote'];
@@ -7248,6 +7710,16 @@ async function analyseActif() {
     document.getElementById('ana-symbol').textContent  = symbol;
     document.getElementById('ana-price').textContent   = price.toFixed(2) + ' €';
 
+    // Open/High/Low/Vol
+    const openEl = document.getElementById('ana-open');
+    const highEl = document.getElementById('ana-high');
+    const lowEl  = document.getElementById('ana-low');
+    const volEl  = document.getElementById('ana-vol');
+    if (openEl) openEl.textContent = parseFloat(quote?.['02. open']||0).toFixed(2) + '€';
+    if (highEl) highEl.textContent = parseFloat(quote?.['03. high']||0).toFixed(2) + '€';
+    if (lowEl)  lowEl.textContent  = parseFloat(quote?.['04. low']||0).toFixed(2) + '€';
+    if (volEl)  volEl.textContent  = parseInt(quote?.['06. volume']||0).toLocaleString('fr-FR');
+
     const changeEl = document.getElementById('ana-change');
     changeEl.textContent  = (change >= 0 ? '+' : '') + change.toFixed(2) + '%';
     changeEl.style.color  = change >= 0 ? 'var(--success)' : 'var(--danger)';
@@ -7269,6 +7741,9 @@ async function analyseActif() {
 
     if (loading) loading.style.display = 'none';
     if (result)  result.style.display  = 'block';
+
+    // Charger le graphique (simulé si limite API atteinte)
+    setTimeout(() => renderSimulatedChart('1M'), 100);
 
   } catch(e) {
     if (loading) loading.style.display = 'none';
@@ -8173,7 +8648,7 @@ function onSearchKeydown(e) {
 async function fetchAutocomplete(query) {
   if (document.getElementById('mkt-type').value === 'crypto') return;
   try {
-    const url = `https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=${encodeURIComponent(query)}&apikey=${AV_KEY}`;
+    const url = `https://ikigai-proxy.dussaux-florianjdr.workers.dev/av?function=SYMBOL_SEARCH&keywords=${encodeURIComponent(query)}`;
     const res = await fetch(url);
     const json = await res.json();
     if (json.Note || json.Information) {
@@ -8248,7 +8723,7 @@ async function searchMarket() {
     const looksLikeTicker = /^[A-Za-z0-9.]{1,8}$/.test(raw) && !raw.includes(' ');
     if (looksLikeTicker) { await loadQuote(raw.toUpperCase()); return; }
     // Nom → SYMBOL_SEARCH sans forcer majuscules
-    const url = `https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=${encodeURIComponent(raw)}&apikey=${AV_KEY}`;
+    const url = `https://ikigai-proxy.dussaux-florianjdr.workers.dev/av?function=SYMBOL_SEARCH&keywords=${encodeURIComponent(raw)}`;
     const res = await fetch(url);
     const json = await res.json();
     // Détecter limite API
@@ -8266,7 +8741,7 @@ async function searchMarket() {
 
 async function loadQuote(symbol) {
   currentSymbol = symbol;
-  const url = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${encodeURIComponent(symbol)}&apikey=${AV_KEY}`;
+  const url = `https://ikigai-proxy.dussaux-florianjdr.workers.dev/av?function=GLOBAL_QUOTE&symbol=${encodeURIComponent(symbol)}`;
   const res = await fetch(url);
   const json = await res.json();
   const q = json['Global Quote'];
@@ -8302,7 +8777,7 @@ async function loadQuote(symbol) {
 
 async function loadCrypto(symbol) {
   currentSymbol = symbol;
-  const url = `https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency=${symbol}&to_currency=USD&apikey=${AV_KEY}`;
+  const url = `https://ikigai-proxy.dussaux-florianjdr.workers.dev/av?function=CURRENCY_EXCHANGE_RATE&from_currency=${symbol}&to_currency=USD`;
   const res = await fetch(url);
   const json = await res.json();
   const rate = json['Realtime Currency Exchange Rate'];
@@ -8334,7 +8809,7 @@ async function loadAnalysts(symbol) {
   document.getElementById('mkt-description-loading').style.display = 'block';
   document.getElementById('mkt-description-block').style.display = 'none';
   try {
-    const url = `https://www.alphavantage.co/query?function=OVERVIEW&symbol=${encodeURIComponent(symbol)}&apikey=${AV_KEY}`;
+    const url = `https://ikigai-proxy.dussaux-florianjdr.workers.dev/av?function=OVERVIEW&symbol=${encodeURIComponent(symbol)}`;
     const res = await fetch(url);
     const d = await res.json();
     if (d.Note || d.Information) return;
@@ -8428,7 +8903,7 @@ async function loadHistory(symbol, mode) {
   chartTitle.textContent = 'Chargement du graphique...';
   try {
     const fn = mode === 'Daily' ? 'TIME_SERIES_INTRADAY&interval=60min' : mode === 'Weekly' ? 'TIME_SERIES_WEEKLY' : 'TIME_SERIES_MONTHLY';
-    const url = `https://www.alphavantage.co/query?function=${fn}&symbol=${encodeURIComponent(symbol)}&apikey=${AV_KEY}`;
+    const url = `https://ikigai-proxy.dussaux-florianjdr.workers.dev/av?function=${fn}&symbol=${encodeURIComponent(symbol)}`;
     const res = await fetch(url);
     const json = await res.json();
 
@@ -8538,7 +9013,7 @@ function removeFromWatchlist(symbol) {
 }
 async function refreshWatchlistItem(symbol) {
   try {
-    const url = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${encodeURIComponent(symbol)}&apikey=${AV_KEY}`;
+    const url = `https://ikigai-proxy.dussaux-florianjdr.workers.dev/av?function=GLOBAL_QUOTE&symbol=${encodeURIComponent(symbol)}`;
     const res = await fetch(url);
     const json = await res.json();
     const q = json['Global Quote'];
@@ -11976,6 +12451,16 @@ function applyTheme(theme) {
   const nameEl = document.getElementById('current-theme-name');
   if (nameEl) nameEl.textContent = THEMES[theme]?.name || theme;
 }
+function paramCat(cat) {
+  const cats = ['apparence','dashboard','focus','notifs','compte','donnees','appli','apropos'];
+  cats.forEach(c => {
+    const panel = document.getElementById('param-panel-' + c);
+    const btn   = document.getElementById('pc-' + c);
+    if (panel) panel.style.display = c === cat ? 'block' : 'none';
+    if (btn)   btn.classList.toggle('active', c === cat);
+  });
+}
+
 function renderParametres() {
   const cur = data.theme || 'dark';
   document.querySelectorAll('[id^="theme-card-"]').forEach(el => {
@@ -11983,6 +12468,11 @@ function renderParametres() {
   });
   const nameEl = document.getElementById('current-theme-name');
   if (nameEl) nameEl.textContent = THEMES[cur]?.name || cur;
+  // Font active state
+  const currentFont = data.selectedFont || 'DM Sans';
+  document.querySelectorAll('.font-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.font === currentFont);
+  });
   // Focus theme
   const curFocus = data.focusTheme || 'default';
   ['default','lofi','bar','lib','foret'].forEach(t => {
@@ -12025,15 +12515,1065 @@ function importData(e) {
 }
 if (data.theme && data.theme !== 'dark') applyTheme(data.theme);
 applyPomoDurations();
+// Auto-détection mobile
+(function() {
+  const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+    || window.innerWidth <= 768;
+  if (isMobile && !data.mobileMode) {
+    data.mobileMode = true;
+    save();
+  }
+  if (!isMobile && data.mobileMode === undefined) {
+    data.mobileMode = false;
+  }
+})();
+
 if (data.mobileMode) applyMobileMode();
+
+// Écouter les changements de taille (rotation téléphone)
+window.addEventListener('resize', () => {
+  const isMobile = window.innerWidth <= 768;
+  if (isMobile && !data.mobileMode) {
+    data.mobileMode = true; save(); applyMobileMode();
+  } else if (!isMobile && data.mobileMode) {
+    data.mobileMode = false; save(); applyMobileMode();
+  }
+});
 applyModules();
 applyDashWidgets();
+loadFont();
 updateDashboardGreeting();
 updateXPWidget();
 checkBadges();
 checkLogin();
 checkOnboarding();
 if (data.notifsOn && Notification.permission === 'granted') startNotifScheduler();
+
+// ===== DONNÉES PAR DÉFAUT =====
+const DEFAULT_DATA = {
+  settings: { dca_mensuel: 300, capital_depart: 1033, rendement_vise: 15 },
+  pea: [
+    { id:'pea1', nom:'ETF S&P 500', ticker:'ESE', isin:'FR0011550681', poche:'Base', secteur:'Indice US large cap', zone_geo:'USA', pct_cible:22, valeur_actuelle:0, dca_mensuel:100, stop_loss:'Jamais', take_profit:'Rebalancer si >27%', quand_acheter:'Chaque mois. Doubler en krach -25%.', quand_vendre:'Jamais. Rebalancer 1er jan si >5pts.', signaux_alerte:'Si >27% du PEA → rebalancer', these:'Socle absolu. Frais 0.05%. Apple, Nvidia, MSFT.', statut:'actif', notes:'', rebal_seuil_haut:27, rebal_seuil_bas:17 },
+    { id:'pea2', nom:'ETF Nasdaq', ticker:'PANX', isin:'', poche:'Base', secteur:'Tech US', zone_geo:'USA', pct_cible:12, valeur_actuelle:0, dca_mensuel:50, stop_loss:'Jamais', take_profit:'Rebalancer si >17%', quand_acheter:'Mensuel.', quand_vendre:'Rebalancer si >17%.', signaux_alerte:'', these:'Exposition tech concentrée.', statut:'actif', notes:'', rebal_seuil_haut:17, rebal_seuil_bas:7 },
+    { id:'pea3', nom:'ETF IA & Tech', ticker:'GOAI', isin:'', poche:'Boost', secteur:'IA / Tech', zone_geo:'Monde', pct_cible:10, valeur_actuelle:0, dca_mensuel:30, stop_loss:'Jamais', take_profit:'Rebalancer si >15%', quand_acheter:'Renforcer sur corrections.', quand_vendre:'Si thème IA se retourne.', signaux_alerte:'', these:'Exposition directe au thème IA.', statut:'actif', notes:'', rebal_seuil_haut:15, rebal_seuil_bas:5 },
+    { id:'pea4', nom:'ETF Europe Mid', ticker:'MEUD', isin:'', poche:'Solide', secteur:'Europe', zone_geo:'Europe', pct_cible:13, valeur_actuelle:0, dca_mensuel:40, stop_loss:'Jamais', take_profit:'Rebalancer si >18%', quand_acheter:'Mensuel.', quand_vendre:'Rebalancer si écart >5pts.', signaux_alerte:'', these:'Diversification Europe.', statut:'actif', notes:'', rebal_seuil_haut:18, rebal_seuil_bas:8 },
+    { id:'pea5', nom:'ETF Défense', ticker:'DFEN', isin:'', poche:'Boost', secteur:'Défense', zone_geo:'Europe/USA', pct_cible:5, valeur_actuelle:0, dca_mensuel:20, stop_loss:'Jamais', take_profit:'Vendre si thème terminé', quand_acheter:'Renforcer sur corrections.', quand_vendre:'Si désescalade géopolitique durable.', signaux_alerte:'Surveiller géopolitique', these:'Thème défense en hausse structurelle.', statut:'actif', notes:'', rebal_seuil_haut:10, rebal_seuil_bas:2 },
+    { id:'pea6', nom:'ETF Infra Numérique', ticker:'INRX', isin:'', poche:'Boost', secteur:'Infrastructure', zone_geo:'Monde', pct_cible:3, valeur_actuelle:0, dca_mensuel:10, stop_loss:'Jamais', take_profit:'', quand_acheter:'', quand_vendre:'', signaux_alerte:'', these:'', statut:'actif', notes:'', rebal_seuil_haut:8, rebal_seuil_bas:1 },
+    { id:'pea7', nom:'ASML', ticker:'ASML', isin:'', poche:'Solide', secteur:'Semi-conducteurs', zone_geo:'Europe', pct_cible:10, valeur_actuelle:0, dca_mensuel:30, stop_loss:'-40%', take_profit:'Rebalancer si >15%', quand_acheter:'Sur correc >15%. Mensuel réduit.', quand_vendre:'Si perte monopole EUV.', signaux_alerte:'Surveiller part de marché EUV', these:'Monopole mondial sur machines EUV. Irremplaçable.', statut:'actif', notes:'', rebal_seuil_haut:15, rebal_seuil_bas:5 },
+    { id:'pea8', nom:'Hermès', ticker:'RMS', isin:'', poche:'Solide', secteur:'Luxe', zone_geo:'France', pct_cible:5, valeur_actuelle:0, dca_mensuel:10, stop_loss:'Jamais', take_profit:'Jamais vendre', quand_acheter:'Renforcer en krach luxe.', quand_vendre:'Jamais.', signaux_alerte:'', these:'Marque ultime, pricing power absolu.', statut:'actif', notes:'', rebal_seuil_haut:10, rebal_seuil_bas:2 },
+    { id:'pea9', nom:'Air Liquide', ticker:'AI', isin:'', poche:'Solide', secteur:'Industrie', zone_geo:'France', pct_cible:5, valeur_actuelle:0, dca_mensuel:0, stop_loss:'Jamais', take_profit:'', quand_acheter:'Ne plus renforcer.', quand_vendre:'', signaux_alerte:'', these:'Dividende aristocrate. Héritage.', statut:'surveillance', notes:'Ne plus renforcer', rebal_seuil_haut:10, rebal_seuil_bas:2 },
+    { id:'pea10', nom:'VusionGroup', ticker:'VU', isin:'', poche:'Spéculatif', secteur:'Tech', zone_geo:'France', pct_cible:3, valeur_actuelle:0, dca_mensuel:0, stop_loss:'-50%', take_profit:'', quand_acheter:'Ne plus renforcer.', quand_vendre:'', signaux_alerte:'', these:'Étiquettes électroniques connectées.', statut:'surveillance', notes:'Ne plus renforcer', rebal_seuil_haut:8, rebal_seuil_bas:1 },
+    { id:'pea11', nom:'Genfit', ticker:'GNFT', isin:'', poche:'Spéculatif', secteur:'Biotech', zone_geo:'France', pct_cible:3, valeur_actuelle:0, dca_mensuel:0, stop_loss:'-50%', take_profit:'+100%', quand_acheter:'Ne plus renforcer.', quand_vendre:'Stop loss -50%.', signaux_alerte:'Surveiller pipeline clinique', these:'Pari biotech. Résultats cliniques NASH.', statut:'surveillance', notes:'Stop loss -50%', rebal_seuil_haut:8, rebal_seuil_bas:1 },
+    { id:'pea12', nom:'Thales', ticker:'HO', isin:'', poche:'Solide', secteur:'Défense/Tech', zone_geo:'France', pct_cible:3, valeur_actuelle:0, dca_mensuel:10, stop_loss:'Jamais', take_profit:'', quand_acheter:'', quand_vendre:'', signaux_alerte:'', these:'Défense + cybersécurité + spatial.', statut:'actif', notes:'', rebal_seuil_haut:8, rebal_seuil_bas:1 },
+    { id:'pea13', nom:'Surgical Robotics', ticker:'RBOT', isin:'', poche:'Spéculatif', secteur:'MedTech', zone_geo:'Monde', pct_cible:3, valeur_actuelle:0, dca_mensuel:5, stop_loss:'-50%', take_profit:'', quand_acheter:'', quand_vendre:'', signaux_alerte:'', these:'Robotique chirurgicale émergente.', statut:'actif', notes:'', rebal_seuil_haut:8, rebal_seuil_bas:1 },
+  ],
+  cto: [
+    { id:'cto1', nom:'Nvidia', ticker:'NVDA', isin:'', poche:'Base', secteur:'Semi-conducteurs / IA', zone_geo:'USA', pct_cible:15, valeur_actuelle:0, dca_mensuel:60, stop_loss:'-35%', take_profit:'Rebalancer si >20%', quand_acheter:'Mensuel. Doubler si -30%.', quand_vendre:'Rebalancer si >20%.', signaux_alerte:'Perte dominance GPU IA', these:'Leader GPU IA. CUDA moat. Datacenter en croissance.', statut:'actif', notes:'', rebal_seuil_haut:20, rebal_seuil_bas:10, type:'Action US' },
+    { id:'cto2', nom:'Microsoft', ticker:'MSFT', isin:'', poche:'Solide', secteur:'Cloud / IA', zone_geo:'USA', pct_cible:12, valeur_actuelle:0, dca_mensuel:40, stop_loss:'Jamais', take_profit:'Rebalancer si >17%', quand_acheter:'Mensuel.', quand_vendre:'Jamais.', signaux_alerte:'', these:'Azure + Copilot + GitHub. Dividende croissant.', statut:'actif', notes:'', rebal_seuil_haut:17, rebal_seuil_bas:7, type:'Action US' },
+    { id:'cto3', nom:'Meta', ticker:'META', isin:'', poche:'Boost', secteur:'Social / IA', zone_geo:'USA', pct_cible:10, valeur_actuelle:0, dca_mensuel:30, stop_loss:'-40%', take_profit:'Rebalancer si >15%', quand_acheter:'Renforcer sur corrections.', quand_vendre:'Si dépréciation de la marque.', signaux_alerte:'', these:'3B users, Llama, Ray-Ban AI.', statut:'actif', notes:'', rebal_seuil_haut:15, rebal_seuil_bas:5, type:'Action US' },
+    { id:'cto4', nom:'Amazon', ticker:'AMZN', isin:'', poche:'Solide', secteur:'Cloud / Commerce', zone_geo:'USA', pct_cible:8, valeur_actuelle:0, dca_mensuel:25, stop_loss:'Jamais', take_profit:'', quand_acheter:'Mensuel.', quand_vendre:'', signaux_alerte:'', these:'AWS #1 cloud, Prime ecosystem.', statut:'actif', notes:'', rebal_seuil_haut:13, rebal_seuil_bas:3, type:'Action US' },
+    { id:'cto5', nom:'ETF Nasdaq x2', ticker:'LQQ', isin:'', poche:'Levier', secteur:'Tech US Levier', zone_geo:'USA', pct_cible:12, valeur_actuelle:0, dca_mensuel:30, stop_loss:'Rebalancer OBLIGATOIRE si >18%', take_profit:'Rebalancer OBLIGATOIRE si >18%', quand_acheter:'Mensuel. REBALANCER si >18%.', quand_vendre:'REBALANCER si >18% du CTO.', signaux_alerte:'REBALANCER SI >18%', these:'Levier x2 sur Nasdaq. Risque érosion à LT.', statut:'actif', notes:'REBALANCER OBLIGATOIRE si >18%', rebal_seuil_haut:18, rebal_seuil_bas:6, type:'ETF Levier', levier_seuil:18 },
+    { id:'cto6', nom:'ETF S&P500 x2', ticker:'2USL', isin:'', poche:'Levier', secteur:'US Large Cap Levier', zone_geo:'USA', pct_cible:8, valeur_actuelle:0, dca_mensuel:20, stop_loss:'Rebalancer OBLIGATOIRE si >13%', take_profit:'Rebalancer OBLIGATOIRE si >13%', quand_acheter:'Mensuel. REBALANCER si >13%.', quand_vendre:'REBALANCER si >13% du CTO.', signaux_alerte:'REBALANCER SI >13%', these:'Levier x2 S&P500. Plus stable que LQQ.', statut:'actif', notes:'REBALANCER OBLIGATOIRE si >13%', rebal_seuil_haut:13, rebal_seuil_bas:3, type:'ETF Levier', levier_seuil:13 },
+    { id:'cto7', nom:'Bitcoin', ticker:'BTC', isin:'', poche:'Spéculatif', secteur:'Crypto', zone_geo:'Décentralisé', pct_cible:12, valeur_actuelle:0, dca_mensuel:30, stop_loss:'Jamais', take_profit:'Alléger si +200%', quand_acheter:'DCA mensuel. Doubler en bear market.', quand_vendre:'Alléger si +200% en bull.', signaux_alerte:'Surveillance régulière', these:'Or numérique. Reserve value. Halving 2024.', statut:'actif', notes:'', rebal_seuil_haut:20, rebal_seuil_bas:5, type:'Crypto' },
+    { id:'cto8', nom:'Ethereum + Staking', ticker:'ETH', isin:'', poche:'Spéculatif', secteur:'Crypto / DeFi', zone_geo:'Décentralisé', pct_cible:8, valeur_actuelle:0, dca_mensuel:20, stop_loss:'-60%', take_profit:'Alléger si +150%', quand_acheter:'DCA mensuel.', quand_vendre:'Alléger en bull.', signaux_alerte:'', these:'Plateforme smart contract. Staking 4-5%/an.', statut:'actif', notes:'', rebal_seuil_haut:15, rebal_seuil_bas:3, type:'Crypto' },
+    { id:'cto9', nom:'Cash Monétaire', ticker:'CSH2', isin:'', poche:'Liquidités', secteur:'Monétaire', zone_geo:'Europe', pct_cible:15, valeur_actuelle:0, dca_mensuel:0, stop_loss:'N/A', take_profit:'Déployer en opportunité', quand_acheter:'Garder pour opportunités.', quand_vendre:'Déployer lors de krachs.', signaux_alerte:'', these:'Poudre sèche. Rendement ~3.5%/an.', statut:'actif', notes:'', rebal_seuil_haut:20, rebal_seuil_bas:5, type:'Monétaire' },
+  ],
+  rules: [
+    { num:1, title:'Ne jamais vendre dans la panique', text:'Les émotions sont le pire ennemi de l\'investisseur. Une chute de marché est une opportunité, pas une catastrophe. Je ne vends jamais sans raison fondamentale.' },
+    { num:2, title:'DCA mensuel automatique', text:'Chaque mois, quoi qu\'il arrive, j\'investis la somme prévue. L\'automatisme me protège des biais émotionnels et du market timing.' },
+    { num:3, title:'Rebalancing annuel obligatoire', text:'Le 1er janvier, je rebalance le PEA vers les % cibles. Pour les ETF à levier, rebalancing dès que le seuil est atteint.' },
+    { num:4, title:'Horizon long terme uniquement', text:'Cet argent est investi pour 10-20 ans. Je ne regarde pas les performances quotidiennes. La volatilité court terme est du bruit.' },
+    { num:5, title:'Diversification intelligente', text:'PEA pour la fiscalité optimale, CTO pour l\'international, crypto pour l\'exposition hors système. Chaque enveloppe a un rôle précis.' },
+    { num:6, title:'Documenter chaque décision', text:'Avant tout achat/vente, j\'écris ma thèse. Après, je la relis. Cela évite les biais de confirmation et force la rigueur intellectuelle.' },
+  ],
+  phases: [
+    { num:1, title:'Phase d\'accumulation (maintenant — 5 ans)', text:'DCA mensuel de 300€. Construire les positions de base. PEA prioritaire pour optimisation fiscale.' },
+    { num:2, title:'Renforcement opportuniste (krachs)', text:'Doubler le DCA sur les positions Base lors de baisses >25%. Utiliser la réserve cash (CSH2).' },
+    { num:3, title:'Rebalancing annuel', text:'Chaque 1er janvier : vérifier les écarts, recalibrer vers les % cibles, ajuster le DCA mensuel.' },
+    { num:4, title:'Révision de la stratégie (an 5)', text:'Réévaluer l\'allocation géographique et sectorielle. Augmenter DCA si revenus ont progressé.' },
+    { num:5, title:'Phase de consolidation (ans 10-15)', text:'Réduire progressivement la part Levier et Spéculatif. Augmenter la part Solide.' },
+    { num:6, title:'Génération de revenus (an 15)', text:'Commencer à exploiter les dividendes et le staking ETH. Envisager des obligations.' },
+    { num:7, title:'Décaissement (an 20)', text:'Sortie progressive du PEA après 5 ans (exonération). Convertir en rentes ou immobilier.' },
+  ],
+  notes: ''
+};
+
+// ===== ÉTAT =====
+let FD = {};
+let editingAsset = null;
+let editingEnv = null;
+let currentSection = 'overview';
+let ficheFilter = { env: 'all', poche: null, statut: null };
+let geoChart = null, sectorChart = null, projChart = null;
+
+// ===== INIT =====
+function init() {
+  const saved = localStorage.getItem('finance_v1');
+  FD = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(DEFAULT_DATA));
+  renderAll();
+}
+
+function save() {
+  localStorage.setItem('finance_v1', JSON.stringify(D));
+}
+
+function renderAll() {
+  // Settings
+  document.getElementById('set-dca').value       = FD.settings.dca_mensuel || 300;
+  document.getElementById('set-capital').value   = FD.settings.capital_depart || 1000;
+  document.getElementById('set-rendement').value = FD.settings.rendement_vise || 15;
+
+  renderOverview();
+  renderPortfolio('pea');
+  renderPortfolio('cto');
+  renderFiches();
+  renderProjections();
+  renderStrategie();
+  document.getElementById('notes-area').value = FD.notes || '';
+}
+
+function saveSettings() {
+  FD.settings.dca_mensuel    = parseFloat(document.getElementById('set-dca').value) || 300;
+  FD.settings.capital_depart = parseFloat(document.getElementById('set-capital').value) || 1000;
+  FD.settings.rendement_vise = parseFloat(document.getElementById('set-rendement').value) || 15;
+  save();
+  renderAll();
+}
+
+// ===== OVERVIEW =====
+function renderOverview() {
+  const peaTotal = FD.pea.reduce((s,a) => s + (a.valeur_actuelle||0), 0);
+  const ctoTotal = FD.cto.reduce((s,a) => s + (a.valeur_actuelle||0), 0);
+  const total    = peaTotal + ctoTotal;
+  const dca      = FD.settings.dca_mensuel || 300;
+  const rend     = FD.settings.rendement_vise || 15;
+  const capital  = FD.settings.capital_depart || 1000;
+
+  // Projeter à 20 ans
+  const obj20 = Math.round(capital * Math.pow(1 + rend/100, 20) + dca * 12 * ((Math.pow(1 + rend/100, 20) - 1) / (rend/100)));
+
+  const kpis = [
+    { label:'Capital total', value: total.toLocaleString('fr-FR') + ' €', sub: 'PEA + CTO + Crypto' },
+    { label:'PEA', value: peaTotal.toLocaleString('fr-FR') + ' €', sub: FD.pea.length + ' actifs' },
+    { label:'CTO / Crypto', value: ctoTotal.toLocaleString('fr-FR') + ' €', sub: FD.cto.length + ' actifs' },
+    { label:'DCA mensuel', value: dca + ' €', sub: 'Versement automatique' },
+    { label:'Rendement visé', value: rend + '%', sub: 'Par an' },
+    { label:'Objectif 20 ans', value: obj20.toLocaleString('fr-FR') + ' €', sub: 'Simulation' },
+  ];
+
+  document.getElementById('kpi-grid').innerHTML = kpis.map(k => `
+    <div class="kpi-card">
+      <div class="kpi-label">${k.label}</div>
+      <div class="kpi-value">${k.value}</div>
+      <div class="kpi-sub">${k.sub}</div>
+    </div>`).join('');
+
+  // Env table
+  const envTbody = document.querySelector('#env-table tbody');
+  envTbody.innerHTML = [
+    { env:'PEA', val:peaTotal, nb:FD.pea.length },
+    { env:'CTO / Crypto', val:ctoTotal, nb:FD.cto.length },
+  ].map(r => `<tr>
+    <td class="td-bold">${r.env}</td>
+    <td class="td-mono">${r.val.toLocaleString('fr-FR')} €</td>
+    <td class="td-mono">${total > 0 ? (r.val/total*100).toFixed(1) : '0'}%</td>
+    <td>${r.nb}</td>
+    <td><span class="badge badge-green">Actif</span></td>
+  </tr>`).join('');
+
+  // Charts
+  renderGeoChart();
+  renderSectorChart();
+}
+
+function renderGeoChart() {
+  const all = [...FD.pea, ...FD.cto];
+  const geo = {};
+  all.forEach(a => {
+    if (!a.zone_geo) return;
+    geo[a.zone_geo] = (geo[a.zone_geo] || 0) + (a.valeur_actuelle || a.pct_cible || 0);
+  });
+  const labels = Object.keys(geo);
+  const values = Object.values(geo);
+  const colors = ['#1B4F8A','#2D6A4F','#854F0B','#A32D2D','#5B3FA6','#1A7A6E','#C47A1F','#4A1A8A'];
+
+  const ctx = document.getElementById('chart-geo');
+  if (geoChart) geoChart.destroy();
+  geoChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: { labels, datasets: [{ data: values, backgroundColor: colors.slice(0, labels.length), borderWidth: 0 }] },
+    options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { font: { size: 11 }, boxWidth: 12 } } } }
+  });
+}
+
+function renderSectorChart() {
+  const all = [...FD.pea, ...FD.cto];
+  const sec = {};
+  all.forEach(a => {
+    if (!a.secteur) return;
+    const key = a.secteur.split('/')[0].split(' ')[0];
+    sec[key] = (sec[key] || 0) + (a.valeur_actuelle || a.pct_cible || 0);
+  });
+  const labels = Object.keys(sec);
+  const values = Object.values(sec);
+  const colors = ['#1B4F8A','#2D6A4F','#854F0B','#A32D2D','#5B3FA6','#1A7A6E','#C47A1F','#4A1A8A','#2D4A8A','#6A2D4F'];
+
+  const ctx = document.getElementById('chart-sector');
+  if (sectorChart) sectorChart.destroy();
+  sectorChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: { labels, datasets: [{ data: values, backgroundColor: colors.slice(0, labels.length), borderWidth: 0 }] },
+    options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { font: { size: 11 }, boxWidth: 12 } } } }
+  });
+}
+
+// ===== PORTFOLIO =====
+function renderPortfolio(env) {
+  const assets = FD[env];
+  const total  = assets.reduce((s,a) => s + (a.valeur_actuelle||0), 0);
+  const tbody  = document.getElementById(env + '-tbody');
+  const tfoot  = document.getElementById(env + '-total');
+
+  tbody.innerHTML = assets.map(a => {
+    const pctReel   = total > 0 ? (a.valeur_actuelle / total * 100) : 0;
+    const ecart     = pctReel - (a.pct_cible || 0);
+    const ecartAbs  = Math.abs(ecart);
+    const ecartCls  = ecartAbs < 3 ? 'alerte-ok' : ecartAbs < 5 ? 'alerte-warn' : 'alerte-danger';
+    const statutBadge = a.statut === 'actif' ? 'badge-green' : a.statut === 'surveillance' ? 'badge-orange' : 'badge-red';
+    const isLevier  = a.levier_seuil && pctReel > a.levier_seuil;
+
+    return `<tr>
+      <td>
+        <div class="td-bold">${a.nom}</div>
+        ${isLevier ? '<div class="levier-warn">⚠ REBALANCING OBLIGATOIRE</div>' : ''}
+        ${a.notes && a.statut !== 'actif' ? '<div style="font-size:11px;color:var(--muted)">' + a.notes + '</div>' : ''}
+      </td>
+      <td><span class="td-ticker">${a.ticker}</span></td>
+      <td><span class="poche-${(a.poche||'').toLowerCase().replace('é','e').replace('é','e')}">${a.poche || (a.type || '—')}</span></td>
+      <td class="td-mono">${a.pct_cible || 0}%</td>
+      <td><input class="val-input" type="number" value="${a.valeur_actuelle||0}" onchange="updateValeur('${env}','${a.id}',this.value)"></td>
+      <td class="td-mono">${pctReel.toFixed(1)}%</td>
+      <td class="td-mono ${ecartCls}">${ecart >= 0 ? '+' : ''}${ecart.toFixed(1)}pts</td>
+      <td class="td-mono">${a.dca_mensuel || 0} €</td>
+      <td><span class="badge ${statutBadge}">${a.statut}</span></td>
+      <td>
+        <button class="btn btn-ghost btn-sm btn-icon" onclick="openEditModal('${env}','${a.id}')" title="Éditer">✏️</button>
+      </td>
+    </tr>`;
+  }).join('');
+
+  const totalDca  = assets.reduce((s,a) => s + (a.dca_mensuel||0), 0);
+  const totalCible = assets.reduce((s,a) => s + (a.pct_cible||0), 0);
+  tfoot.innerHTML = `
+    <td colspan="3">TOTAL (${assets.length} actifs)</td>
+    <td class="td-mono">${totalCible}%</td>
+    <td class="td-mono">${total.toLocaleString('fr-FR')} €</td>
+    <td class="td-mono">100%</td>
+    <td>—</td>
+    <td class="td-mono">${totalDca} €/mois</td>
+    <td colspan="2"></td>`;
+}
+
+function updateValeur(env, id, val) {
+  const asset = FD[env].find(a => a.id === id);
+  if (asset) {
+    asset.valeur_actuelle = parseFloat(val) || 0;
+    save();
+    renderPortfolio(env);
+    renderOverview();
+    renderStrategie();
+  }
+}
+
+// ===== MODAL =====
+function openAddModal(env) {
+  editingAsset = null;
+  editingEnv   = env;
+  document.getElementById('modal-title').textContent = 'Ajouter un actif — ' + env.toUpperCase();
+  clearModal();
+  document.getElementById('modal-delete-btn').style.display = 'none';
+  document.getElementById('asset-modal').classList.add('open');
+}
+
+function openEditModal(env, id) {
+  editingEnv   = env;
+  editingAsset = id;
+  const a = FD[env].find(x => x.id === id);
+  if (!a) return;
+  document.getElementById('modal-title').textContent = 'Modifier — ' + a.nom;
+  document.getElementById('f-nom').value       = a.nom || '';
+  document.getElementById('f-ticker').value    = a.ticker || '';
+  document.getElementById('f-isin').value      = a.isin || '';
+  document.getElementById('f-poche').value     = a.poche || a.type || 'Base';
+  document.getElementById('f-secteur').value   = a.secteur || '';
+  document.getElementById('f-zone').value      = a.zone_geo || '';
+  document.getElementById('f-pct-cible').value = a.pct_cible || '';
+  document.getElementById('f-dca').value       = a.dca_mensuel || '';
+  document.getElementById('f-valeur').value    = a.valeur_actuelle || '';
+  document.getElementById('f-seuil-bas').value = a.rebal_seuil_bas || '';
+  document.getElementById('f-seuil-haut').value= a.rebal_seuil_haut || '';
+  document.getElementById('f-stop').value      = a.stop_loss || '';
+  document.getElementById('f-tp').value        = a.take_profit || '';
+  document.getElementById('f-statut').value    = a.statut || 'actif';
+  document.getElementById('f-acheter').value   = a.quand_acheter || '';
+  document.getElementById('f-vendre').value    = a.quand_vendre || '';
+  document.getElementById('f-these').value     = a.these || '';
+  document.getElementById('f-notes').value     = a.notes || '';
+  document.getElementById('modal-delete-btn').style.display = 'inline-block';
+  document.getElementById('asset-modal').classList.add('open');
+}
+
+function clearModal() {
+  ['f-nom','f-ticker','f-isin','f-secteur','f-zone','f-pct-cible','f-dca','f-valeur','f-seuil-bas','f-seuil-haut','f-stop','f-tp','f-acheter','f-vendre','f-these','f-notes'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('f-poche').value  = 'Base';
+  document.getElementById('f-statut').value = 'actif';
+}
+
+function closeModal() {
+  document.getElementById('asset-modal').classList.remove('open');
+}
+
+function saveAsset() {
+  const asset = {
+    id: editingAsset || (editingEnv + '_' + Date.now()),
+    nom:           document.getElementById('f-nom').value,
+    ticker:        document.getElementById('f-ticker').value.toUpperCase(),
+    isin:          document.getElementById('f-isin').value,
+    poche:         document.getElementById('f-poche').value,
+    type:          document.getElementById('f-poche').value,
+    secteur:       document.getElementById('f-secteur').value,
+    zone_geo:      document.getElementById('f-zone').value,
+    pct_cible:     parseFloat(document.getElementById('f-pct-cible').value) || 0,
+    dca_mensuel:   parseFloat(document.getElementById('f-dca').value) || 0,
+    valeur_actuelle: parseFloat(document.getElementById('f-valeur').value) || 0,
+    rebal_seuil_bas: parseFloat(document.getElementById('f-seuil-bas').value) || 0,
+    rebal_seuil_haut: parseFloat(document.getElementById('f-seuil-haut').value) || 0,
+    stop_loss:     document.getElementById('f-stop').value,
+    take_profit:   document.getElementById('f-tp').value,
+    statut:        document.getElementById('f-statut').value,
+    quand_acheter: document.getElementById('f-acheter').value,
+    quand_vendre:  document.getElementById('f-vendre').value,
+    these:         document.getElementById('f-these').value,
+    notes:         document.getElementById('f-notes').value,
+  };
+  if (editingAsset) {
+    const idx = FD[editingEnv].findIndex(a => a.id === editingAsset);
+    if (idx >= 0) FD[editingEnv][idx] = asset;
+  } else {
+    FD[editingEnv].push(asset);
+  }
+  save();
+  closeModal();
+  renderAll();
+}
+
+function deleteAsset() {
+  if (!confirm('Supprimer cet actif ?')) return;
+  FD[editingEnv] = FD[editingEnv].filter(a => a.id !== editingAsset);
+  save();
+  closeModal();
+  renderAll();
+}
+
+// ===== FICHES =====
+function renderFiches() {
+  const all = [
+    ...FD.pea.map(a => ({...a, _env:'pea'})),
+    ...FD.cto.map(a => ({...a, _env:'cto'})),
+  ];
+
+  let filtered = all;
+  if (ficheFilter.env !== 'all') filtered = filtered.filter(a => a._env === ficheFilter.env);
+  if (ficheFilter.poche) filtered = filtered.filter(a => a.poche === ficheFilter.poche);
+  if (ficheFilter.statut) filtered = filtered.filter(a => a.statut === ficheFilter.statut);
+
+  const grid = document.getElementById('fiches-grid');
+  if (!filtered.length) { grid.innerHTML = '<p style="color:var(--muted);font-size:13px">Aucun actif trouvé.</p>'; return; }
+
+  grid.innerHTML = filtered.map(a => {
+    const statutColor = a.statut === 'actif' ? 'badge-green' : a.statut === 'surveillance' ? 'badge-orange' : 'badge-red';
+    return `<div class="fiche-card" onclick="openEditModal('${a._env}','${a.id}')">
+      <div class="fiche-header">
+        <div>
+          <div class="fiche-name">${a.nom}</div>
+          <div class="fiche-ticker">${a.ticker} · ${a._env.toUpperCase()} · ${a.secteur || '—'}</div>
+        </div>
+        <div style="text-align:right">
+          <span class="badge ${statutColor}">${a.statut}</span>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px">${a.pct_cible}% cible</div>
+        </div>
+      </div>
+      ${a.stop_loss ? `<div class="fiche-row"><span class="label">Stop loss : </span><strong>${a.stop_loss}</strong></div>` : ''}
+      ${a.take_profit ? `<div class="fiche-row"><span class="label">Take profit : </span><strong>${a.take_profit}</strong></div>` : ''}
+      ${a.quand_acheter ? `<div class="fiche-achat">✅ ${a.quand_acheter}</div>` : ''}
+      ${a.quand_vendre ? `<div class="fiche-vente">⚠ ${a.quand_vendre}</div>` : ''}
+      ${a.these ? `<div class="fiche-these">${a.these}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function filterFiches(env, btn) {
+  ficheFilter.env = env;
+  ficheFilter.poche = null;
+  ficheFilter.statut = null;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderFiches();
+}
+
+function filterFichesPoche(poche, btn) {
+  ficheFilter.poche = ficheFilter.poche === poche ? null : poche;
+  ficheFilter.env = 'all';
+  ficheFilter.statut = null;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  if (ficheFilter.poche) btn.classList.add('active');
+  else document.querySelector('.filter-btn').classList.add('active');
+  renderFiches();
+}
+
+function filterFichesStatut(statut, btn) {
+  ficheFilter.statut = ficheFilter.statut === statut ? null : statut;
+  ficheFilter.env = 'all';
+  ficheFilter.poche = null;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  if (ficheFilter.statut) btn.classList.add('active');
+  else document.querySelector('.filter-btn').classList.add('active');
+  renderFiches();
+}
+
+// ===== PROJECTIONS =====
+function renderProjections() {
+  const dca     = parseFloat(document.getElementById('proj-dca')?.value) || FD.settings.dca_mensuel || 300;
+  const capital = parseFloat(document.getElementById('proj-capital')?.value) || FD.settings.capital_depart || 1000;
+  const duree   = parseInt(document.getElementById('proj-duree')?.value) || 20;
+  const rendement = (FD.settings.rendement_vise || 15) / 100;
+  const sp500   = 0.10;
+  const livretA = 0.03;
+  const baissier = 0.04;
+
+  const labels = Array.from({length: duree+1}, (_,i) => 'An ' + i);
+
+  function calcCourbe(taux) {
+    const tauxM = taux / 12;
+    let val = capital;
+    return Array.from({length: duree+1}, (_, y) => {
+      if (y === 0) return Math.round(val);
+      for (let m = 0; m < 12; m++) val = val * (1 + tauxM) + dca;
+      return Math.round(val);
+    });
+  }
+
+  const portData = calcCourbe(rendement);
+  const spData   = calcCourbe(sp500);
+  const liData   = calcCourbe(livretA);
+  const bData    = calcCourbe(baissier);
+
+  const ctx = document.getElementById('proj-chart');
+  if (projChart) projChart.destroy();
+  projChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        { label: 'Mon portefeuille (' + Math.round(rendement*100) + '%/an)', data: portData, borderColor: '#2D6A4F', backgroundColor: 'rgba(45,106,79,.08)', borderWidth: 2.5, tension: 0.3, fill: true, pointRadius: 0 },
+        { label: 'S&P 500 (10%/an)', data: spData, borderColor: '#1B4F8A', backgroundColor: 'transparent', borderWidth: 1.5, tension: 0.3, pointRadius: 0 },
+        { label: 'Livret A (3%/an)', data: liData, borderColor: '#999', backgroundColor: 'transparent', borderWidth: 1.5, borderDash: [5,5], tension: 0.3, pointRadius: 0 },
+        { label: 'Scénario baissier (4%/an)', data: bData, borderColor: '#854F0B', backgroundColor: 'transparent', borderWidth: 1.5, borderDash: [3,3], tension: 0.3, pointRadius: 0 },
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position: 'bottom', labels: { font: { size: 11 }, boxWidth: 16 } },
+        tooltip: { callbacks: { label: ctx => ctx.dataset.label + ' : ' + ctx.parsed.y.toLocaleString('fr-FR') + ' €' } }
+      },
+      scales: {
+        x: { grid: { color: '#f0f0f0' }, ticks: { font: { size: 10 } } },
+        y: { grid: { color: '#f0f0f0' }, ticks: { font: { size: 10 }, callback: v => (v/1000).toFixed(0) + 'k€' } }
+      }
+    }
+  });
+
+  // Jalons
+  const jalonsEl = document.getElementById('proj-jalons');
+  const jalons = [1, 3, 5, 10, 15, duree];
+  jalonsEl.innerHTML = jalons.filter(y => y <= duree).map(y => `
+    <div class="jalon-card">
+      <div class="jalon-year">An ${y}</div>
+      <div class="jalon-val">${portData[y]?.toLocaleString('fr-FR') || '—'} €</div>
+      <div class="jalon-dca">${(dca * 12 * y).toLocaleString('fr-FR')} € versés</div>
+    </div>`).join('');
+}
+
+// ===== STRATÉGIE =====
+function renderStrategie() {
+  // Règles
+  const rulesGrid = document.getElementById('rules-grid');
+  rulesGrid.innerHTML = FD.rules.map((r, i) => `
+    <div class="rule-card">
+      <div class="rule-num">0${r.num}</div>
+      <div class="rule-title">${r.title}</div>
+      <div class="rule-text">${r.text}</div>
+      <button class="btn btn-ghost btn-sm rule-edit-btn" onclick="editRule(${i})">✏️ Modifier</button>
+    </div>`).join('');
+
+  // Rebalancing
+  const all = [
+    ...FD.pea.map(a => ({...a, _env:'PEA'})),
+    ...FD.cto.map(a => ({...a, _env:'CTO'})),
+  ];
+  const peaTotal = FD.pea.reduce((s,a) => s + (a.valeur_actuelle||0), 0);
+  const ctoTotal = FD.cto.reduce((s,a) => s + (a.valeur_actuelle||0), 0);
+
+  const rebalTbody = document.getElementById('rebal-tbody');
+  rebalTbody.innerHTML = all.map(a => {
+    const envTotal = a._env === 'PEA' ? peaTotal : ctoTotal;
+    const pctReel  = envTotal > 0 ? (a.valeur_actuelle/envTotal*100) : 0;
+    const ecart    = pctReel - (a.pct_cible || 0);
+    const ecartAbs = Math.abs(ecart);
+    let alerte = '';
+    if (ecartAbs < 3) alerte = `<span class="alerte-ok">✓ OK (${ecart >= 0 ? '+' : ''}${ecart.toFixed(1)}pts)</span>`;
+    else if (ecartAbs < 5) alerte = `<span class="alerte-warn">⚠ Surveiller (${ecart >= 0 ? '+' : ''}${ecart.toFixed(1)}pts)</span>`;
+    else alerte = `<span class="alerte-danger">🔴 REBALANCER (${ecart >= 0 ? '+' : ''}${ecart.toFixed(1)}pts)</span>`;
+    return `<tr>
+      <td><strong>${a.nom}</strong><span style="font-size:11px;color:var(--muted);margin-left:6px">${a._env}</span></td>
+      <td class="td-mono">${a.pct_cible || 0}%</td>
+      <td class="td-mono" style="color:var(--orange)">${a.rebal_seuil_bas || '—'}%</td>
+      <td class="td-mono" style="color:var(--red)">${a.rebal_seuil_haut || '—'}%</td>
+      <td class="td-mono">${pctReel.toFixed(1)}%</td>
+      <td>${alerte}</td>
+    </tr>`;
+  }).join('');
+
+  // Phases
+  const phasesList = document.getElementById('phases-list');
+  phasesList.innerHTML = FD.phases.map((p, i) => `
+    <div class="phase-item">
+      <div class="phase-num">${p.num}</div>
+      <div class="phase-content">
+        <div class="phase-title">${p.title}</div>
+        <div class="phase-text">${p.text}</div>
+      </div>
+      <button class="btn btn-ghost btn-sm btn-icon" onclick="editPhase(${i})" title="Modifier">✏️</button>
+    </div>`).join('');
+}
+
+function editRule(idx) {
+  const r = FD.rules[idx];
+  const newTitle = prompt('Titre de la règle :', r.title);
+  if (newTitle === null) return;
+  const newText = prompt('Description :', r.text);
+  if (newText === null) return;
+  FD.rules[idx].title = newTitle;
+  FD.rules[idx].text  = newText;
+  save();
+  renderStrategie();
+}
+
+function editPhase(idx) {
+  const p = FD.phases[idx];
+  const newTitle = prompt('Titre de la phase :', p.title);
+  if (newTitle === null) return;
+  const newText = prompt('Description :', p.text);
+  if (newText === null) return;
+  FD.phases[idx].title = newTitle;
+  FD.phases[idx].text  = newText;
+  save();
+  renderStrategie();
+}
+
+function saveNotes() {
+  FD.notes = document.getElementById('notes-area').value;
+  save();
+}
+
+// ===== NAVIGATION =====
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('s-' + id).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b => {
+    if (b.textContent.toLowerCase().includes(id === 'overview' ? 'vue' : id === 'pea' ? 'pea' : id === 'cto' ? 'cto' : id === 'fiches' ? 'fiche' : id === 'projections' ? 'proj' : 'strat')) {
+      b.classList.add('active');
+    }
+  });
+  currentSection = id;
+  if (id === 'projections') renderProjections();
+}
+
+// ===== EXPORT / IMPORT / RESET =====
+function exportData() {
+  const blob = new Blob([JSON.stringify(D, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'finance_ikigai_' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+}
+
+function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      FD = JSON.parse(e.target.result);
+      save();
+      renderAll();
+      alert('✅ Données importées !');
+    } catch(err) { alert('❌ Fichier invalide'); }
+  };
+  reader.readAsText(file);
+}
+
+function resetData() {
+  FD = JSON.parse(JSON.stringify(DEFAULT_DATA));
+  save();
+  renderAll();
+  alert('✅ Données réinitialisées');
+}
+
+// ===== START =====
+init();
+
+
+// ===== FINANCE NAV =====
+function finGo(id, btn) {
+  document.querySelectorAll('.fin-s').forEach(s => s.style.display = 'none');
+  document.querySelectorAll('.fin-nb').forEach(b => b.classList.remove('active'));
+  const el = document.getElementById('fin-s-' + id);
+  if (el) el.style.display = 'block';
+  if (btn) btn.classList.add('active');
+  if (id === 'graphs') setTimeout(renderGraphs, 50);
+}
+function saveSettingsP() {
+  FD.settings.dca_mensuel    = parseFloat(document.getElementById('sp-dca')?.value)||300;
+  FD.settings.capital_depart = parseFloat(document.getElementById('sp-capital')?.value)||1033;
+  FD.settings.rendement_vise = parseFloat(document.getElementById('sp-rendement')?.value)||15;
+  FD.settings.objectif_20ans = parseFloat(document.getElementById('sp-objectif')?.value)||620000;
+  save(); syncSettings(); renderAll();
+}
+
+// ===================== DONNÉES PAR DÉFAUT =====================
+const FIN_DEF = {
+  settings:{dca_mensuel:300,capital_depart:1033,rendement_vise:15,objectif_20ans:620000},
+  history:[],
+  pea:[
+    {id:'p1',nom:'ETF S&P 500',ticker:'ESE',isin:'FR0011550681',poche:'Base',secteur:'Indice US large cap',zone_geo:'USA',pct_cible:22,prix_revient:246,valeur_actuelle:246,dca_mensuel:100,stop_loss:'Jamais',take_profit:'Rebalancer si >27%',seuil_haut:27,seuil_bas:17,statut:'actif',notes:'Socle absolu. Frais 0.05%.',updated:''},
+    {id:'p2',nom:'ETF Nasdaq 100',ticker:'PANX',isin:'LU1681038243',poche:'Boost',secteur:'Tech US',zone_geo:'USA',pct_cible:12,prix_revient:0,valeur_actuelle:0,dca_mensuel:100,stop_loss:'Jamais',take_profit:'Rebalancer si >17%',seuil_haut:17,seuil_bas:7,statut:'actif',notes:'Ouvrir maintenant.',updated:''},
+    {id:'p3',nom:'ETF IA / Robotique',ticker:'GOAI',isin:'LU1861132840',poche:'Boost',secteur:'IA & Robotique',zone_geo:'Mondial',pct_cible:10,prix_revient:0,valeur_actuelle:0,dca_mensuel:100,stop_loss:'Jamais',take_profit:'Rebalancer si >15%',seuil_haut:15,seuil_bas:5,statut:'actif',notes:'Vague IA décennale.',updated:''},
+    {id:'p4',nom:'ETF Europe Qualité',ticker:'MEUD',isin:'LU1681041544',poche:'Base',secteur:'Indice Europe',zone_geo:'Europe',pct_cible:13,prix_revient:0,valeur_actuelle:0,dca_mensuel:0,stop_loss:'Jamais',take_profit:'Rebalancer si >18%',seuil_haut:18,seuil_bas:8,statut:'actif',notes:'Phase 2 — dès mois 5.',updated:''},
+    {id:'p5',nom:'ETF Défense EU',ticker:'DFEN',isin:'',poche:'Boost',secteur:'Défense',zone_geo:'Europe',pct_cible:5,prix_revient:0,valeur_actuelle:0,dca_mensuel:0,stop_loss:'Jamais',take_profit:'Rebalancer si >10%',seuil_haut:10,seuil_bas:2,statut:'actif',notes:'Phase 4 — mois 11.',updated:''},
+    {id:'p6',nom:'ETF Inde',ticker:'INRX',isin:'',poche:'Boost',secteur:'Marchés émergents',zone_geo:'Inde/Émergents',pct_cible:3,prix_revient:0,valeur_actuelle:0,dca_mensuel:0,stop_loss:'Jamais',take_profit:'Rebalancer si >8%',seuil_haut:8,seuil_bas:1,statut:'actif',notes:'Phase 4.',updated:''},
+    {id:'p7',nom:'ASML',ticker:'ASML',isin:'NL0010273215',poche:'Solide',secteur:'Semi-conducteurs',zone_geo:'Europe',pct_cible:10,prix_revient:0,valeur_actuelle:0,dca_mensuel:0,stop_loss:'Jamais',take_profit:'Rebalancer si >15%',seuil_haut:15,seuil_bas:5,statut:'actif',notes:'Phase 3.',updated:''},
+    {id:'p8',nom:'Hermès',ticker:'RMS',isin:'FR0000052292',poche:'Solide',secteur:'Luxe',zone_geo:'Europe',pct_cible:5,prix_revient:0,valeur_actuelle:0,dca_mensuel:0,stop_loss:'Jamais',take_profit:'Rebalancer si >10%',seuil_haut:10,seuil_bas:2,statut:'actif',notes:'Phase 5 — an 2.',updated:''},
+    {id:'p9',nom:'Air Liquide',ticker:'AI',isin:'FR0000120073',poche:'Solide',secteur:'Industrie & Énergie',zone_geo:'Europe',pct_cible:5,prix_revient:359,valeur_actuelle:359,dca_mensuel:0,stop_loss:'Jamais',take_profit:'Rebalancer si >10%',seuil_haut:10,seuil_bas:2,statut:'surveillance',notes:'⚠ Ne plus renforcer.',updated:''},
+    {id:'p10',nom:'VusionGroup',ticker:'VU',isin:'FR0011289040',poche:'Spéculatif',secteur:'Tech / Retail',zone_geo:'Europe',pct_cible:3,prix_revient:130,valeur_actuelle:130,dca_mensuel:0,stop_loss:'Pas de stop fixe',take_profit:'Si +100% → vendre 50%',seuil_haut:8,seuil_bas:0,statut:'surveillance',notes:'⚠ Ne plus renforcer.',updated:''},
+    {id:'p11',nom:'Genfit',ticker:'GNFT',isin:'FR0004163111',poche:'Spéculatif',secteur:'Santé / Biotech',zone_geo:'Europe',pct_cible:3,prix_revient:121,valeur_actuelle:121,dca_mensuel:0,stop_loss:'🔴 -50% → vendre tout',take_profit:'Si essais positifs',seuil_haut:8,seuil_bas:0,statut:'stop',notes:'🔴 Stop loss -50%.',updated:''},
+    {id:'p12',nom:'Thales',ticker:'HO',isin:'FR0000121329',poche:'Spéculatif',secteur:'Défense',zone_geo:'Europe',pct_cible:3,prix_revient:0,valeur_actuelle:0,dca_mensuel:0,stop_loss:'Stop loss -50%',take_profit:'Si +100% → vendre 50%',seuil_haut:8,seuil_bas:0,statut:'actif',notes:'Phase 4.',updated:''},
+    {id:'p13',nom:'Surgical Robotics',ticker:'RBOT',isin:'',poche:'Spéculatif',secteur:'Santé / Robotique',zone_geo:'Europe',pct_cible:3,prix_revient:0,valeur_actuelle:0,dca_mensuel:0,stop_loss:'Stop loss -50%',take_profit:'Si ×3 → vendre 50%',seuil_haut:8,seuil_bas:0,statut:'actif',notes:'Phase 4.',updated:''},
+    {id:'p14',nom:'Slot Cash krach',ticker:'Cash',isin:'',poche:'Base',secteur:'Monétaire',zone_geo:'Mondial',pct_cible:3,prix_revient:0,valeur_actuelle:0,dca_mensuel:0,stop_loss:'N/A',take_profit:'Déployer si marché -25%',seuil_haut:8,seuil_bas:0,statut:'actif',notes:'Poudre sèche.',updated:''},
+    {id:'p15',nom:'Stif — Héritage',ticker:'STIF',isin:'FR0010386334',poche:'Héritage',secteur:'Industrie',zone_geo:'Europe',pct_cible:0,prix_revient:177,valeur_actuelle:177,dca_mensuel:0,stop_loss:'Pas de stop',take_profit:'Si +50% → vendre tout',seuil_haut:0,seuil_bas:0,statut:'surveillance',notes:'⚠ Hors stratégie.',updated:''},
+  ],
+  cto:[
+    {id:'c1',nom:'Nvidia',ticker:'NVDA',isin:'US67066G1040',poche:'Actions US',secteur:'Semi-conducteurs / IA',zone_geo:'USA',pct_cible:15,prix_revient:0,valeur_actuelle:0,dca_mensuel:0,stop_loss:'Jamais',take_profit:'Rebalancer si >22%',seuil_haut:22,seuil_bas:10,statut:'actif',notes:'Monopole GPU IA.',updated:''},
+    {id:'c2',nom:'Microsoft',ticker:'MSFT',isin:'US5949181045',poche:'Actions US',secteur:'Cloud / IA',zone_geo:'USA',pct_cible:12,prix_revient:0,valeur_actuelle:0,dca_mensuel:0,stop_loss:'Jamais',take_profit:'Rebalancer si >17%',seuil_haut:17,seuil_bas:7,statut:'actif',notes:'Azure + OpenAI.',updated:''},
+    {id:'c3',nom:'Meta',ticker:'META',isin:'US30303M1027',poche:'Actions US',secteur:'Social / IA',zone_geo:'USA',pct_cible:10,prix_revient:0,valeur_actuelle:0,dca_mensuel:0,stop_loss:'Jamais',take_profit:'Rebalancer si >15%',seuil_haut:15,seuil_bas:5,statut:'actif',notes:'3,2 Md users.',updated:''},
+    {id:'c4',nom:'Amazon',ticker:'AMZN',isin:'US0231351067',poche:'Actions US',secteur:'Cloud / Commerce',zone_geo:'USA',pct_cible:8,prix_revient:0,valeur_actuelle:0,dca_mensuel:0,stop_loss:'Jamais',take_profit:'Rebalancer si >13%',seuil_haut:13,seuil_bas:3,statut:'actif',notes:'AWS = 70% profits.',updated:''},
+    {id:'c5',nom:'ETF Nasdaq ×2',ticker:'LQQ',isin:'FR0010342592',poche:'Levier ×2',secteur:'Tech US levier',zone_geo:'USA',pct_cible:12,prix_revient:0,valeur_actuelle:0,dca_mensuel:0,stop_loss:'DCA protège',take_profit:'🚨 OBLIGATOIRE si >18%',seuil_haut:18,seuil_bas:7,statut:'actif',notes:'REBALANCING OBLIGATOIRE si >18%.',updated:''},
+    {id:'c6',nom:'ETF S&P500 ×2',ticker:'2USL',isin:'IE00B4QNK009',poche:'Levier ×2',secteur:'Large cap US levier',zone_geo:'USA',pct_cible:8,prix_revient:0,valeur_actuelle:0,dca_mensuel:0,stop_loss:'DCA protège',take_profit:'🚨 OBLIGATOIRE si >13%',seuil_haut:13,seuil_bas:3,statut:'actif',notes:'REBALANCING OBLIGATOIRE si >13%.',updated:''},
+    {id:'c7',nom:'Bitcoin',ticker:'BTC',isin:'',poche:'Crypto',secteur:'Crypto',zone_geo:'Mondial',pct_cible:12,prix_revient:0,valeur_actuelle:0,dca_mensuel:0,stop_loss:'Jamais',take_profit:'Rebalancer si >20%',seuil_haut:20,seuil_bas:7,statut:'actif',notes:'Halving 2028.',updated:''},
+    {id:'c8',nom:'Ethereum + Staking',ticker:'ETH',isin:'',poche:'Crypto',secteur:'Crypto',zone_geo:'Mondial',pct_cible:8,prix_revient:0,valeur_actuelle:0,dca_mensuel:0,stop_loss:'Jamais',take_profit:'Rebalancer si >13%',seuil_haut:13,seuil_bas:3,statut:'actif',notes:'Staking +4%/an.',updated:''},
+    {id:'c9',nom:'Cash Monétaire',ticker:'CSH2',isin:'FR0010510800',poche:'Cash opportuniste',secteur:'Monétaire',zone_geo:'Europe',pct_cible:15,prix_revient:0,valeur_actuelle:0,dca_mensuel:0,stop_loss:'N/A',take_profit:'Déployer si S&P -25%',seuil_haut:0,seuil_bas:10,statut:'actif',notes:'3,5%/an.',updated:''},
+  ]
+};
+
+// ===================== STATE =====================
+
+let _fin_fin_editEnv = null, _fin_editId = null;
+let _finGeoChart=null,_finSecChart=null,_finProjChart=null,_finPeaChart=null,_finCtoChart=null,_finSparkChart=null;
+
+function init(){
+  const s = localStorage.getItem('fin2_v1');
+  FD = s ? JSON.parse(s) : JSON.parse(JSON.stringify(FIN_DEF));
+  syncSettings();
+  renderAll();
+}
+
+function save(){
+  localStorage.setItem('fin2_v1', JSON.stringify(D));
+}
+
+function syncSettings(){
+  const s = FD.settings;
+  document.getElementById('s-dca').value       = s.dca_mensuel||300;
+  document.getElementById('s-capital').value   = s.capital_depart||1033;
+  document.getElementById('s-rendement').value = s.rendement_vise||15;
+  document.getElementById('s-objectif').value  = s.objectif_20ans||620000;
+  document.getElementById('proj-dca').value    = s.dca_mensuel||300;
+  document.getElementById('proj-cap').value    = s.capital_depart||1033;
+  document.getElementById('proj-taux').value   = s.rendement_vise||15;
+}
+
+function saveSettings(){
+  FD.settings.dca_mensuel    = parseFloat(document.getElementById('s-dca').value)||300;
+  FD.settings.capital_depart = parseFloat(document.getElementById('s-capital').value)||1033;
+  FD.settings.rendement_vise = parseFloat(document.getElementById('s-rendement').value)||15;
+  FD.settings.objectif_20ans = parseFloat(document.getElementById('s-objectif').value)||620000;
+  save(); syncSettings(); renderAll();
+}
+
+function renderAll(){
+  renderOverview();
+  renderTable('pea');
+  renderTable('cto');
+  renderGraphs();
+  renderSparkline();
+}
+
+// ===================== UTILS =====================
+function fmtN(v,dec=0){return isNaN(v)?'—':v.toLocaleString('fr-FR',{minimumFractionDigits:dec,maximumFractionDigits:dec});}
+function fmtPct(v,dec=1){return isNaN(v)?'—':((v>=0?'+':'')+v.toFixed(dec)+'%');}
+function fmtEur(v){return fmtN(v,0)+' €';}
+function perfColor(v){return v>0?'pos':v<0?'neg':'neutral';}
+function ecartClass(v){const a=Math.abs(v);return a<3?'e-ok':a<5?'e-warn':'e-danger';}
+function pocheClass(p){
+  const m={'Base':'p-base','Boost':'p-boost','Solide':'p-solide','Spéculatif':'p-specu','Levier ×2':'p-levier','Crypto':'p-crypto','Actions US':'p-actions','Cash opportuniste':'p-cash','Héritage':'p-heritage'};
+  return m[p]||'p-base';
+}
+function now(){return new Date().toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});}
+
+// ===================== OVERVIEW =====================
+function renderOverview(){
+  const peaInv  = FD.pea.reduce((s,a)=>s+(a.prix_revient||0),0);
+  const peaVal  = FD.pea.reduce((s,a)=>s+(a.valeur_actuelle||0),0);
+  const ctoInv  = FD.cto.reduce((s,a)=>s+(a.prix_revient||0),0);
+  const ctoVal  = FD.cto.reduce((s,a)=>s+(a.valeur_actuelle||0),0);
+  const totInv  = peaInv+ctoInv;
+  const totVal  = peaVal+ctoVal;
+  const totPerf = totInv>0?(totVal-totInv)/totInv*100:0;
+  const totPerfE= totVal-totInv;
+  const dca     = FD.settings.dca_mensuel||300;
+
+  document.getElementById('kpi-grid').innerHTML=[
+    {l:'Capital investi',v:fmtEur(totInv),s:'Total versé'},
+    {l:'Valeur actuelle',v:fmtEur(totVal),s:'PEA + CTO + Crypto',c:totPerfE>=0?'var(--success)':'var(--danger)'},
+    {l:'Performance',v:(totPerfE>=0?'+':'')+fmtEur(totPerfE),s:fmtPct(totPerf),c:totPerfE>=0?'var(--success)':'var(--danger)'},
+    {l:'DCA mensuel',v:fmtEur(dca),s:'Versement auto'},
+  ].map(k=>`<div class="kpi"><div class="kpi-lbl">${k.l}</div><div class="kpi-val" style="${k.c?'color:'+k.c:''}">${k.v}</div><div class="kpi-sub">${k.s}</div></div>`).join('');
+
+  // Env table
+  document.getElementById('env-tbody').innerHTML=[
+    {n:'PEA',inv:peaInv,val:peaVal,nb:FD.pea.length},
+    {n:'CTO / Crypto',inv:ctoInv,val:ctoVal,nb:FD.cto.length},
+  ].map(r=>{
+    const pe=r.inv>0?(r.val-r.inv)/r.inv*100:0;
+    const pe2=r.val-r.inv;
+    return`<tr><td style="font-weight:700">${r.n}</td><td>${fmtEur(r.inv)}</td><td>${fmtEur(r.val)}</td><td class="${perfColor(pe2)}">${pe2>=0?'+':''}${fmtEur(pe2)}</td><td class="${perfColor(pe)}">${fmtPct(pe)}</td><td>${r.nb}</td></tr>`;
+  }).join('');
+
+  renderGeoChart(totVal);
+  renderSecChart(totVal);
+}
+
+function renderGeoChart(totVal){
+  const map={};
+  [...FD.pea,...FD.cto].forEach(a=>{
+    if(!a.zone_geo||!a.valeur_actuelle)return;
+    map[a.zone_geo]=(map[a.zone_geo]||0)+a.valeur_actuelle;
+  });
+  const labels=Object.keys(map),data=Object.values(map);
+  const colors=['#a060ff','#60a0ff','#40d0a0','#c8a96e','#ff4060','#f7931a','#60d0ff','#d060ff'];
+  const ctx=document.getElementById('chart-geo');
+  if(_finGeoChart)_finGeoChart.destroy();
+  _finGeoChart=new Chart(ctx,{type:'doughnut',data:{labels,datasets:[{data,backgroundColor:colors.slice(0,labels.length),borderWidth:0}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{color:'#888',font:{size:10},boxWidth:10}}}}});
+}
+
+function renderSecChart(){
+  const map={};
+  [...FD.pea,...FD.cto].forEach(a=>{
+    if(!a.secteur||!a.valeur_actuelle)return;
+    const k=a.secteur.split('/')[0].trim().split(' ')[0];
+    map[k]=(map[k]||0)+a.valeur_actuelle;
+  });
+  const labels=Object.keys(map),data=Object.values(map);
+  const colors=['#a060ff','#60a0ff','#40d0a0','#c8a96e','#ff4060','#f7931a','#60d0ff','#d060ff','#80ff60','#ff8060'];
+  const ctx=document.getElementById('chart-sec');
+  if(_finSecChart)_finSecChart.destroy();
+  _finSecChart=new Chart(ctx,{type:'doughnut',data:{labels,datasets:[{data,backgroundColor:colors.slice(0,labels.length),borderWidth:0}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{color:'#888',font:{size:10},boxWidth:10}}}}});
+}
+
+// ===================== TABLE =====================
+function renderTable(env){
+  const assets=FD[env];
+  const total=assets.reduce((s,a)=>s+(a.valeur_actuelle||0),0);
+  const totInv=assets.reduce((s,a)=>s+(a.prix_revient||0),0);
+  const tbody=document.getElementById(env+'-tbody');
+  const tfoot=document.getElementById(env+'-tfoot');
+
+  tbody.innerHTML=assets.map(a=>{
+    const pr=a.prix_revient||0,val=a.valeur_actuelle||0;
+    const perf=val-pr;
+    const perfPct=pr>0?(val-pr)/pr*100:0;
+    const pctReel=total>0?val/total*100:0;
+    const ecart=pctReel-(a.pct_cible||0);
+    const statCls=a.statut==='actif'?'b-actif':a.statut==='surveillance'?'b-surv':'b-stop';
+    const isLevierBad=a.seuil_haut>0&&pctReel>a.seuil_haut;
+
+    return`<tr>
+      <td>
+        <div style="font-weight:600;font-size:13px">${a.nom}</div>
+        <div style="font-size:10px;color:var(--muted)">${a.ticker}${a.isin?' · '+a.isin:''}</div>
+        ${isLevierBad?'<span class="badge b-rebal">⚠ REBALANCING OBLIGATOIRE</span>':''}
+        ${a.notes?'<div style="font-size:10px;color:var(--muted);margin-top:2px">'+a.notes+'</div>':''}
+      </td>
+      <td><span class="${pocheClass(a.poche)}">${a.poche}</span></td>
+      <td>
+        <span class="editable" contenteditable="true" 
+          onblur="updateField('${env}','${a.id}','prix_revient',this.textContent)"
+          onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur()}">${fmtN(pr,2)}</span>
+      </td>
+      <td>
+        <span class="editable" contenteditable="true"
+          onblur="updateField('${env}','${a.id}','valeur_actuelle',this.textContent)"
+          onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur()}">${fmtN(val,2)}</span>
+        ${a.updated?'<span class="updated">'+a.updated+'</span>':''}
+      </td>
+      <td class="${perfColor(perf)}">${perf>=0?'+':''}${fmtEur(perf)}<br><span style="font-size:10px">${fmtPct(perfPct)}</span></td>
+      <td style="font-family:var(--mono);font-size:11px">${fmtN(pctReel,1)}%</td>
+      <td style="font-family:var(--mono);font-size:11px">${a.pct_cible||0}%</td>
+      <td class="${ecartClass(ecart)}" style="font-family:var(--mono);font-size:11px;font-weight:600">${ecart>=0?'+':''}${fmtN(ecart,1)}pts</td>
+      <td class="hide-mobile" style="font-family:var(--mono);font-size:11px">${a.dca_mensuel||0} €</td>
+      <td><span class="badge ${statCls}">${a.statut}</span></td>
+      <td style="white-space:nowrap">
+        <button class="btn-icon" onclick="openEdit('${env}','${a.id}')" title="Éditer">✏️</button>
+        <button class="btn-icon" onclick="confirmDelete('${env}','${a.id}')" title="Supprimer">🗑</button>
+      </td>
+    </tr>`;
+  }).join('');
+
+  const totDca=assets.reduce((s,a)=>s+(a.dca_mensuel||0),0);
+  const totCible=assets.reduce((s,a)=>s+(a.pct_cible||0),0);
+  const totPerf=totInv>0?(total-totInv)/totInv*100:0;
+  tfoot.innerHTML=`
+    <td colspan="2">TOTAL (${assets.length})</td>
+    <td>${fmtEur(totInv)}</td>
+    <td>${fmtEur(total)}</td>
+    <td class="${perfColor(total-totInv)}">${total-totInv>=0?'+':''}${fmtEur(total-totInv)}<br><span style="font-size:10px">${fmtPct(totPerf)}</span></td>
+    <td>100%</td><td>${totCible}%</td><td>—</td>
+    <td class="hide-mobile">${fmtEur(totDca)}/mois</td>
+    <td colspan="2"></td>`;
+}
+
+function updateField(env,id,field,rawVal){
+  const a=FD[env].find(x=>x.id===id);
+  if(!a)return;
+  const val=parseFloat(rawVal.replace(/\s/g,'').replace(',','.'))||0;
+  a[field]=val;
+  if(field==='valeur_actuelle'){
+    a.updated=now();
+    // Historiser
+    const totVal=[...FD.pea,...FD.cto].reduce((s,x)=>s+(x.valeur_actuelle||0),0);
+    if(!FD.history)FD.history=[];
+    FD.history.push({d:new Date().toISOString().slice(0,10),v:totVal});
+    if(FD.history.length>12)FD.history=FD.history.slice(-12);
+  }
+  save();
+  renderAll();
+}
+
+// ===================== GRAPHIQUES =====================
+function renderGraphs(){
+  renderRepartChart('pea');
+  renderRepartChart('cto');
+  renderProj();
+}
+
+function renderRepartChart(env){
+  const assets=FD[env];
+  const total=assets.reduce((s,a)=>s+(a.valeur_actuelle||0),0);
+  const labels=assets.map(a=>a.ticker);
+  const reels=assets.map(a=>total>0?parseFloat((a.valeur_actuelle/total*100).toFixed(1)):0);
+  const cibles=assets.map(a=>a.pct_cible||0);
+  const colors=reels.map((r,i)=>{
+    const e=Math.abs(r-(cibles[i]||0));
+    return e<3?'rgba(64,208,160,.7)':e<5?'rgba(200,169,110,.7)':'rgba(255,64,96,.7)';
+  });
+  const ctx=document.getElementById('chart-'+env+'-repart');
+  if(env==='pea'&&_finPeaChart){_finPeaChart.destroy();_finPeaChart=null;}
+  if(env==='cto'&&_finCtoChart){_finCtoChart.destroy();_finCtoChart=null;}
+  const ch=new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels,
+      datasets:[
+        {label:'Cible %',data:cibles,backgroundColor:'rgba(96,160,255,.3)',borderColor:'rgba(96,160,255,.6)',borderWidth:1},
+        {label:'Réel %',data:reels,backgroundColor:colors,borderWidth:0}
+      ]
+    },
+    options:{
+      indexAxis:'y',responsive:true,
+      plugins:{legend:{labels:{color:'#888',font:{size:10}}}},
+      scales:{
+        x:{grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#888',font:{size:10},callback:v=>v+'%'}},
+        y:{grid:{display:false},ticks:{color:'#aaa',font:{size:10}}}
+      }
+    }
+  });
+  if(env==='pea')_finPeaChart=ch; else _finCtoChart=ch;
+}
+
+function renderProj(){
+  const dca=parseFloat(document.getElementById('proj-dca')?.value)||300;
+  const cap=parseFloat(document.getElementById('proj-cap')?.value)||1033;
+  const taux=parseFloat(document.getElementById('proj-taux')?.value)||15;
+  const duree=20;
+  function calc(t){
+    const tm=t/100/12;let v=cap;
+    return Array.from({length:duree+1},(_,y)=>{if(y===0)return Math.round(v);for(let m=0;m<12;m++)v=v*(1+tm)+dca;return Math.round(v);});
+  }
+  const labels=Array.from({length:duree+1},(_,i)=>'An '+i);
+  const port=calc(taux),sp=calc(10),li=calc(3),bai=calc(7);
+  const ctx=document.getElementById('proj-chart');
+  if(_finProjChart)_finProjChart.destroy();
+  _finProjChart=new Chart(ctx,{
+    type:'line',
+    data:{labels,datasets:[
+      {label:'Mon portefeuille ('+taux+'%)',data:port,borderColor:'#40d0a0',backgroundColor:'rgba(64,208,160,.06)',borderWidth:2.5,fill:true,tension:.3,pointRadius:0},
+      {label:'S&P500 (10%)',data:sp,borderColor:'#60a0ff',backgroundColor:'transparent',borderWidth:1.5,tension:.3,pointRadius:0},
+      {label:'Livret A (3%)',data:li,borderColor:'#888',borderDash:[5,5],backgroundColor:'transparent',borderWidth:1.5,tension:.3,pointRadius:0},
+      {label:'Baissier (7%)',data:bai,borderColor:'#c8a96e',borderDash:[3,3],backgroundColor:'transparent',borderWidth:1.5,tension:.3,pointRadius:0},
+    ]},
+    options:{responsive:true,plugins:{legend:{labels:{color:'#888',font:{size:10},boxWidth:14}}},scales:{x:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#888',font:{size:9}}},y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#888',font:{size:9},callback:v=>(v/1000).toFixed(0)+'k€'}}}}
+  });
+  const jalonsEl=document.getElementById('jalons');
+  jalonsEl.innerHTML=[5,10,15,20].map(y=>`
+    <div class="jalon">
+      <div class="jalon-yr">An ${y}</div>
+      <div class="jalon-val">${(port[y]/1000).toFixed(0)}k€</div>
+      <div class="jalon-dca">${fmtEur(dca*12*y)} versés</div>
+    </div>`).join('');
+}
+
+function renderSparkline(){
+  if(!FD.history||FD.history.length<2)return;
+  const ctx=document.getElementById('sparkline');
+  if(_finSparkChart)_finSparkChart.destroy();
+  _finSparkChart=new Chart(ctx,{
+    type:'line',
+    data:{
+      labels:FD.history.map(h=>h.d),
+      datasets:[{data:FD.history.map(h=>h.v),borderColor:'#a060ff',backgroundColor:'rgba(160,96,255,.08)',borderWidth:2,fill:true,tension:.3,pointRadius:3,pointBackgroundColor:'#a060ff'}]
+    },
+    options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#888',font:{size:9}}},y:{ticks:{color:'#888',font:{size:9},callback:v=>fmtEur(v)},grid:{color:'rgba(255,255,255,.04)'}}}}
+  });
+}
+
+// ===================== MODAL =====================
+function openAdd(env){
+  _fin_editEnv=env; _fin_editId=null;
+  document.getElementById('modal-title').textContent='Ajouter — '+env.toUpperCase();
+  clearModal();
+  document.getElementById('btn-delete').style.display='none';
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function openEdit(env,id){
+  _fin_editEnv=env; _fin_editId=id;
+  const a=FD[env].find(x=>x.id===id);
+  if(!a)return;
+  document.getElementById('modal-title').textContent='Modifier — '+a.nom;
+  document.getElementById('f-nom').value=a.nom||'';
+  document.getElementById('f-ticker').value=a.ticker||'';
+  document.getElementById('f-isin').value=a.isin||'';
+  document.getElementById('f-poche').value=a.poche||'Base';
+  document.getElementById('f-secteur').value=a.secteur||'';
+  document.getElementById('f-zone').value=a.zone_geo||'';
+  document.getElementById('f-pct').value=a.pct_cible||'';
+  document.getElementById('f-pr').value=a.prix_revient||'';
+  document.getElementById('f-val').value=a.valeur_actuelle||'';
+  document.getElementById('f-dca').value=a.dca_mensuel||'';
+  document.getElementById('f-sh').value=a.seuil_haut||'';
+  document.getElementById('f-sb').value=a.seuil_bas||'';
+  document.getElementById('f-stop').value=a.stop_loss||'';
+  document.getElementById('f-tp').value=a.take_profit||'';
+  document.getElementById('f-statut').value=a.statut||'actif';
+  document.getElementById('f-notes').value=a.notes||'';
+  document.getElementById('btn-delete').style.display='inline-block';
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function clearModal(){
+  ['f-nom','f-ticker','f-isin','f-secteur','f-zone','f-pct','f-pr','f-val','f-dca','f-sh','f-sb','f-stop','f-tp','f-notes'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('f-poche').value='Base';
+  document.getElementById('f-statut').value='actif';
+}
+function closeModal(){document.getElementById('modal-overlay').classList.remove('open');}
+function saveAsset(){
+  const asset={
+    id:_fin_editId||(_fin_editEnv+'_'+Date.now()),
+    nom:document.getElementById('f-nom').value,
+    ticker:document.getElementById('f-ticker').value.toUpperCase(),
+    isin:document.getElementById('f-isin').value,
+    poche:document.getElementById('f-poche').value,
+    secteur:document.getElementById('f-secteur').value,
+    zone_geo:document.getElementById('f-zone').value,
+    pct_cible:parseFloat(document.getElementById('f-pct').value)||0,
+    prix_revient:parseFloat(document.getElementById('f-pr').value)||0,
+    valeur_actuelle:parseFloat(document.getElementById('f-val').value)||0,
+    dca_mensuel:parseFloat(document.getElementById('f-dca').value)||0,
+    seuil_haut:parseFloat(document.getElementById('f-sh').value)||0,
+    seuil_bas:parseFloat(document.getElementById('f-sb').value)||0,
+    stop_loss:document.getElementById('f-stop').value,
+    take_profit:document.getElementById('f-tp').value,
+    statut:document.getElementById('f-statut').value,
+    notes:document.getElementById('f-notes').value,
+    updated:'',
+  };
+  if(_fin_editId){const i=FD[_fin_editEnv].findIndex(a=>a.id===_fin_editId);if(i>=0)FD[_fin_editEnv][i]=asset;}
+  else FD[_fin_editEnv].push(asset);
+  save(); closeModal(); renderAll();
+}
+function deleteAsset(){
+  if(!confirm('Supprimer cet actif ?'))return;
+  FD[_fin_editEnv]=FD[_fin_editEnv].filter(a=>a.id!==_fin_editId);
+  save(); closeModal(); renderAll();
+}
+function confirmDelete(env,id){
+  const a=FD[env].find(x=>x.id===id);
+  if(!a)return;
+  if(!confirm('Supprimer "'+a.nom+'" ?'))return;
+  FD[env]=FD[env].filter(x=>x.id!==id);
+  save(); renderAll();
+}
+
+// ===================== NAV =====================
+function go(id){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('s-'+id).classList.add('active');
+  event.currentTarget.classList.add('active');
+  if(id==='graphs')renderGraphs();
+}
+
+// ===================== EXPORT/IMPORT/RESET =====================
+function exportJSON(){
+  const blob=new Blob([JSON.stringify(D,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='finance_'+new Date().toISOString().slice(0,10)+'.json';a.click();
+}
+function importJSON(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{try{FD=JSON.parse(ev.target.result);save();renderAll();syncSettings();alert('✅ Importé !');}catch{alert('❌ Fichier invalide');}};
+  r.readAsText(f);
+}
+function resetConfirm(){
+  if(!confirm('Remettre les données par défaut ?'))return;
+  if(!confirm('Confirmé ? Toutes tes données seront effacées.'))return;
+  FD=JSON.parse(JSON.stringify(FIN_DEF));save();renderAll();syncSettings();
+}
+
+init();
 
 // ==================== PWA ====================
 if ('serviceWorker' in navigator) {
@@ -13294,4 +14834,47 @@ renderDashboard();
 </script>
 </body>
 </html>
+<!-- ===== INVESTISSEMENTS ===== -->
+<div id="s-investissements" class="section">
+  <iframe 
+    src="finance2.html" 
+    id="finance-iframe"
+    style="width:100%;height:calc(100vh - 60px);border:none;border-radius:0;display:block"
+    allow="clipboard-write"
+  ></iframe>
+</div>
+
+
+
+<!-- Modal actif finance -->
+<div class="overlay" id="modal-overlay">
+  <div class="modal">
+    <h3 id="modal-title">Ajouter un actif</h3>
+    <div class="modal-grid">
+      <div class="field"><label>Nom</label><input id="f-nom"></div>
+      <div class="field"><label>Ticker</label><input id="f-ticker"></div>
+      <div class="field"><label>ISIN</label><input id="f-isin"></div>
+      <div class="field"><label>Poche</label><select id="f-poche"><option>Base</option><option>Boost</option><option>Solide</option><option>Spéculatif</option><option>Levier ×2</option><option>Crypto</option><option>Actions US</option><option>Cash opportuniste</option><option>Héritage</option></select></div>
+      <div class="field"><label>Secteur</label><input id="f-secteur"></div>
+      <div class="field"><label>Zone géo</label><input id="f-zone"></div>
+      <div class="field"><label>% Cible</label><input id="f-pct" type="number" step="0.5"></div>
+      <div class="field"><label>Prix de revient (€)</label><input id="f-pr" type="number" step="0.01"></div>
+      <div class="field"><label>Valeur actuelle (€)</label><input id="f-val" type="number" step="0.01"></div>
+      <div class="field"><label>DCA mensuel (€)</label><input id="f-dca" type="number"></div>
+      <div class="field"><label>Seuil rebal haut (%)</label><input id="f-sh" type="number"></div>
+      <div class="field"><label>Seuil rebal bas (%)</label><input id="f-sb" type="number"></div>
+      <div class="field"><label>Stop loss</label><input id="f-stop"></div>
+      <div class="field"><label>Take profit</label><input id="f-tp"></div>
+      <div class="field"><label>Statut</label><select id="f-statut"><option value="actif">Actif</option><option value="surveillance">Surveillance</option><option value="stop">Stop</option></select></div>
+      <div class="field" style="grid-column:1/-1"><label>Notes / Thèse</label><textarea id="f-notes" rows="3"></textarea></div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:16px;justify-content:flex-end">
+      <button class="btn" style="background:rgba(255,64,96,.1);color:var(--danger);border:1px solid rgba(255,64,96,.2);font-size:12px;display:none;margin-right:auto" id="btn-delete" onclick="deleteAsset()">🗑 Supprimer</button>
+      <button class="btn btn-ghost" style="font-size:12px" onclick="closeModal()">Annuler</button>
+      <button class="btn btn-primary" style="font-size:12px" onclick="saveAsset()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+
 
