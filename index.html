@@ -6615,7 +6615,7 @@ function fcGetData() {
   return data.flashcards;
 }
 
-function fcSave() { save(); }
+function fcSave() { finSave(); }
 
 function fcTab(tab) {
   ['study','decks','create'].forEach(t => {
@@ -6918,7 +6918,7 @@ function addHabit() {
   const n = document.getElementById('hab-name').value.trim();
   if (!n) return;
   data.habitudes.push({ id: Date.now(), name: n, cat: document.getElementById('hab-cat').value, time: document.getElementById('hab-time').value, streak: 0 });
-  save();
+  finSave();
   document.getElementById('hab-name').value = '';
   document.getElementById('hab-time').value = '';
   renderHabitudes();
@@ -6932,13 +6932,13 @@ function toggleHabit(id) {
     const allDone = data.habitudes.every(h => data.habitDone[today() + h.id]);
     if (allDone && data.habitudes.length > 0) gainXP('habit_all', 25);
   }
-  save();
+  finSave();
   if (activeSection === 'dashboard') renderDashboard();
   if (activeSection === 'habitudes') renderHabitudes();
 }
 function deleteHabit(id) {
   data.habitudes = data.habitudes.filter(h => h.id !== id);
-  save(); renderHabitudes();
+  finSave(); renderHabitudes();
 }
 function renderHabitudes() {
   renderSmartTrackers();
@@ -7151,7 +7151,7 @@ function insertLink(title) {
 function newNote() {
   currentNoteId = Date.now();
   data.notes.unshift({ id: currentNoteId, title: 'Nouvelle note', content: '', tags: '', date: new Date().toISOString() });
-  save();
+  finSave();
   document.getElementById('note-title-input').value = 'Nouvelle note';
   document.getElementById('note-content').value = '';
   document.getElementById('note-tags').value = '';
@@ -7168,7 +7168,7 @@ function saveNote() {
     n.content = document.getElementById('note-content').value;
     n.tags = document.getElementById('note-tags').value;
     n.date = new Date().toISOString();
-    save();
+    finSave();
     renderNotes();
     renderBacklinks();
   }
@@ -7178,7 +7178,7 @@ function deleteNote() {
   if (!currentNoteId) return;
   data.notes = data.notes.filter(n => n.id !== currentNoteId);
   currentNoteId = null;
-  save();
+  finSave();
   document.getElementById('note-title-input').value = '';
   document.getElementById('note-content').value = '';
   document.getElementById('note-tags').value = '';
@@ -7391,7 +7391,7 @@ function addCours() {
     link: document.getElementById('cours-link').value, prog: parseInt(document.getElementById('cours-prog').value) || 0,
     notes: document.getElementById('cours-notes').value, date: new Date().toISOString()
   });
-  save();
+  finSave();
   document.getElementById('cours-title').value = '';
   document.getElementById('cours-link').value = '';
   document.getElementById('cours-prog').value = '';
@@ -7400,7 +7400,7 @@ function addCours() {
 }
 function deleteCours(id) {
   data.cours = data.cours.filter(c => c.id !== id);
-  save(); renderCours();
+  finSave(); renderCours();
 }
 function renderCours() {
   const typeIcons = { 'Cours en ligne': '💻', 'Livre': '📚', 'Podcast': '🎧', 'Vidéo YouTube': '▶', 'Article': '📰', 'Autre': '◈' };
@@ -7831,7 +7831,7 @@ function anaBuy() {
     type: 'Action',
     date: new Date().toISOString().slice(0,10),
   });
-  save();
+  finSave();
   alert('✅ ' + _anaCurrentName + ' ajouté à ton portefeuille !');
   invTab('portfolio');
 }
@@ -8068,7 +8068,7 @@ function addInvestissement() {
     horizon: document.getElementById('inv-horizon').value,
     notes: document.getElementById('inv-notes').value
   });
-  save();
+  finSave();
   ['inv-name','inv-nb-actions','inv-prix-achat','inv-prix-now','inv-amount-free','inv-current-free','inv-date','inv-notes'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
   document.getElementById('inv-calc-total').textContent = '0 €';
   document.getElementById('inv-calc-current').textContent = '0 €';
@@ -8076,7 +8076,7 @@ function addInvestissement() {
 }
 function deleteInvestissement(id) {
   data.investissements = data.investissements.filter(i => i.id !== id);
-  save(); renderInvestissements();
+  finSave(); renderInvestissements();
 }
 
 // ---- Clôture d'une position ----
@@ -8130,7 +8130,7 @@ function confirmCloture() {
     notes: inv.notes
   });
   data.investissements = data.investissements.filter(i => i.id !== cloturePendingId);
-  save();
+  finSave();
   closeCloture();
   renderInvestissements();
 }
@@ -8141,7 +8141,7 @@ function closeCloture() {
 
 function deleteTradeCloture(id) {
   data.tradesClotured = (data.tradesClotured || []).filter(t => t.id !== id);
-  save(); renderInvestissements();
+  finSave(); renderInvestissements();
 }
 function renderInvestissements() {
   // Initialiser l'onglet actif
@@ -8311,13 +8311,13 @@ function addDca() {
     notes: document.getElementById('dca-notes').value,
     date: document.getElementById('dca-date').value || today()
   });
-  save();
+  finSave();
   ['dca-actif','dca-montant','dca-prix','dca-nb-actions','dca-prix-action','dca-date','dca-notes'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
   document.getElementById('dca-calc-parts').textContent = '0';
   document.getElementById('dca-calc-montant-actions').textContent = '0 €';
   renderDca();
 }
-function deleteDca(id) { data.dca = data.dca.filter(d => d.id !== id); save(); renderDca(); }
+function deleteDca(id) { data.dca = data.dca.filter(d => d.id !== id); finSave(); renderDca(); }
 function renderDca() {
   const allEntries = data.dca;
 
@@ -8463,12 +8463,12 @@ function addPokemon() {
     date: document.getElementById('poke-date').value || today(),
     notes: document.getElementById('poke-notes').value
   });
-  save();
+  finSave();
   ['poke-name','poke-set','poke-achat-prix','poke-valeur-prix','poke-notes'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('poke-qty').value = '1';
   renderPokemon();
 }
-function deletePokemon(id) { data.pokemon = data.pokemon.filter(p => p.id !== id); save(); renderPokemon(); }
+function deletePokemon(id) { data.pokemon = data.pokemon.filter(p => p.id !== id); finSave(); renderPokemon(); }
 function renderPokemon() {
   const search = (document.getElementById('poke-search') ? document.getElementById('poke-search').value : '').toLowerCase();
   const all = data.pokemon;
@@ -8555,7 +8555,7 @@ function saveJournal() {
     gratitude: [document.getElementById('grat1').value, document.getElementById('grat2').value, document.getElementById('grat3').value].filter(Boolean),
     ts: new Date().toISOString()
   });
-  save();
+  finSave();
   ['journal-entry','grat1','grat2','grat3','mood-score'].forEach(id => document.getElementById(id).value = '');
   selectedMood = null;
   document.querySelectorAll('#mood-selector .feeling-btn').forEach(b => b.classList.remove('selected'));
@@ -9005,11 +9005,11 @@ function addToWatchlist() {
   if (!currentSymbol) return;
   if (data.watchlist.find(w => w.symbol === currentSymbol)) { alert('Déjà dans ta watchlist !'); return; }
   data.watchlist.push({ symbol: currentSymbol, price: currentPrice, addedAt: today() });
-  save(); renderWatchlist();
+  finSave(); renderWatchlist();
 }
 function removeFromWatchlist(symbol) {
   data.watchlist = data.watchlist.filter(w => w.symbol !== symbol);
-  save(); renderWatchlist();
+  finSave(); renderWatchlist();
 }
 async function refreshWatchlistItem(symbol) {
   try {
@@ -9019,7 +9019,7 @@ async function refreshWatchlistItem(symbol) {
     const q = json['Global Quote'];
     if (q && q['05. price']) {
       const item = data.watchlist.find(w => w.symbol === symbol);
-      if (item) { item.price = parseFloat(q['05. price']); item.change = parseFloat(q['10. change percent']); save(); renderWatchlist(); }
+      if (item) { item.price = parseFloat(q['05. price']); item.change = parseFloat(q['10. change percent']); finSave(); renderWatchlist(); }
     }
   } catch(e) {}
 }
@@ -10705,7 +10705,7 @@ function updateMusicUI(playing) {
 }
 
 function setFocusTheme(theme) {
-  data.focusTheme = theme; save();
+  data.focusTheme = theme; finSave();
   applyFocusThemeToScene(theme);
   ['default','lofi','bar','lib','foret'].forEach(t => {
     const c = document.getElementById('ftheme-card-' + t);
@@ -10829,7 +10829,7 @@ function savePomodurations() {
   const s = parseInt(document.getElementById('pomo-dur-short')?.value) || 5;
   const l = parseInt(document.getElementById('pomo-dur-long')?.value)  || 15;
   data.pomoDurations = { work: w, short: s, long: l };
-  save();
+  finSave();
   // Mettre à jour POMO_MODES
   POMO_MODES.work.secs  = w * 60;
   POMO_MODES.short.secs = s * 60;
@@ -10872,7 +10872,7 @@ async function requestNotifPermission() {
   updateNotifPermissionUI();
   if (perm === 'granted') {
     data.notifsOn = true;
-    save();
+    finSave();
     updateNotifUI();
     sendNotif('✦ Ikigai', 'Notifications activées ! Tu recevras tes rappels ici.', '✦');
     startNotifScheduler();
@@ -10885,7 +10885,7 @@ function toggleNotifs() {
     return;
   }
   data.notifsOn = !data.notifsOn;
-  save();
+  finSave();
   updateNotifUI();
   if (data.notifsOn) startNotifScheduler();
   else stopNotifScheduler();
@@ -10894,7 +10894,7 @@ function toggleNotifs() {
 function toggleNotifType(type) {
   if (!data.notifTypes) data.notifTypes = { pomo:true, eau:true, objectifs:true, streak:true };
   data.notifTypes[type] = !data.notifTypes[type];
-  save();
+  finSave();
   updateNotifUI();
 }
 
@@ -10971,7 +10971,7 @@ function checkScheduledNotifs() {
       const remaining = eauGoal - eauCur;
       sendNotif('💧 Hydratation', `Il te reste ${remaining}ml à boire aujourd'hui. Tu es à ${Math.round(eauCur/eauGoal*100)}% de ton objectif !`, '💧');
       data.lastEauNotif = notifHour;
-      save();
+      finSave();
     }
   }
 
@@ -10984,7 +10984,7 @@ function checkScheduledNotifs() {
       if (total > 0 && doneCount === 0) {
         sendNotif('🎯 Objectifs du jour', `Tu as ${total} objectif${total>1?'s':''} pour aujourd'hui. Commence maintenant !`, '🎯');
         data.lastObjNotif = key;
-        save();
+        finSave();
       }
     }
   }
@@ -11005,7 +11005,7 @@ function checkScheduledNotifs() {
             : `Il te reste ${missing} habitude${missing>1?'s':''} à faire aujourd'hui.`;
           sendNotif('🔥 Streak en danger !', msg, '🔥');
           data.lastStreakNotif = key;
-          save();
+          finSave();
         }
       }
     }
@@ -11086,13 +11086,13 @@ function previewPomoSound(type) {
 
 function togglePomoSound() {
   data.pomoSoundOff = !data.pomoSoundOff;
-  save();
+  finSave();
   updatePomoSoundUI();
 }
 
 function setPomoSoundVol(val) {
   data.pomoSoundVol = parseInt(val);
-  save();
+  finSave();
   const label = document.getElementById('pomo-sound-vol-label');
   if (label) label.textContent = val + '%';
 }
@@ -11612,7 +11612,7 @@ function finishSportSeance(progId) {
   gainXP('sport', 30);
   if (!data.sportHistory) data.sportHistory = [];
   data.sportHistory.unshift({ title:prog.title, duration:prog.duration, date:new Date().toLocaleDateString('fr-FR'), time:new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}) });
-  save();
+  finSave();
   playPomoSound('long');
   document.getElementById('sport-active-seance').innerHTML = `
     <div class="card" style="text-align:center;padding:40px">
@@ -12012,7 +12012,7 @@ function saveMeditSession(prog) {
   if (!data.meditHistory) data.meditHistory = [];
   data.meditHistory.unshift({ title: prog.title, duration: prog.duration, date: new Date().toLocaleDateString('fr-FR'), time: new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}) });
   if (data.meditHistory.length > 50) data.meditHistory.pop();
-  save();
+  finSave();
 }
 
 function renderMeditHistory() {
@@ -12231,7 +12231,7 @@ function saveYogaSession(prog) {
   if (!data.yogaHistory) data.yogaHistory = [];
   data.yogaHistory.unshift({ title: prog.title, duration: prog.duration, date: new Date().toLocaleDateString('fr-FR'), time: new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}) });
   if (data.yogaHistory.length > 50) data.yogaHistory.pop();
-  save();
+  finSave();
 }
 
 function renderYogaHistory() {
@@ -12276,7 +12276,7 @@ const GROUP_SECTIONS = { organisation:'nav-section-organisation', savoir:'nav-se
 function toggleModule(id) {
   if (!data.modules) data.modules = {};
   data.modules[id] = data.modules[id] === false ? true : false;
-  save(); applyModules(); renderModulesList();
+  finSave(); applyModules(); renderModulesList();
 }
 
 function applyModules() {
@@ -12320,7 +12320,7 @@ function renderModulesList() {
 
 function toggleMobileMode() {
   data.mobileMode = !data.mobileMode;
-  save();
+  finSave();
   applyMobileMode();
 }
 
@@ -12443,7 +12443,7 @@ const THEMES = { dark:{name:'Sombre Doré'}, light:{name:'Clair'}, manga:{name:'
 function applyTheme(theme) {
   Object.keys(THEMES).forEach(t => document.body.classList.remove('theme-'+t));
   if (theme !== 'dark') document.body.classList.add('theme-'+theme);
-  data.theme = theme; save();
+  data.theme = theme; finSave();
   document.querySelectorAll('[id^="theme-card-"]').forEach(el => {
     const t = el.id.replace('theme-card-','');
     el.style.borderColor = t===theme ? 'var(--accent)' : 'transparent';
@@ -12510,7 +12510,7 @@ function exportData() {
 function importData(e) {
   const file = e.target.files[0]; if(!file) return;
   const r = new FileReader();
-  r.onload = ev => { try { Object.assign(data,JSON.parse(ev.target.result)); save(); if(data.theme)applyTheme(data.theme); renderDashboard(); alert('✅ Importé !'); } catch(err){ alert('❌ Fichier invalide'); } };
+  r.onload = ev => { try { Object.assign(data,JSON.parse(ev.target.result)); finSave(); if(data.theme)applyTheme(data.theme); renderDashboard(); alert('✅ Importé !'); } catch(err){ alert('❌ Fichier invalide'); } };
   r.readAsText(file);
 }
 if (data.theme && data.theme !== 'dark') applyTheme(data.theme);
@@ -12521,7 +12521,7 @@ applyPomoDurations();
     || window.innerWidth <= 768;
   if (isMobile && !data.mobileMode) {
     data.mobileMode = true;
-    save();
+    finSave();
   }
   if (!isMobile && data.mobileMode === undefined) {
     data.mobileMode = false;
@@ -12534,9 +12534,9 @@ if (data.mobileMode) applyMobileMode();
 window.addEventListener('resize', () => {
   const isMobile = window.innerWidth <= 768;
   if (isMobile && !data.mobileMode) {
-    data.mobileMode = true; save(); applyMobileMode();
+    data.mobileMode = true; finSave(); applyMobileMode();
   } else if (!isMobile && data.mobileMode) {
-    data.mobileMode = false; save(); applyMobileMode();
+    data.mobileMode = false; finSave(); applyMobileMode();
   }
 });
 applyModules();
@@ -12607,17 +12607,17 @@ let ficheFilter = { env: 'all', poche: null, statut: null };
 let geoChart = null, sectorChart = null, projChart = null;
 
 // ===== INIT =====
-function init() {
+function finInit() {
   const saved = localStorage.getItem('finance_v1');
   FD = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(DEFAULT_DATA));
-  renderAll();
+  finRenderAll();
 }
 
-function save() {
+function finSave() {
   localStorage.setItem('finance_v1', JSON.stringify(D));
 }
 
-function renderAll() {
+function finRenderAll() {
   // Settings
   document.getElementById('set-dca').value       = FD.settings.dca_mensuel || 300;
   document.getElementById('set-capital').value   = FD.settings.capital_depart || 1000;
@@ -12632,12 +12632,12 @@ function renderAll() {
   document.getElementById('notes-area').value = FD.notes || '';
 }
 
-function saveSettings() {
+function finSaveSettings() {
   FD.settings.dca_mensuel    = parseFloat(document.getElementById('set-dca').value) || 300;
   FD.settings.capital_depart = parseFloat(document.getElementById('set-capital').value) || 1000;
   FD.settings.rendement_vise = parseFloat(document.getElementById('set-rendement').value) || 15;
-  save();
-  renderAll();
+  finSave();
+  finRenderAll();
 }
 
 // ===== OVERVIEW =====
@@ -12778,7 +12778,7 @@ function updateValeur(env, id, val) {
   const asset = FD[env].find(a => a.id === id);
   if (asset) {
     asset.valeur_actuelle = parseFloat(val) || 0;
-    save();
+    finSave();
     renderPortfolio(env);
     renderOverview();
     renderStrategie();
@@ -12864,17 +12864,17 @@ function saveAsset() {
   } else {
     FD[editingEnv].push(asset);
   }
-  save();
+  finSave();
   closeModal();
-  renderAll();
+  finRenderAll();
 }
 
 function deleteAsset() {
   if (!confirm('Supprimer cet actif ?')) return;
   FD[editingEnv] = FD[editingEnv].filter(a => a.id !== editingAsset);
-  save();
+  finSave();
   closeModal();
-  renderAll();
+  finRenderAll();
 }
 
 // ===== FICHES =====
@@ -13068,7 +13068,7 @@ function editRule(idx) {
   if (newText === null) return;
   FD.rules[idx].title = newTitle;
   FD.rules[idx].text  = newText;
-  save();
+  finSave();
   renderStrategie();
 }
 
@@ -13080,13 +13080,13 @@ function editPhase(idx) {
   if (newText === null) return;
   FD.phases[idx].title = newTitle;
   FD.phases[idx].text  = newText;
-  save();
+  finSave();
   renderStrategie();
 }
 
 function saveNotes() {
   FD.notes = document.getElementById('notes-area').value;
-  save();
+  finSave();
 }
 
 // ===== NAVIGATION =====
@@ -13119,8 +13119,8 @@ function importData(event) {
   reader.onload = e => {
     try {
       FD = JSON.parse(e.target.result);
-      save();
-      renderAll();
+      finSave();
+      finRenderAll();
       alert('✅ Données importées !');
     } catch(err) { alert('❌ Fichier invalide'); }
   };
@@ -13129,13 +13129,13 @@ function importData(event) {
 
 function resetData() {
   FD = JSON.parse(JSON.stringify(DEFAULT_DATA));
-  save();
-  renderAll();
+  finSave();
+  finRenderAll();
   alert('✅ Données réinitialisées');
 }
 
 // ===== START =====
-init();
+finInit();
 
 
 // ===== FINANCE NAV =====
@@ -13152,7 +13152,7 @@ function saveSettingsP() {
   FD.settings.capital_depart = parseFloat(document.getElementById('sp-capital')?.value)||1033;
   FD.settings.rendement_vise = parseFloat(document.getElementById('sp-rendement')?.value)||15;
   FD.settings.objectif_20ans = parseFloat(document.getElementById('sp-objectif')?.value)||620000;
-  save(); syncSettings(); renderAll();
+  finSave(); finSyncSettings(); finRenderAll();
 }
 
 // ===================== DONNÉES PAR DÉFAUT =====================
@@ -13194,18 +13194,12 @@ const FIN_DEF = {
 let _fin_fin_editEnv = null, _fin_editId = null;
 let _finGeoChart=null,_finSecChart=null,_finProjChart=null,_finPeaChart=null,_finCtoChart=null,_finSparkChart=null;
 
-function init(){
-  const s = localStorage.getItem('fin2_v1');
-  FD = s ? JSON.parse(s) : JSON.parse(JSON.stringify(FIN_DEF));
-  syncSettings();
-  renderAll();
-}
 
-function save(){
+function finSave(){
   localStorage.setItem('fin2_v1', JSON.stringify(D));
 }
 
-function syncSettings(){
+function finSyncSettings(){
   const s = FD.settings;
   document.getElementById('s-dca').value       = s.dca_mensuel||300;
   document.getElementById('s-capital').value   = s.capital_depart||1033;
@@ -13216,15 +13210,15 @@ function syncSettings(){
   document.getElementById('proj-taux').value   = s.rendement_vise||15;
 }
 
-function saveSettings(){
+function finSaveSettings(){
   FD.settings.dca_mensuel    = parseFloat(document.getElementById('s-dca').value)||300;
   FD.settings.capital_depart = parseFloat(document.getElementById('s-capital').value)||1033;
   FD.settings.rendement_vise = parseFloat(document.getElementById('s-rendement').value)||15;
   FD.settings.objectif_20ans = parseFloat(document.getElementById('s-objectif').value)||620000;
-  save(); syncSettings(); renderAll();
+  finSave(); finSyncSettings(); finRenderAll();
 }
 
-function renderAll(){
+function finRenderAll(){
   renderOverview();
   renderTable('pea');
   renderTable('cto');
@@ -13379,8 +13373,8 @@ function updateField(env,id,field,rawVal){
     FD.history.push({d:new Date().toISOString().slice(0,10),v:totVal});
     if(FD.history.length>12)FD.history=FD.history.slice(-12);
   }
-  save();
-  renderAll();
+  finSave();
+  finRenderAll();
 }
 
 // ===================== GRAPHIQUES =====================
@@ -13531,19 +13525,19 @@ function saveAsset(){
   };
   if(_fin_editId){const i=FD[_fin_editEnv].findIndex(a=>a.id===_fin_editId);if(i>=0)FD[_fin_editEnv][i]=asset;}
   else FD[_fin_editEnv].push(asset);
-  save(); closeModal(); renderAll();
+  finSave(); closeModal(); finRenderAll();
 }
 function deleteAsset(){
   if(!confirm('Supprimer cet actif ?'))return;
   FD[_fin_editEnv]=FD[_fin_editEnv].filter(a=>a.id!==_fin_editId);
-  save(); closeModal(); renderAll();
+  finSave(); closeModal(); finRenderAll();
 }
 function confirmDelete(env,id){
   const a=FD[env].find(x=>x.id===id);
   if(!a)return;
   if(!confirm('Supprimer "'+a.nom+'" ?'))return;
   FD[env]=FD[env].filter(x=>x.id!==id);
-  save(); renderAll();
+  finSave(); finRenderAll();
 }
 
 // ===================== NAV =====================
@@ -13564,16 +13558,16 @@ function exportJSON(){
 function importJSON(e){
   const f=e.target.files[0];if(!f)return;
   const r=new FileReader();
-  r.onload=ev=>{try{FD=JSON.parse(ev.target.result);save();renderAll();syncSettings();alert('✅ Importé !');}catch{alert('❌ Fichier invalide');}};
+  r.onload=ev=>{try{FD=JSON.parse(ev.target.result);finSave();finRenderAll();finSyncSettings();alert('✅ Importé !');}catch{alert('❌ Fichier invalide');}};
   r.readAsText(f);
 }
 function resetConfirm(){
   if(!confirm('Remettre les données par défaut ?'))return;
   if(!confirm('Confirmé ? Toutes tes données seront effacées.'))return;
-  FD=JSON.parse(JSON.stringify(FIN_DEF));save();renderAll();syncSettings();
+  FD=JSON.parse(JSON.stringify(FIN_DEF));finSave();finRenderAll();finSyncSettings();
 }
 
-init();
+finInit();
 
 // ==================== PWA ====================
 if ('serviceWorker' in navigator) {
